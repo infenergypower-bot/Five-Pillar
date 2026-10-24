@@ -14,7 +14,7 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:bootstrap-admin": "node prisma/bootstrap-admin.mjs",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",

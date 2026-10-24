@@ -64,12 +64,14 @@ async function main() {
     "clients.read", "clients.write", "costs.read", "costs.write", "quotes.approve",
     "margin.override", "projects.write", "finance.write", "ip.write", "integrations.write",
   ];
+  const persistedPermissions = new Map<string, string>();
   for (const key of permissions) {
-    await prisma.permission.upsert({
+    const permission = await prisma.permission.upsert({
       where: { key },
       update: {},
       create: { id: `seed-permission-${key}`, key, description: `Seed permission: ${key}` },
     });
+    persistedPermissions.set(key, permission.id);
   }
   const founderRole = await prisma.accessRole.upsert({
     where: { organizationId_name: { organizationId: organization.id, name: "Founder" } },
@@ -88,10 +90,12 @@ async function main() {
     create: { userId: founder.id, roleId: founderRole.id },
   });
   for (const key of permissions) {
+    const permissionId = persistedPermissions.get(key);
+    if (!permissionId) throw new Error(`Permission ${key} was not persisted`);
     await prisma.rolePermission.upsert({
-      where: { roleId_permissionId: { roleId: founderRole.id, permissionId: `seed-permission-${key}` } },
+      where: { roleId_permissionId: { roleId: founderRole.id, permissionId } },
       update: {},
-      create: { roleId: founderRole.id, permissionId: `seed-permission-${key}` },
+      create: { roleId: founderRole.id, permissionId },
     });
   }
 
