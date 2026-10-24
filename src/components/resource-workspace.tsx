@@ -4,7 +4,7 @@ import { AlertCircle, CheckCircle2, LoaderCircle, Plus, RefreshCw, X } from "luc
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ModuleDefinition, ResourceField } from "@/lib/modules";
-import { publicDemoMode } from "@/lib/demo-mode";
+import { useDemoMode } from "@/components/demo-mode-provider";
 
 type RecordValue = string | number | boolean | null | undefined | Record<string, unknown>;
 type ResourceRecord = Record<string, RecordValue>;
@@ -41,6 +41,7 @@ function Field({ field }: { field: ResourceField }) {
 }
 
 export function ResourceWorkspace({ module }: { module: ModuleDefinition }) {
+  const demoMode = useDemoMode();
   const [records, setRecords] = useState<ResourceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -121,7 +122,7 @@ export function ResourceWorkspace({ module }: { module: ModuleDefinition }) {
         <div><span className="kicker">{module.eyebrow}</span><h1>{module.title}</h1><p>{module.description}</p></div>
         <div className="module-actions">
           <button className="secondary-button" onClick={() => void load()} type="button"><RefreshCw size={15} /> Refresh</button>
-          {module.fields && !publicDemoMode && <button className="primary-button" onClick={() => setCreating(true)} type="button"><Plus size={15} /> {module.createLabel}</button>}
+          {module.fields && !demoMode && <button className="primary-button" onClick={() => setCreating(true)} type="button"><Plus size={15} /> {module.createLabel}</button>}
         </div>
       </section>
 
@@ -132,7 +133,7 @@ export function ResourceWorkspace({ module }: { module: ModuleDefinition }) {
         <article className="panel resource-panel">
           <header><div><span className="kicker">Persisted records</span><h2>{module.title}</h2></div><span className="count-badge">{records.length}</span></header>
           {loading ? <div className="empty-state"><LoaderCircle className="spin" size={25} /><strong>Loading authorized records</strong></div> :
-            rows.length === 0 ? <div className="empty-state"><strong>No records available</strong><span>{publicDemoMode ? "No demonstration records are available in this section." : "Create the first authorized record or adjust your filters."}</span></div> :
+            rows.length === 0 ? <div className="empty-state"><strong>No records available</strong><span>{demoMode ? "No demonstration records are available in this section." : "Create the first authorized record or adjust your filters."}</span></div> :
               <div className="data-table" role="table">
                 <div className="data-row data-head" role="row">{module.columns.map((column) => <span key={column}>{column.replaceAll(/([A-Z])/g, " $1")}</span>)}</div>
                 {rows.map(({ id, record }) => <div className="data-row" role="row" key={id}>{module.columns.map((column) => <span key={column} data-label={column}>{display(record[column])}</span>)}</div>)}
@@ -141,7 +142,7 @@ export function ResourceWorkspace({ module }: { module: ModuleDefinition }) {
         <aside className="panel guidance-panel"><span className="kicker">Operating controls</span><h2>Built-in safeguards</h2>{module.guidance.map((item) => <p key={item}><CheckCircle2 size={15} />{item}</p>)}</aside>
       </section>
 
-      {creating && module.fields && !publicDemoMode && <div className="modal-backdrop" role="presentation" onMouseDown={() => setCreating(false)}>
+      {creating && module.fields && !demoMode && <div className="modal-backdrop" role="presentation" onMouseDown={() => setCreating(false)}>
         <section className="modal-card" role="dialog" aria-modal="true" aria-labelledby="create-title" onMouseDown={(event) => event.stopPropagation()}>
           <header><div><span className="kicker">New persisted record</span><h2 id="create-title">{module.createLabel}</h2></div><button aria-label="Close" className="icon-button" onClick={() => setCreating(false)} type="button"><X size={18} /></button></header>
           <form action={create} className="resource-form">

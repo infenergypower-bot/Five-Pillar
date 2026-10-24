@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, CheckCircle2, CircleDollarSign, Film, LoaderCircle, Sparkles, TriangleAlert, Users } from "lucide-react";
 import Link from "next/link";
-import { publicDemoMode } from "@/lib/demo-mode";
+import { useDemoMode } from "@/components/demo-mode-provider";
 import { useEffect, useState } from "react";
 
 interface DashboardData {
@@ -17,6 +17,44 @@ interface DashboardData {
   projects?: Array<{ id: string; title: string; client?: string; status: string; dueAt?: string; progress?: number }>;
 }
 
+interface DashboardResponse {
+  leads: Record<string, number>;
+  projects: Record<string, number>;
+  quotes: Record<string, number>;
+  invoices: Array<{ billed: string; collected: string }>;
+  recentProjects: Array<{ id: string; title: string; client?: { displayName?: string } | null; status: string; dueAt?: string | null }>;
+}
+
+function currency(value: number): string {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+}
+
+function normalizeDashboard(data: DashboardResponse): DashboardData {
+  const inactiveStatuses = new Set(["COMPLETED", "ARCHIVED", "CANCELLED"]);
+  const activeProjects = Object.entries(data.projects).reduce((sum, [status, count]) => inactiveStatuses.has(status) ? sum : sum + count, 0);
+  const billed = data.invoices.reduce((sum, invoice) => sum + Number(invoice.billed), 0);
+  const collected = data.invoices.reduce((sum, invoice) => sum + Number(invoice.collected), 0);
+  const quotePipeline = Object.entries(data.quotes).filter(([status]) => !["ACCEPTED", "DECLINED", "EXPIRED", "ARCHIVED"].includes(status));
+  return {
+    pipelineValue: `${quotePipeline.reduce((sum, [, count]) => sum + count, 0)} quotes`,
+    qualifiedLeads: Object.values(data.leads).reduce((sum, count) => sum + count, 0),
+    contractedRevenue: currency(billed),
+    collectedRevenue: currency(collected),
+    activeProjects,
+    onTimeDeliveryRate: "Not tracked",
+    pipeline: quotePipeline.map(([stage, count]) => ({ stage: stage.replaceAll("_", " "), count, amount: `${count} quote${count === 1 ? "" : "s"}` })),
+    alerts: data.quotes.INTERNAL_REVIEW ? [{ title: "Quote awaiting review", detail: `${data.quotes.INTERNAL_REVIEW} quote requires an authorized decision.`, href: "/quotes" }] : [],
+    projects: data.recentProjects.map((project) => ({
+      id: project.id,
+      title: project.title,
+      client: project.client?.displayName,
+      status: project.status,
+      dueAt: project.dueAt ?? undefined,
+      progress: inactiveStatuses.has(project.status) ? 100 : 50,
+    })),
+  };
+}
+
 const metricDefinitions = [
   { key: "pipelineValue", label: "Active pipeline", detailKey: "qualifiedLeads", suffix: " qualified opportunities", icon: Users, tone: "teal" },
   { key: "contractedRevenue", label: "Contracted revenue", detailKey: "collectedRevenue", suffix: " collected", icon: CircleDollarSign, tone: "gold" },
@@ -25,6 +63,7 @@ const metricDefinitions = [
 ] as const;
 
 export function DashboardOverview() {
+  const demoMode = useDemoMode();
   const [data, setData] = useState<DashboardData>();
   const [error, setError] = useState("");
 
@@ -32,9 +71,10 @@ export function DashboardOverview() {
     const controller = new AbortController();
     fetch("/api/dashboard", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
-        const body = await response.json() as DashboardData & { error?: string; data?: DashboardData };
+        const body = await response.json() as { error?: string; data?: DashboardResponse };
         if (!response.ok) throw new Error(body.error ?? `Dashboard failed with HTTP ${response.status}.`);
-        setData(body.data ?? body);
+        if (!body.data) throw new Error("Dashboard response did not include data.");
+        setData(normalizeDashboard(body.data));
       })
       .catch((cause: unknown) => {
         if (cause instanceof DOMException && cause.name === "AbortError") return;
@@ -44,7 +84,7 @@ export function DashboardOverview() {
   }, []);
 
   if (!data && !error) return <div className="dashboard-loading"><LoaderCircle className="spin" /><span>Loading live operations</span></div>;
-  if (error) return <section className="system-message error"><TriangleAlert size={18} /><span>{error}</span>{!publicDemoMode && <Link href="/login">Sign in</Link>}</section>;
+  if (error) return <section className="system-message error"><TriangleAlert size={18} /><span>{error}</span>{!demoMode && <Link href="/login">Sign in</Link>}</section>;
 
   return (
     <>

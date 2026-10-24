@@ -4,7 +4,7 @@ import Decimal from "decimal.js";
 import { ArrowLeft, Check, CircleAlert, Plus, Save } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { publicDemoMode } from "@/lib/demo-mode";
+import { useDemoMode } from "@/components/demo-mode-provider";
 
 const roles = [
   { activity: "Discovery & strategy", role: "Founder", hours: 4, rate: 75 },
@@ -19,6 +19,7 @@ function money(value: Decimal) {
 }
 
 export function QuoteBuilder() {
+  const demoMode = useDemoMode();
   const [projectTitle, setProjectTitle] = useState("New production");
   const [clientId, setClientId] = useState("");
   const [servicePath, setServicePath] = useState("VISUAL_PRODUCTION");
@@ -150,7 +151,7 @@ export function QuoteBuilder() {
     <div className="quote-page">
       <div className="quote-heading">
         <div><Link href="/quotes"><ArrowLeft size={16} /> Quotes</Link><h1>{projectTitle}</h1><p>{quoteId ? `Saved draft · ${quoteId}` : "Unsaved draft"}</p></div>
-        <div>{publicDemoMode ? <span className="count-badge">Simulation only · changes are not saved</span> : <><button className="secondary-button" disabled={working} onClick={() => void saveDraft().catch(() => undefined)} type="button"><Save size={16} /> Save draft</button><button className="primary-button" disabled={working || belowMinimum} onClick={() => void requestApproval()} type="button">Request approval</button></>}</div>
+        <div>{demoMode ? <span className="count-badge">Simulation only · changes are not saved</span> : <><button className="secondary-button" disabled={working} onClick={() => void saveDraft().catch(() => undefined)} type="button"><Save size={16} /> Save draft</button><button className="primary-button" disabled={working || belowMinimum} onClick={() => void requestApproval()} type="button">Request approval</button></>}</div>
       </div>
       {error && <div className="system-message error"><CircleAlert size={17} />{error}</div>}
       {notice && <div className="system-message success"><Check size={17} />{notice}</div>}
@@ -190,7 +191,7 @@ export function QuoteBuilder() {
             <div className="total"><dt>All-in cost</dt><dd>{money(result.cost)}</dd></div><div className="profit"><dt>Expected profit</dt><dd>{money(result.profit)}</dd></div>
           </dl>
           <div className="targets"><p><span>Minimum · 50%</span><strong>{money(result.cost.div(0.5))}</strong></p><p><span>Recommended · 55%</span><strong>{money(result.cost.div(0.45))}</strong></p><p><span>Premium · 60%</span><strong>{money(result.cost.div(0.4))}</strong></p></div>
-          {!publicDemoMode && <button className="primary-button wide" disabled={belowMinimum || working} onClick={() => void generateProposal()} type="button">Generate proposal</button>}
+          {!demoMode && <button className="primary-button wide" disabled={belowMinimum || working} onClick={() => void generateProposal()} type="button">Generate proposal</button>}
           <small>Internal costs and margins never appear in the client proposal.</small>
         </aside>
       </div>

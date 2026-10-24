@@ -3,7 +3,7 @@
 import { Check, Download, RefreshCw, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { publicDemoMode } from "@/lib/demo-mode";
+import { useDemoMode } from "@/components/demo-mode-provider";
 
 type RecordData = Record<string, unknown>;
 
@@ -21,13 +21,14 @@ function message(body: unknown, fallback: string): string {
 }
 
 export function WorkflowActions({ module, id, record }: { module: string; id: string; record: RecordData }) {
+  const demoMode = useDemoMode();
   const router = useRouter();
   const [status, setStatus] = useState(String(record.status ?? ""));
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [working, setWorking] = useState(false);
 
-  if (publicDemoMode) {
+  if (demoMode) {
     return (
       <section className="panel workflow-panel">
         <header><div><span className="kicker">Read-only demonstration</span><h2>Workflow actions</h2></div></header>

@@ -54,8 +54,8 @@ npm audit
 
 `/api/health` is the fast Railway liveness endpoint. `/api/ready` verifies PostgreSQL connectivity for operational readiness monitoring.
 
-Set both `DEMO_MODE=true` and `NEXT_PUBLIC_DEMO_MODE=true` to expose the seeded
-workspace without a sign-in screen. Demo mode supplies a read-only principal,
+Set `DEMO_MODE=true` to expose the seeded workspace without a sign-in screen.
+Demo mode supplies a read-only principal,
 hides persistence controls, and rejects non-read API methods with HTTP 403.
 
 For a new empty production database, set `BOOTSTRAP_ADMIN_EMAIL` and a temporary

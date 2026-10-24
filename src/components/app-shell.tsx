@@ -8,7 +8,7 @@ import {
   Search, Settings2, Sparkles, UsersRound, WandSparkles, Workflow,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { publicDemoMode } from "@/lib/demo-mode";
+import { useDemoMode } from "@/components/demo-mode-provider";
 
 const navigation = [
   { label: "Command center", href: "/", icon: Gauge },
@@ -37,6 +37,7 @@ const intelligence = [
 
 export function AppShell({ children, title, eyebrow }: { children: ReactNode; title: string; eyebrow: string }) {
   const pathname = usePathname();
+  const demoMode = useDemoMode();
   const links = (items: typeof navigation) => items.map(({ label, href, icon: Icon }) => (
     <Link className={pathname === href || (href !== "/" && pathname.startsWith(`${href}/`)) ? "active" : ""} href={href} key={label}>
       <Icon size={17} />{label}
@@ -46,7 +47,7 @@ export function AppShell({ children, title, eyebrow }: { children: ReactNode; ti
   return (
     <div className="app-frame">
       <aside className="sidebar">
-        <Link className="brand" href="/"><div className="brand-symbol"><i /><i /><i /><i /><i /></div><div><strong>PILLAR ONE</strong><span>{publicDemoMode ? "READ-ONLY DEMO" : "OPERATING SYSTEM"}</span></div></Link>
+        <Link className="brand" href="/"><div className="brand-symbol"><i /><i /><i /><i /><i /></div><div><strong>PILLAR ONE</strong><span>{demoMode ? "READ-ONLY DEMO" : "OPERATING SYSTEM"}</span></div></Link>
         <nav>
           <p>Workspace</p>
           {links(navigation)}
@@ -56,7 +57,7 @@ export function AppShell({ children, title, eyebrow }: { children: ReactNode; ti
           <Link className={pathname === "/settings" ? "active" : ""} href="/settings"><Settings2 size={17} />Settings</Link>
           <Link className={pathname === "/portal" ? "active" : ""} href="/portal"><UsersRound size={17} />Client portal</Link>
         </nav>
-        <div className="sidebar-foot"><div className="avatar">P1</div><div><strong>{publicDemoMode ? "Demo workspace" : "Authorized workspace"}</strong><span>{publicDemoMode ? "View only" : "Role-scoped access"}</span></div>{!publicDemoMode && <ChevronDown size={15} />}</div>
+        <div className="sidebar-foot"><div className="avatar">P1</div><div><strong>{demoMode ? "Demo workspace" : "Authorized workspace"}</strong><span>{demoMode ? "View only" : "Role-scoped access"}</span></div>{!demoMode && <ChevronDown size={15} />}</div>
       </aside>
       <main className="workspace">
         <header className="topbar">
