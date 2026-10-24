@@ -9,13 +9,16 @@ import {
   CircleAlert,
   FileCheck2,
   LoaderCircle,
+  Plus,
   RefreshCw,
   Save,
   ShieldCheck,
   Sparkles,
   Users,
+  X,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDemoMode } from "@/components/demo-mode-provider";
 
@@ -38,6 +41,15 @@ interface DiscoveryListItem {
   client?: { displayName: string } | null;
   project?: { title: string; status: string } | null;
   _count: { answers: number; materials: number; clarifications: number; risks: number };
+}
+
+interface ClientListItem {
+  id: string;
+  displayName: string;
+}
+
+interface ClientPage {
+  items: ClientListItem[];
 }
 
 interface DiscoveryOption {
@@ -160,8 +172,12 @@ function ReadinessBadge({ status }: { status: string }) {
 
 export function DiscoveryWorkspace() {
   const demoMode = useDemoMode();
+  const router = useRouter();
   const [sessions, setSessions] = useState<DiscoveryListItem[]>([]);
+  const [clients, setClients] = useState<ClientListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -192,6 +208,33 @@ export function DiscoveryWorkspace() {
     average: sessions.length ? Math.round(sessions.reduce((sum, session) => sum + session.completeness, 0) / sessions.length) : 0,
   }), [sessions]);
 
+  async function openCreator() {
+    setError("");
+    try {
+      setClients((await getJson<ClientPage>("/api/clients?limit=100")).items);
+      setCreating(true);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to load clients for the new intake.");
+    }
+  }
+
+  async function createIntake(formData: FormData) {
+    setSaving(true);
+    setError("");
+    try {
+      const intake = await sendJson<{ id: string }>("/api/intakes", "POST", {
+        clientId: String(formData.get("clientId") ?? ""),
+        servicePath: String(formData.get("servicePath") ?? ""),
+      });
+      setCreating(false);
+      router.push(`/intake/${encodeURIComponent(intake.id)}`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to create the intake.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <>
       <section className="module-hero discovery-hero">
@@ -200,7 +243,10 @@ export function DiscoveryWorkspace() {
           <h1>Adaptive discovery</h1>
           <p>Relevant questions only, deterministic production gates, verified answer reuse, and structured briefs.</p>
         </div>
-        <button className="secondary-button" onClick={() => void load()} type="button"><RefreshCw size={15} /> Refresh</button>
+        <div className="module-actions">
+          <button className="secondary-button" onClick={() => void load()} type="button"><RefreshCw size={15} /> Refresh</button>
+          {!demoMode && <button className="primary-button" onClick={() => void openCreator()} type="button"><Plus size={15} /> Start new intake</button>}
+        </div>
       </section>
       {!demoMode && <div className="discovery-callout"><ShieldCheck size={18} /><div><strong>Production workspace</strong><span>Create, update, verify, and advance discovery records without signing in.</span></div></div>}
       {error && <div className="system-message error"><AlertCircle size={18} />{error}</div>}
@@ -233,6 +279,18 @@ export function DiscoveryWorkspace() {
           </div>}
       </section>
       {!demoMode && <AdminQuestionBank />}
+      {creating && !demoMode && <div className="modal-backdrop" role="presentation" onMouseDown={() => setCreating(false)}>
+        <section className="modal-card intake-creator" role="dialog" aria-modal="true" aria-labelledby="intake-create-title" onMouseDown={(event) => event.stopPropagation()}>
+          <header><div><span className="kicker">New customer discovery</span><h2 id="intake-create-title">Start adaptive intake</h2></div><button aria-label="Close" className="icon-button" onClick={() => setCreating(false)} type="button"><X size={18} /></button></header>
+          <p className="modal-intro">Choose the client and service path. Pillar One will open the correct question branches and preserve progress automatically.</p>
+          <form action={createIntake} className="resource-form">
+            <label>Client<select name="clientId" required defaultValue=""><option value="" disabled>Select a client…</option>{clients.map((client) => <option key={client.id} value={client.id}>{client.displayName}</option>)}</select></label>
+            <label>Service path<select name="servicePath" required defaultValue=""><option value="" disabled>Select a service…</option><option value="VISUAL_PRODUCTION">Visual production</option><option value="MANAGED_MARKETING">Managed marketing</option><option value="COMBINED">Combined studio + marketing</option><option value="ORIGINAL_ENTERTAINMENT">Original entertainment</option><option value="CUSTOM">Custom or not yet determined</option></select></label>
+            <div className="intake-path-note"><Sparkles size={17} /><span>The selected path initializes conditional discovery. You can refine requirements inside the new session.</span></div>
+            <div className="form-actions"><button className="secondary-button" onClick={() => setCreating(false)} type="button">Cancel</button><button className="primary-button" disabled={saving} type="submit">{saving ? <LoaderCircle className="spin" size={15} /> : <Plus size={15} />} Create and open intake</button></div>
+          </form>
+        </section>
+      </div>}
     </>
   );
 }

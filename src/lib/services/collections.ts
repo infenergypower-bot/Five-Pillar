@@ -184,6 +184,39 @@ export async function createIntake(principal: AuthPrincipal, raw: unknown) {
         status: true, completeness: true, readiness: true, submittedAt: true, createdAt: true, updatedAt: true,
       },
     });
+    await tx.serviceSelection.create({
+      data: { intakeId: intake.id, servicePath: input.servicePath },
+    });
+    const servicePathQuestion = await tx.questionDefinition.findFirst({
+      where: { section: { versionId: questionnaire.id }, key: "service_path", active: true },
+      select: { id: true },
+    });
+    if (servicePathQuestion) {
+      const answer = await tx.intakeAnswer.create({
+        data: {
+          intakeId: intake.id,
+          questionId: servicePathQuestion.id,
+          value: [input.servicePath],
+          source: "AUTHORIZED_STAFF",
+          verificationStatus: "STAFF_VERIFIED",
+          verifiedById: principal.userId,
+          verifiedAt: new Date(),
+          answeredById: principal.userId,
+          isDraft: true,
+        },
+      });
+      await tx.intakeAnswerRevision.create({
+        data: {
+          answerId: answer.id,
+          version: 1,
+          value: [input.servicePath],
+          source: "AUTHORIZED_STAFF",
+          verificationStatus: "STAFF_VERIFIED",
+          changedById: principal.userId,
+          changeReason: "Initialized from intake service selection",
+        },
+      });
+    }
     await audit(tx, principal, "intake.created", "Intake", intake.id, { status: intake.status, servicePath: intake.servicePath });
     return intake;
   });
