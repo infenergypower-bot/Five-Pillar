@@ -409,7 +409,7 @@ export function DiscoverySession({ id }: { id: string }) {
     const answers = section.questions.filter((question) => values[question.id] !== undefined).map((question) => ({
       questionId: question.id,
       value: values[question.id],
-      source: "STAFF_INTERVIEW",
+      source: "AUTHORIZED_STAFF",
       verificationStatus: "STAFF_VERIFIED",
     }));
     if (!answers.length) return;
