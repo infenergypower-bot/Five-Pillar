@@ -375,6 +375,7 @@ export async function saveDiscoveryAnswers(principal: AuthPrincipal, id: string,
       const question = questionMap.get(candidate.questionId);
       if (!question) throw new ServiceError("INVALID_QUESTION", "Question is not part of this discovery version", 400);
       const prior = await tx.intakeAnswer.findUnique({ where: { intakeId_questionId: { intakeId: id, questionId: candidate.questionId } } });
+      if (prior && JSON.stringify(prior.value) === JSON.stringify(candidate.value)) continue;
       const version = (prior?.version ?? 0) + 1;
       const verificationStatus = principal.role === "CLIENT"
         ? VerificationStatus.UNVERIFIED
