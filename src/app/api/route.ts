@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export function GET() {
   return NextResponse.json({
-    name: "Five Pillar operational API",
+    name: "Pillar One operational API",
     envelope: { success: { data: "..." }, failure: { error: { code: "...", message: "...", details: "optional" } } },
     authentication: "Opaque database session in an HttpOnly cookie. Mutations require JSON.",
     collections: {

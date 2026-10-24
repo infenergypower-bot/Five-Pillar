@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Five Pillar OS",
+  title: "Pillar One",
   description: "Client, production, and profitability operations for Five Pillar Tech Ventures.",
 };
 

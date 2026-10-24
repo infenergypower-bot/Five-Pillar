@@ -19,6 +19,8 @@ const schema = z.object({
   ALPHI_API_URL: optionalUrl,
   ALPHI_API_KEY: z.string().optional(),
   JOB_RUNNER_SECRET: z.string().min(32).optional(),
+  DEMO_MODE: z.enum(["true", "false"]).optional(),
+  NEXT_PUBLIC_DEMO_MODE: z.enum(["true", "false"]).optional(),
 });
 
 export type AppEnvironment = z.infer<typeof schema>;

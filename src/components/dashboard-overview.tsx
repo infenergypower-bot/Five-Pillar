@@ -2,6 +2,7 @@
 
 import { ArrowUpRight, CheckCircle2, CircleDollarSign, Film, LoaderCircle, Sparkles, TriangleAlert, Users } from "lucide-react";
 import Link from "next/link";
+import { publicDemoMode } from "@/lib/demo-mode";
 import { useEffect, useState } from "react";
 
 interface DashboardData {
@@ -43,7 +44,7 @@ export function DashboardOverview() {
   }, []);
 
   if (!data && !error) return <div className="dashboard-loading"><LoaderCircle className="spin" /><span>Loading live operations</span></div>;
-  if (error) return <section className="system-message error"><TriangleAlert size={18} /><span>{error}</span><Link href="/login">Sign in</Link></section>;
+  if (error) return <section className="system-message error"><TriangleAlert size={18} /><span>{error}</span>{!publicDemoMode && <Link href="/login">Sign in</Link>}</section>;
 
   return (
     <>

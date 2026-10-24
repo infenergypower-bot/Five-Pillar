@@ -121,6 +121,6 @@ export async function renderProposalPdf(input: ClientProposalDocument): Promise<
   document.setTitle(`${input.projectTitle} - Proposal`);
   document.setAuthor("Five Pillar Tech Ventures");
   document.setSubject("Client proposal");
-  document.setCreator("Five Pillar Client & Production OS");
+  document.setCreator("Pillar One");
   return document.save();
 }

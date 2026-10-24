@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import type { Role } from "@prisma/client";
 import type { Principal } from "@/lib/authorization";
 import { db } from "@/lib/db";
+import { demoModeEnabled } from "@/lib/demo-mode";
 import { createOpaqueToken, hashOpaqueToken } from "./tokens";
 
 export const SESSION_COOKIE = "__Host-five-pillar-session";
@@ -51,6 +52,22 @@ export async function readSessionToken(): Promise<string | undefined> {
 
 export async function getPrincipal(): Promise<AuthPrincipal | null> {
   const token = await readSessionToken();
+  if (!token && demoModeEnabled()) {
+    const demoUser = await db.user.findFirst({
+      where: { organization: { slug: "five-pillar" }, role: "SUPER_ADMIN", active: true },
+      orderBy: { createdAt: "asc" },
+    });
+    if (!demoUser) return null;
+    return {
+      sessionId: "read-only-demo",
+      userId: demoUser.id,
+      organizationId: demoUser.organizationId,
+      role: demoUser.role,
+      name: "Demo workspace",
+      email: demoUser.email,
+      assignedProjectIds: [],
+    };
+  }
   if (!token) return null;
   const now = new Date();
   const session = await db.session.findUnique({
@@ -63,7 +80,26 @@ export async function getPrincipal(): Promise<AuthPrincipal | null> {
       },
     },
   });
-  if (!session || session.revokedAt || session.expiresAt <= now || !session.user.active) return null;
+  if (!session || session.revokedAt || session.expiresAt <= now || !session.user.active) {
+    if (demoModeEnabled()) {
+      const demoUser = await db.user.findFirst({
+        where: { organization: { slug: "five-pillar" }, role: "SUPER_ADMIN", active: true },
+        orderBy: { createdAt: "asc" },
+      });
+      if (demoUser) {
+        return {
+          sessionId: "read-only-demo",
+          userId: demoUser.id,
+          organizationId: demoUser.organizationId,
+          role: demoUser.role,
+          name: "Demo workspace",
+          email: demoUser.email,
+          assignedProjectIds: [],
+        };
+      }
+    }
+    return null;
+  }
 
   const client =
     session.user.role === "CLIENT"

@@ -3,6 +3,7 @@
 import { Check, Download, RefreshCw, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { publicDemoMode } from "@/lib/demo-mode";
 
 type RecordData = Record<string, unknown>;
 
@@ -25,6 +26,15 @@ export function WorkflowActions({ module, id, record }: { module: string; id: st
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [working, setWorking] = useState(false);
+
+  if (publicDemoMode) {
+    return (
+      <section className="panel workflow-panel">
+        <header><div><span className="kicker">Read-only demonstration</span><h2>Workflow actions</h2></div></header>
+        <p className="workflow-note">Transitions and approvals are disabled while you explore the Pillar One demo.</p>
+      </section>
+    );
+  }
 
   async function post(path: string, payload?: Record<string, unknown>) {
     setWorking(true);
