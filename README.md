@@ -62,7 +62,7 @@ decisions.
 2. Add PostgreSQL.
 3. Configure every required variable from `.env.example`.
 4. Deploy using `Dockerfile` and `railway.toml`.
-5. Railway runs `npx prisma migrate deploy` before startup.
+5. Railway and the container startup both run the idempotent `prisma migrate deploy` command before the application starts.
 6. Configure `/api/health` as the health endpoint.
 7. Do not automatically seed production.
 
