@@ -57,6 +57,7 @@ npm audit
 Set `DEMO_MODE=true` to expose the seeded workspace without a sign-in screen.
 Demo mode supplies a read-only principal,
 hides persistence controls, and rejects non-read API methods with HTTP 403.
+The production container refreshes the idempotent demonstration dataset at startup only when demo mode is enabled.
 
 For a new empty production database, set `BOOTSTRAP_ADMIN_EMAIL` and a temporary
 `BOOTSTRAP_ADMIN_PASSWORD` of at least 14 characters, run
