@@ -24,6 +24,19 @@ function collection(body: unknown): ResourceRecord[] {
   return source && typeof source === "object" ? [source as ResourceRecord] : [];
 }
 
+function portalCollection(body: unknown): ResourceRecord[] {
+  if (!body || typeof body !== "object" || !("data" in body) || !body.data || typeof body.data !== "object") return [];
+  const data = body.data as Record<string, unknown>;
+  const projects = Array.isArray(data.projects) ? data.projects as Array<Record<string, unknown>> : [];
+  const proposals = Array.isArray(data.proposals) ? data.proposals as Array<Record<string, unknown>> : [];
+  const invoices = Array.isArray(data.invoices) ? data.invoices as Array<Record<string, unknown>> : [];
+  return [
+    ...projects.map((record) => ({ ...record, type: "Project", action: "View project", href: `/projects/${encodeURIComponent(String(record.id))}` })),
+    ...proposals.map((record) => ({ ...record, title: `Proposal ${record.id}`, type: "Proposal", action: "Review proposal", href: `/proposals/${encodeURIComponent(String(record.id))}` })),
+    ...invoices.map((record) => ({ ...record, title: String(record.number ?? record.id), type: "Invoice", action: "View invoice", href: `/invoices/${encodeURIComponent(String(record.id))}` })),
+  ];
+}
+
 function display(value: RecordValue): string {
   if (value === null || value === undefined || value === "") return "—";
   if (typeof value === "boolean") return value ? "Yes" : "No";
@@ -54,8 +67,8 @@ export function ResourceWorkspace({ module }: { module: ModuleDefinition }) {
     if (response.status === 401) throw new Error("Sign in is required to access this workspace.");
     const body: unknown = await response.json();
     if (!response.ok) throw new Error(errorMessage(body, `Request failed with HTTP ${response.status}.`));
-    return collection(body);
-  }, [module.endpoint]);
+    return module.slug === "portal" ? portalCollection(body) : collection(body);
+  }, [module.endpoint, module.slug]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -136,7 +149,7 @@ export function ResourceWorkspace({ module }: { module: ModuleDefinition }) {
             rows.length === 0 ? <div className="empty-state"><strong>No records available</strong><span>{demoMode ? "No demonstration records are available in this section." : "Create the first authorized record or adjust your filters."}</span></div> :
               <div className="data-table" role="table">
                 <div className="data-row data-head" role="row">{module.columns.map((column) => <span key={column}>{column.replaceAll(/([A-Z])/g, " $1")}</span>)}</div>
-                {rows.map(({ id, record }) => <Link className="data-row" href={`/${module.slug}/${encodeURIComponent(id)}`} role="row" key={id}>{module.columns.map((column) => <span key={column} data-label={column}>{display(record[column])}</span>)}</Link>)}
+                {rows.map(({ id, record }) => <Link className="data-row" href={typeof record.href === "string" ? record.href : `/${module.slug}/${encodeURIComponent(id)}`} role="row" key={id}>{module.columns.map((column) => <span key={column} data-label={column}>{display(record[column])}</span>)}</Link>)}
               </div>}
         </article>
         <aside className="panel guidance-panel"><span className="kicker">Operating controls</span><h2>Built-in safeguards</h2>{module.guidance.map((item) => <p key={item}><CheckCircle2 size={15} />{item}</p>)}</aside>
