@@ -31,7 +31,12 @@ export function assertClientSafe(value: unknown, path = "proposal"): void {
 function wrap(text: string, font: PDFFont, size: number, width: number): string[] {
   const lines: string[] = [];
   let current = "";
-  for (const word of text.replaceAll(/\s+/g, " ").trim().split(" ")) {
+  const printable = text
+    .replaceAll(/[—–]/g, "-")
+    .replaceAll(/[“”]/g, "\"")
+    .replaceAll(/[‘’]/g, "'")
+    .replaceAll("…", "...");
+  for (const word of printable.replaceAll(/\s+/g, " ").trim().split(" ")) {
     const candidate = current ? `${current} ${word}` : word;
     if (font.widthOfTextAtSize(candidate, size) <= width) {
       current = candidate;

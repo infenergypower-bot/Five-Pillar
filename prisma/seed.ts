@@ -12,6 +12,7 @@ import {
   InvoiceStatus,
   IPFormat,
   LedgerEntryType,
+  LeadStage,
   OutboxStatus,
   PaymentStatus,
   PrismaClient,
@@ -309,11 +310,17 @@ async function main() {
     },
   });
 
-  const createClient = async (id: string, displayName: string) =>
+  const createClient = async (id: string, displayName: string, industry: string, website: string) =>
     prisma.client.upsert({
       where: { id },
-      update: {},
-      create: { id, organizationId: organization.id, legalName: `${displayName} LLC`, displayName },
+      update: { legalName: `${displayName} LLC`, displayName, industry, website },
+      create: { id, organizationId: organization.id, legalName: `${displayName} LLC`, displayName, industry, website },
+    });
+  const createWonLead = async (id: string, businessName: string, contactName: string, path: ServicePath, opportunityValue: number) =>
+    prisma.lead.upsert({
+      where: { id },
+      update: { businessName, contactName, stage: LeadStage.WON, serviceInterests: [path], opportunityValue },
+      create: { id, organizationId: organization.id, ownerId: founder.id, businessName, contactName, email: `${id}@example.invalid`, source: "Pillar One demonstration", stage: LeadStage.WON, serviceInterests: [path], opportunityValue },
     });
   const createIntake = async (id: string, clientId: string, path: ServicePath, completeness: number) =>
     prisma.intake.upsert({
@@ -373,7 +380,8 @@ async function main() {
   };
 
   // Scenario A: accepted 30-second commercial through production, approval, delivery, and paid closeout.
-  const commercialClient = await createClient("seed-client-commercial", "Atlas Outdoor");
+  const commercialClient = await createClient("seed-client-commercial", "Atlas Outdoor", "Outdoor consumer goods", "https://atlas-outdoor.example");
+  await createWonLead("seed-lead-commercial", "Atlas Outdoor", "Morgan Lee", ServicePath.VISUAL_PRODUCTION, 2995);
   await prisma.brand.upsert({
     where: { id: "seed-brand-atlas" },
     update: {},
@@ -425,8 +433,8 @@ async function main() {
   });
   await prisma.proposalVersion.upsert({
     where: { proposalId_version: { proposalId: commercialProposal.id, version: 1 } },
-    update: {},
-    create: { proposalId: commercialProposal.id, version: 1, templateKey: "visual-production", sections: { scope: true, timeline: true, rights: true, paymentSchedule: ["50%", "25%", "25%"] } },
+    update: { sections: { scope: [{ description: "30-second cinematic production" }, { description: "One master and three platform cutdowns" }], timeline: true, rights: true, paymentSchedule: ["50%", "25%", "25%"], investment: { total: "2995.00", currency: "USD" } } },
+    create: { proposalId: commercialProposal.id, version: 1, templateKey: "visual-production", sections: { scope: [{ description: "30-second cinematic production" }, { description: "One master and three platform cutdowns" }], timeline: true, rights: true, paymentSchedule: ["50%", "25%", "25%"], investment: { total: "2995.00", currency: "USD" } } },
   });
   const commercialProject = await prisma.project.upsert({
     where: { quoteId: commercialQuote.id },
@@ -464,8 +472,8 @@ async function main() {
   for (const [index, type] of [ApprovalType.CONCEPT, ApprovalType.SCRIPT, ApprovalType.STORYBOARD, ApprovalType.FINAL_CUT, ApprovalType.FINAL_DELIVERY].entries()) {
     await prisma.approval.upsert({
       where: { id: `seed-approval-commercial-${index}` },
-      update: {},
-      create: { id: `seed-approval-commercial-${index}`, projectId: commercialProject.id, type, status: ApprovalStatus.APPROVED, decidedById: founder.id, decidedAt: now },
+      update: { requestedAt: now, decidedAt: now },
+      create: { id: `seed-approval-commercial-${index}`, projectId: commercialProject.id, type, status: ApprovalStatus.APPROVED, requestedAt: now, decidedById: founder.id, decidedAt: now },
     });
   }
   const finalAsset = await prisma.asset.upsert({
@@ -488,9 +496,15 @@ async function main() {
     update: {},
     create: { organizationId: organization.id, invoiceId: commercialInvoice.id, idempotencyKey: "seed-payment-commercial", amount: 2995, status: PaymentStatus.SUCCEEDED, provider: "DEMO_CONFIRMED", receivedAt: now },
   });
+  await prisma.expense.upsert({
+    where: { id: "seed-expense-commercial-production" },
+    update: { amount: 1290, incurredAt: now },
+    create: { id: "seed-expense-commercial-production", organizationId: organization.id, projectId: commercialProject.id, category: "PRODUCTION", vendor: "Five Pillar Studio", description: "Summit Bottle production and post-production", amount: 1290, incurredAt: now, billable: true },
+  });
 
   // Scenario B: managed marketing onboarding with founder labor and attributable Alphi infrastructure.
-  const marketingClient = await createClient("seed-client-marketing", "Harbor Health");
+  const marketingClient = await createClient("seed-client-marketing", "Harbor Health", "Healthcare services", "https://harbor-health.example");
+  await createWonLead("seed-lead-marketing", "Harbor Health", "Avery Brooks", ServicePath.MANAGED_MARKETING, 3250);
   await createIntake("seed-intake-marketing", marketingClient.id, ServicePath.MANAGED_MARKETING, 94);
   await prisma.serviceSubscription.upsert({
     where: { id: "seed-service-sub-marketing" },
@@ -498,10 +512,15 @@ async function main() {
     create: { id: "seed-service-sub-marketing", clientId: marketingClient.id, subscriptionId: alphi.id, packageName: "Managed Marketing Level 3", serviceLevel: 3, onboardingFee: 750, monthlyFee: 2500, minimumTermMonths: 3, startsAt: now, deliverables: { channels: ["Instagram", "LinkedIn"], reporting: "monthly", approvalRequired: true }, founderHours: 4 },
   });
   const marketingQuote = await createQuote("seed-quote-marketing", marketingClient.id, "Managed Marketing Onboarding", ServicePath.MANAGED_MARKETING, 1450, 3250, QuoteStatus.ACCEPTED);
-  await prisma.proposal.upsert({
+  const marketingProposal = await prisma.proposal.upsert({
     where: { id: "seed-proposal-marketing" },
     update: {},
     create: { id: "seed-proposal-marketing", organizationId: organization.id, clientId: marketingClient.id, quoteId: marketingQuote.id, status: ProposalStatus.ACCEPTED },
+  });
+  await prisma.proposalVersion.upsert({
+    where: { proposalId_version: { proposalId: marketingProposal.id, version: 1 } },
+    update: { sections: { scope: [{ description: "Managed marketing onboarding" }, { description: "Monthly campaign operations and reporting" }], investment: { total: "3250.00", currency: "USD" } } },
+    create: { proposalId: marketingProposal.id, version: 1, templateKey: "managed-marketing", sections: { scope: [{ description: "Managed marketing onboarding" }, { description: "Monthly campaign operations and reporting" }], investment: { total: "3250.00", currency: "USD" } } },
   });
   const marketingProject = await prisma.project.upsert({
     where: { quoteId: marketingQuote.id },
@@ -515,7 +534,8 @@ async function main() {
   });
 
   // Scenario C: hybrid proposal keeps studio production and recurring managed services separate.
-  const hybridClient = await createClient("seed-client-hybrid", "Northstar Foods");
+  const hybridClient = await createClient("seed-client-hybrid", "Northstar Foods", "Food and beverage", "https://northstar-foods.example");
+  await createWonLead("seed-lead-hybrid", "Northstar Foods", "Jordan Kim", ServicePath.COMBINED, 8000);
   const hybridQuote = await createQuote("seed-quote-hybrid", hybridClient.id, "Launch Commercial + Managed Campaign", ServicePath.COMBINED, 3600, 8000, QuoteStatus.ACCEPTED);
   for (const line of [
     { id: "seed-line-hybrid-studio", category: "STUDIO", description: "Original launch commercial", cost: 2200, price: 4995, path: ServicePath.VISUAL_PRODUCTION },
@@ -527,10 +547,15 @@ async function main() {
       create: { id: line.id, quoteVersionId: `${hybridQuote.id}-v1`, category: line.category, description: line.description, quantity: 1, unitCost: line.cost, clientUnitPrice: line.price, internalOnly: false, servicePath: line.path },
     });
   }
-  await prisma.proposal.upsert({
+  const hybridProposal = await prisma.proposal.upsert({
     where: { id: "seed-proposal-hybrid" },
     update: {},
     create: { id: "seed-proposal-hybrid", organizationId: organization.id, clientId: hybridClient.id, quoteId: hybridQuote.id, status: ProposalStatus.ACCEPTED },
+  });
+  await prisma.proposalVersion.upsert({
+    where: { proposalId_version: { proposalId: hybridProposal.id, version: 1 } },
+    update: { sections: { scope: [{ description: "Original launch commercial" }, { description: "Monthly managed marketing campaign" }], investment: { total: "8000.00", currency: "USD" } } },
+    create: { proposalId: hybridProposal.id, version: 1, templateKey: "combined", sections: { scope: [{ description: "Original launch commercial" }, { description: "Monthly managed marketing campaign" }], investment: { total: "8000.00", currency: "USD" } } },
   });
   const hybridProject = await prisma.project.upsert({
     where: { quoteId: hybridQuote.id },

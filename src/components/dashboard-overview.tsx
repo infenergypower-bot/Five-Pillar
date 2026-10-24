@@ -36,15 +36,17 @@ function normalizeDashboard(data: DashboardResponse): DashboardData {
   const collected = data.invoices.reduce((sum, invoice) => sum + Number(invoice.collected), 0);
   const quotePipeline = Object.entries(data.quotes).filter(([status]) => !["ACCEPTED", "DECLINED", "EXPIRED", "ARCHIVED"].includes(status));
   const quotePipelineCount = quotePipeline.reduce((sum, [, count]) => sum + count, 0);
+  const qualifiedLeads = Object.entries(data.leads).reduce((sum, [stage, count]) => ["WON", "LOST"].includes(stage) ? sum : sum + count, 0);
+  const reviewCount = data.quotes.INTERNAL_REVIEW ?? 0;
   return {
     pipelineValue: `${quotePipelineCount} quote${quotePipelineCount === 1 ? "" : "s"}`,
-    qualifiedLeads: Object.values(data.leads).reduce((sum, count) => sum + count, 0),
+    qualifiedLeads,
     contractedRevenue: currency(billed),
     collectedRevenue: currency(collected),
     activeProjects,
     onTimeDeliveryRate: "Not tracked",
     pipeline: quotePipeline.map(([stage, count]) => ({ stage: stage.replaceAll("_", " "), count, amount: `${count} quote${count === 1 ? "" : "s"}` })),
-    alerts: data.quotes.INTERNAL_REVIEW ? [{ title: "Quote awaiting review", detail: `${data.quotes.INTERNAL_REVIEW} quote requires an authorized decision.`, href: "/quotes" }] : [],
+    alerts: reviewCount ? [{ title: "Quote awaiting review", detail: `${reviewCount} quote${reviewCount === 1 ? "" : "s"} require${reviewCount === 1 ? "s" : ""} an authorized decision.`, href: "/quotes" }] : [],
     projects: data.recentProjects.map((project) => ({
       id: project.id,
       title: project.title,
@@ -103,7 +105,7 @@ export function DashboardOverview() {
       <section className="dashboard-grid">
         <article className="panel pipeline-panel">
           <header><div><span className="kicker">Revenue</span><h2>Client pipeline</h2></div><Link href="/leads">View CRM</Link></header>
-          <div className="pipeline-list">{data?.pipeline?.length ? data.pipeline.map((item) => <div className="pipeline-row" key={item.stage}><div><span>{item.stage}</span><small>{item.count} records</small></div><div className="track"><i style={{ width: `${Math.min(100, Math.max(8, item.count * 10))}%` }} /></div><strong>{item.amount}</strong></div>) : <div className="empty-state"><strong>No pipeline records</strong></div>}</div>
+          <div className="pipeline-list">{data?.pipeline?.length ? data.pipeline.map((item) => <div className="pipeline-row" key={item.stage}><div><span>{item.stage}</span><small>{item.count} record{item.count === 1 ? "" : "s"}</small></div><div className="track"><i style={{ width: `${Math.min(100, Math.max(8, item.count * 10))}%` }} /></div><strong>{item.amount}</strong></div>) : <div className="empty-state"><strong>No pipeline records</strong></div>}</div>
         </article>
         <article className="panel alert-panel">
           <header><div><span className="kicker">Attention</span><h2>Critical actions</h2></div><span className="count-badge">{data?.alerts?.length ?? 0}</span></header>

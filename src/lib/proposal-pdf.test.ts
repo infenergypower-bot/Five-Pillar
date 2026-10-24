@@ -25,6 +25,15 @@ describe("proposal PDF", () => {
     expect(bytes.length).toBeGreaterThan(1000);
   });
 
+  it("normalizes common Unicode punctuation for standard PDF fonts", async () => {
+    const bytes = await renderProposalPdf({
+      ...proposal,
+      projectTitle: "The Fifth Light — Proof of Concept",
+      overview: "A “cinematic” proof of concept…",
+    });
+    expect(new TextDecoder().decode(bytes.slice(0, 5))).toBe("%PDF-");
+  });
+
   it("rejects internal economics at runtime", () => {
     expect(() => assertClientSafe({ ...proposal, operatingMargin: 0.55 })).toThrow("forbidden internal field");
     expect(() => assertClientSafe({ ...proposal, nested: { hourlyRate: 75 } })).toThrow("forbidden internal field");

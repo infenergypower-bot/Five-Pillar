@@ -136,7 +136,7 @@ export function ResourceWorkspace({ module }: { module: ModuleDefinition }) {
             rows.length === 0 ? <div className="empty-state"><strong>No records available</strong><span>{demoMode ? "No demonstration records are available in this section." : "Create the first authorized record or adjust your filters."}</span></div> :
               <div className="data-table" role="table">
                 <div className="data-row data-head" role="row">{module.columns.map((column) => <span key={column}>{column.replaceAll(/([A-Z])/g, " $1")}</span>)}</div>
-                {rows.map(({ id, record }) => <div className="data-row" role="row" key={id}>{module.columns.map((column) => <span key={column} data-label={column}>{display(record[column])}</span>)}</div>)}
+                {rows.map(({ id, record }) => <Link className="data-row" href={`/${module.slug}/${encodeURIComponent(id)}`} role="row" key={id}>{module.columns.map((column) => <span key={column} data-label={column}>{display(record[column])}</span>)}</Link>)}
               </div>}
         </article>
         <aside className="panel guidance-panel"><span className="kicker">Operating controls</span><h2>Built-in safeguards</h2>{module.guidance.map((item) => <p key={item}><CheckCircle2 size={15} />{item}</p>)}</aside>

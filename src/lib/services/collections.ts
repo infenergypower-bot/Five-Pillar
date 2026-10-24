@@ -138,12 +138,13 @@ export async function listIntakes(principal: AuthPrincipal, raw: PageInput = {})
     select: {
       id: true, clientId: true, questionnaireVersionId: true, version: true, servicePath: true,
       status: true, completeness: true, readiness: true, submittedAt: true, createdAt: true, updatedAt: true,
+      client: { select: { displayName: true } },
     },
     orderBy: { id: "asc" },
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
-  return nextCursor(rows, page.limit);
+  return nextCursor(rows.map(({ client, ...row }) => ({ ...row, client: client?.displayName ?? null })), page.limit);
 }
 
 export async function createIntake(principal: AuthPrincipal, raw: unknown) {
@@ -403,13 +404,20 @@ export async function listProjects(principal: AuthPrincipal, raw: PageInput = {}
     },
     select: {
       id: true, clientId: true, quoteId: true, originalTitleId: true, title: true, servicePath: true,
-      status: true, currency: true, budget: true, startAt: true, dueAt: true, createdAt: true, updatedAt: true,
+      status: true, currency: true, budget: true, actualCost: true, startAt: true, dueAt: true, createdAt: true, updatedAt: true,
+      scenes: { select: { shots: { select: { approvedTakeId: true } } } },
     },
     orderBy: { id: "asc" },
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
-  return nextCursor(rows.map((row) => ({ ...row, budget: row.budget ? money(row.budget) : null })), page.limit);
+  return nextCursor(rows.map(({ scenes, ...row }) => ({
+    ...row,
+    budget: row.budget ? money(row.budget) : null,
+    actualCost: money(row.actualCost),
+    scenes: scenes.length,
+    approvedShots: scenes.reduce((count, scene) => count + scene.shots.filter((shot) => Boolean(shot.approvedTakeId)).length, 0),
+  })), page.limit);
 }
 
 export async function createProject(principal: AuthPrincipal, raw: unknown) {
@@ -442,14 +450,16 @@ export async function listInvoices(principal: AuthPrincipal, raw: PageInput = {}
       id: true, clientId: true, projectId: true, number: true, status: true, currency: true,
       subtotal: true, tax: true, total: true, amountPaid: true, dueAt: true, paidAt: true,
       createdAt: true, updatedAt: true,
+      client: { select: { displayName: true } },
       lines: { select: { id: true, description: true, quantity: true, unitPrice: true, amount: true } },
     },
     orderBy: { id: "asc" },
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
-  return nextCursor(rows.map((row) => ({
+  return nextCursor(rows.map(({ client, ...row }) => ({
     ...row,
+    client: client?.displayName ?? null,
     subtotal: money(row.subtotal), tax: money(row.tax), total: money(row.total), amountPaid: money(row.amountPaid),
     lines: row.lines.map((line) => ({ ...line, quantity: money(line.quantity), unitPrice: money(line.unitPrice), amount: money(line.amount) })),
   })), page.limit);

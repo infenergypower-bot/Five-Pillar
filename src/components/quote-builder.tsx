@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useDemoMode } from "@/components/demo-mode-provider";
 
-const roles = [
+const initialLaborLines = [
   { activity: "Discovery & strategy", role: "Founder", hours: 4, rate: 75 },
   { activity: "Concept & script", role: "Creative Director", hours: 7, rate: 68 },
   { activity: "Production & prompting", role: "AI Production", hours: 14, rate: 55 },
@@ -23,7 +23,8 @@ export function QuoteBuilder() {
   const [projectTitle, setProjectTitle] = useState("New production");
   const [clientId, setClientId] = useState("");
   const [servicePath, setServicePath] = useState("VISUAL_PRODUCTION");
-  const [price, setPrice] = useState(2995);
+  const [laborLines, setLaborLines] = useState(initialLaborLines);
+  const [price, setPrice] = useState(7995);
   const [aiCost, setAiCost] = useState(420);
   const [thirdParty, setThirdParty] = useState(180);
   const [overhead, setOverhead] = useState(12);
@@ -34,7 +35,7 @@ export function QuoteBuilder() {
   const [error, setError] = useState("");
 
   const result = useMemo(() => {
-    const labor = roles.reduce((sum, line) => sum.plus(new Decimal(line.hours).times(line.rate)), new Decimal(0));
+    const labor = laborLines.reduce((sum, line) => sum.plus(new Decimal(line.hours).times(line.rate)), new Decimal(0));
     const direct = new Decimal(aiCost).plus(thirdParty);
     const overheadValue = labor.plus(direct).times(new Decimal(overhead).div(100));
     const preContingency = labor.plus(direct).plus(overheadValue);
@@ -44,7 +45,7 @@ export function QuoteBuilder() {
     const profit = selling.minus(cost);
     const margin = selling.gt(0) ? profit.div(selling).times(100) : new Decimal(0);
     return { labor, direct, overheadValue, contingencyValue, cost, profit, margin };
-  }, [aiCost, contingency, overhead, price, thirdParty]);
+  }, [aiCost, contingency, laborLines, overhead, price, thirdParty]);
 
   const belowMinimum = result.margin.lt(50);
 
@@ -78,7 +79,7 @@ export function QuoteBuilder() {
             premiumPrice: result.cost.div(0.4).toDecimalPlaces(2).toNumber(),
           },
           lines: [
-            ...roles.map((line, index) => ({
+            ...laborLines.map((line, index) => ({
               category: "LABOR",
               description: `${line.activity} — ${line.role}`,
               quantity: line.hours,
@@ -107,6 +108,13 @@ export function QuoteBuilder() {
     } finally {
       setWorking(false);
     }
+
+  }
+
+  function updateLaborLine(index: number, field: "activity" | "role" | "hours" | "rate", value: string) {
+    setLaborLines((lines) => lines.map((line, lineIndex) => lineIndex === index
+      ? { ...line, [field]: field === "hours" || field === "rate" ? Number(value) : value }
+      : line));
   }
 
   async function requestApproval() {
@@ -166,8 +174,13 @@ export function QuoteBuilder() {
           </div>
           <div className="quote-card"><span className="kicker">02 · Labor</span><h2>Production estimate</h2>
             <div className="labor-grid labor-head"><span>Activity</span><span>Role</span><span>Hours</span><span>Cost</span></div>
-            {roles.map((line) => <div className="labor-grid" key={line.activity}><strong>{line.activity}</strong><span>{line.role}</span><span>{line.hours}</span><span>${line.hours * line.rate}</span></div>)}
-            <button className="text-button"><Plus size={15} /> Add labor line</button>
+            {laborLines.map((line, index) => <div className="labor-grid" key={index}>
+              <input aria-label={`Labor activity ${index + 1}`} onChange={(event) => updateLaborLine(index, "activity", event.target.value)} value={line.activity} />
+              <input aria-label={`Labor role ${index + 1}`} onChange={(event) => updateLaborLine(index, "role", event.target.value)} value={line.role} />
+              <input aria-label={`Labor hours ${index + 1}`} min="0" onChange={(event) => updateLaborLine(index, "hours", event.target.value)} type="number" value={line.hours} />
+              <span>{money(new Decimal(line.hours).times(line.rate))}</span>
+            </div>)}
+            <button className="text-button" onClick={() => setLaborLines((lines) => [...lines, { activity: "New activity", role: "Contributor", hours: 1, rate: 50 }])} type="button"><Plus size={15} /> Add labor line</button>
           </div>
         </section>
         <section className="quote-column">

@@ -39,7 +39,7 @@ export function RecordDetail({ module, id, title }: { module: string; id: string
       {error && <div className="system-message error"><TriangleAlert size={18} />{error}</div>}
       {!record && !error && <div className="dashboard-loading"><LoaderCircle className="spin" /><span>Loading authorized record</span></div>}
       {record && <><section className="panel detail-panel">
-        <header><div><span className="kicker">Persisted record</span><h2>{String(record.title ?? record.displayName ?? record.businessName ?? record.name ?? id)}</h2></div></header>
+        <header><div><span className="kicker">Persisted record</span><h2>{String(record.title ?? record.displayName ?? record.businessName ?? record.name ?? id)}</h2></div>{module === "proposals" && <a className="secondary-button" download href={`/api/proposals/${encodeURIComponent(id)}/pdf`}>Download PDF</a>}</header>
         <dl className="detail-grid">{Object.entries(record).filter(([key]) => !["passwordHash", "tokenHash", "secretCiphertext"].includes(key)).map(([key, value]) => <div key={key}><dt>{key.replaceAll(/([A-Z])/g, " $1")}</dt><dd className={typeof value === "object" ? "structured-value" : ""}>{printable(value)}</dd></div>)}</dl>
       </section><WorkflowActions module={module} id={id} record={record} /></>}
     </>
