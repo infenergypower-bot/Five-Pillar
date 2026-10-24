@@ -1,0 +1,92 @@
+import type { AuthPrincipal } from "@/lib/auth";
+import {
+  getAsset,
+  getClient,
+  getContract,
+  getCost,
+  getCreative,
+  getIntake,
+  getIntegration,
+  getInvoice,
+  getLead,
+  getOriginalTitle,
+  getProject,
+  getProposal,
+  getQuote,
+  getReport,
+  getReview,
+  getSetting,
+  getSubscription,
+  getTask,
+  listAssets,
+  listClients,
+  listContracts,
+  listCosts,
+  listCreative,
+  listIntegrations,
+  listIntakes,
+  listInvoices,
+  listLeads,
+  listOriginalTitles,
+  listProjects,
+  listProposals,
+  listQuotes,
+  listReports,
+  listReviews,
+  listSettings,
+  listSubscriptions,
+  listTasks,
+} from "@/lib/services";
+
+type Page = { cursor?: string; limit?: string };
+
+export function listResource(resource: string, principal: AuthPrincipal, page: Page) {
+  const handlers: Record<string, () => Promise<unknown>> = {
+    leads: () => listLeads(principal, page),
+    clients: () => listClients(principal, page),
+    intakes: () => listIntakes(principal, page),
+    quotes: () => listQuotes(principal, page),
+    proposals: () => listProposals(principal, page),
+    contracts: () => listContracts(principal, page),
+    projects: () => listProjects(principal, page),
+    tasks: () => listTasks(principal, page),
+    reviews: () => listReviews(principal, page),
+    assets: () => listAssets(principal, page),
+    invoices: () => listInvoices(principal, page),
+    subscriptions: () => listSubscriptions(principal, page),
+    costs: () => listCosts(principal, page),
+    reports: () => listReports(principal, page),
+    creative: () => listCreative(principal, page),
+    "original-titles": () => listOriginalTitles(principal, page),
+    integrations: () => listIntegrations(principal, page),
+    settings: () => listSettings(principal, page),
+  };
+  return handlers[resource]();
+}
+
+export function getResource(resource: string, principal: AuthPrincipal, id: string) {
+  const handlers: Record<string, () => Promise<unknown>> = {
+    leads: () => getLead(principal, id),
+    clients: () => getClient(principal, id),
+    intakes: () => getIntake(principal, id),
+    intake: () => getIntake(principal, id),
+    quotes: () => getQuote(principal, id),
+    proposals: () => getProposal(principal, id),
+    contracts: () => getContract(principal, id),
+    projects: () => getProject(principal, id),
+    productions: () => getProject(principal, id),
+    tasks: () => getTask(principal, id),
+    reviews: () => getReview(principal, id),
+    assets: () => getAsset(principal, id),
+    invoices: () => getInvoice(principal, id),
+    subscriptions: () => getSubscription(principal, id),
+    costs: () => getCost(principal, id),
+    reports: () => getReport(principal, id),
+    creative: () => getCreative(principal, id),
+    "original-titles": () => getOriginalTitle(principal, id),
+    "original-ip": () => getOriginalTitle(principal, id),
+    integrations: () => getIntegration(principal, id),
+    settings: () => getSetting(principal, id),
+  };
+  return handlers[resource]();
+}
