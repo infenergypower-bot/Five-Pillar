@@ -1,4 +1,5 @@
 import {
+  AnswerSource,
   ApprovalStatus,
   ApprovalType,
   IPFormat,
@@ -7,10 +8,12 @@ import {
   PaymentStatus,
   ProjectStatus,
   ProposalStatus,
+  QuestionType,
   QuoteStatus,
   RevisionCategory,
   RightsStatus,
   ServicePath,
+  VerificationStatus,
   WorkStatus,
 } from "@prisma/client";
 import { z } from "zod";
@@ -52,8 +55,78 @@ export const clientCreateSchema = z.object({
 });
 export const intakeCreateSchema = z.object({
   clientId: id.optional(),
+  projectId: id.optional(),
   questionnaireVersionId: id.optional(),
+  serviceTypeId: id.optional(),
   servicePath: z.enum(ServicePath),
+});
+export const discoveryAnswerSchema = z.object({
+  answers: z.array(z.object({
+    questionId: id,
+    value: z.unknown(),
+    source: z.enum(AnswerSource).default(AnswerSource.CLIENT),
+    sourceReference: z.string().trim().max(500).optional(),
+    verificationStatus: z.enum(VerificationStatus).default(VerificationStatus.UNVERIFIED),
+  })).min(1).max(200),
+  changeReason: z.string().trim().max(1000).optional(),
+});
+export const discoveryVerificationSchema = z.object({
+  verificationStatus: z.enum([VerificationStatus.CLIENT_CONFIRMED, VerificationStatus.STAFF_VERIFIED, VerificationStatus.REJECTED]),
+  reason: z.string().trim().max(1000).optional(),
+});
+export const discoveryMaterialSchema = z.object({
+  assetId: id,
+  category: z.string().trim().min(1).max(120),
+  description: z.string().trim().max(1000).optional(),
+  extractedData: z.record(z.string(), z.unknown()).optional(),
+  extractionProvider: z.string().trim().max(120).optional(),
+});
+export const discoveryConfirmationSchema = z.object({
+  confirmerName: z.string().trim().min(1).max(160),
+  confirmerEmail: z.email().trim().toLowerCase(),
+  confirmation: z.object({
+    accepted: z.literal(true),
+    notes: z.string().trim().max(2000).optional(),
+  }),
+});
+export const discoveryCollaboratorSchema = z.object({
+  name: z.string().trim().min(1).max(160),
+  email: z.email().trim().toLowerCase(),
+  role: z.string().trim().min(1).max(120),
+  permissions: z.array(z.string().trim().min(1).max(80)).max(20).default(["ANSWER"]),
+});
+export const discoveryQuestionSchema = z.object({
+  sectionId: id,
+  key: z.string().trim().regex(/^[a-z0-9_]+$/).max(120),
+  label: z.string().trim().min(1).max(500),
+  description: z.string().trim().max(2000).optional(),
+  helpText: z.string().trim().max(2000).optional(),
+  type: z.enum(QuestionType),
+  category: z.string().trim().min(1).max(120),
+  required: z.boolean().default(false),
+  recommended: z.boolean().default(false),
+  internalOnly: z.boolean().default(false),
+  allowsFile: z.boolean().default(false),
+  critical: z.boolean().default(false),
+  active: z.boolean().default(true),
+  validation: z.record(z.string(), z.unknown()).optional(),
+  destination: z.record(z.string(), z.unknown()).optional(),
+  reuseKey: z.string().trim().max(120).optional(),
+  clarification: z.record(z.string(), z.unknown()).optional(),
+  sortOrder: z.number().int().min(0).max(10_000),
+  conditions: z.array(z.object({
+    sourceQuestionId: id,
+    operator: z.string().trim().min(1).max(40),
+    expectedValue: z.unknown(),
+  })).max(20).default([]),
+});
+export const discoveryQuestionUpdateSchema = discoveryQuestionSchema.partial().omit({ sectionId: true, key: true });
+export const serviceTypeDefinitionSchema = z.object({
+  key: z.string().trim().regex(/^[a-z0-9_-]+$/).max(120),
+  name: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(2000).optional(),
+  active: z.boolean().default(true),
+  configuration: z.record(z.string(), z.unknown()).optional(),
 });
 export const proposalCreateSchema = z.object({
   quoteId: id,

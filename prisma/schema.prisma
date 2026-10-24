@@ -53,6 +53,70 @@ enum IntakeStatus {
   ARCHIVED
 }
 
+enum DiscoveryReadinessStatus {
+  DISCOVERY_INCOMPLETE
+  CLARIFICATION_REQUIRED
+  READY_FOR_PRELIMINARY_ESTIMATE
+  READY_FOR_FIRM_QUOTATION
+  READY_FOR_CREATIVE_DEVELOPMENT
+  READY_FOR_PRODUCTION
+  READY_FOR_FINAL_DELIVERY
+}
+
+enum AnswerSource {
+  CLIENT
+  AUTHORIZED_STAFF
+  STAKEHOLDER
+  DOCUMENT_EXTRACTION
+  REUSED_VERIFIED_ANSWER
+  AI_RECOMMENDATION
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  CLIENT_CONFIRMED
+  STAFF_VERIFIED
+  REJECTED
+  SUPERSEDED
+}
+
+enum ClarificationStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+enum DiscoveryRiskSeverity {
+  INFO
+  LOW
+  MEDIUM
+  HIGH
+  BLOCKING
+}
+
+enum DiscoveryOutputType {
+  CLIENT_BUSINESS_PROFILE
+  BRAND_INTELLIGENCE_PROFILE
+  TARGET_AUDIENCE_PROFILE
+  CREATIVE_DIRECTION_BRIEF
+  TECHNICAL_PRODUCTION_SPECIFICATION
+  SCRIPT_DEVELOPMENT_BRIEF
+  CHARACTER_ENVIRONMENT_REQUIREMENTS
+  SHOT_SCENE_ESTIMATE
+  LABOR_ESTIMATE
+  AI_GENERATION_REQUIREMENTS
+  PRELIMINARY_PRICING_ESTIMATE
+  PRODUCTION_READINESS_CHECKLIST
+  ALPHI_INTEGRATION_PAYLOAD
+}
+
+enum DiscoveryImpactStatus {
+  OPEN
+  REVIEWED
+  ACCEPTED
+  DISMISSED
+}
+
 enum QuestionType {
   SHORT_TEXT
   LONG_TEXT
@@ -306,6 +370,7 @@ model Organization {
   brands         Brand[]
   products       Product[]
   questionnaires QuestionnaireDefinition[]
+  serviceTypes   ServiceTypeDefinition[]
   packages       ServicePackage[]
   catalogItems   CatalogItem[]
   priceBooks     PriceBook[]
@@ -603,14 +668,34 @@ model Product {
 model QuestionnaireDefinition {
   id             String                 @id @default(cuid())
   organizationId String
+  serviceTypeId  String?
   key            String
   name           String
   servicePath    ServicePath?
   status         RecordStatus           @default(DRAFT)
   organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serviceType    ServiceTypeDefinition? @relation(fields: [serviceTypeId], references: [id], onDelete: SetNull)
   versions       QuestionnaireVersion[]
 
   @@unique([organizationId, key])
+}
+
+model ServiceTypeDefinition {
+  id             String                    @id @default(cuid())
+  organizationId String
+  key            String
+  name           String
+  description    String?
+  active         Boolean                   @default(true)
+  configuration  Json?
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  organization   Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  questionnaires QuestionnaireDefinition[]
+  intakes        Intake[]
+
+  @@unique([organizationId, key])
+  @@index([organizationId, active])
 }
 
 model QuestionnaireVersion {
@@ -649,11 +734,17 @@ model QuestionDefinition {
   description      String?
   helpText         String?
   type             QuestionType
+  category         String               @default("GENERAL")
   required         Boolean              @default(false)
   recommended      Boolean              @default(false)
   internalOnly     Boolean              @default(false)
   allowsFile       Boolean              @default(false)
   validation       Json?
+  destination      Json?
+  reuseKey         String?
+  clarification    Json?
+  critical         Boolean              @default(false)
+  active           Boolean              @default(true)
   sortOrder        Int
   section          QuestionnaireSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   options          QuestionOption[]
@@ -692,23 +783,43 @@ model QuestionCondition {
 model Intake {
   id                     String               @id @default(cuid())
   clientId               String?
+  projectId              String?
+  serviceTypeId          String?
   questionnaireVersionId String
   version                Int                  @default(1)
   servicePath            ServicePath
   status                 IntakeStatus         @default(DRAFT)
   completeness           Int                  @default(0)
   readiness              Json?
+  readinessStatus        DiscoveryReadinessStatus @default(DISCOVERY_INCOMPLETE)
+  readinessAssessedAt    DateTime?
+  compiledBriefVersion   Int                  @default(0)
+  confirmedBriefVersion  Int?
+  confirmedAt            DateTime?
+  confirmedById          String?
+  lockedAt               DateTime?
   submittedAt            DateTime?
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @updatedAt
   client                 Client?              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  project                Project?             @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  serviceType            ServiceTypeDefinition? @relation(fields: [serviceTypeId], references: [id], onDelete: SetNull)
   questionnaireVersion   QuestionnaireVersion @relation(fields: [questionnaireVersionId], references: [id], onDelete: Restrict)
   answers                IntakeAnswer[]
   serviceSelections      ServiceSelection[]
   briefs                 ProductionBrief[]
+  materials              DiscoveryMaterial[]
+  clarifications         DiscoveryClarification[]
+  risks                  DiscoveryRisk[]
+  outputs                DiscoveryOutput[]
+  impacts                DiscoveryImpact[]
+  collaborators          DiscoveryCollaborator[]
+  confirmations          DiscoveryConfirmation[]
 
   @@unique([clientId, questionnaireVersionId, version])
   @@index([clientId, status])
+  @@index([projectId])
+  @@index([readinessStatus])
 }
 
 model IntakeAnswer {
@@ -717,12 +828,38 @@ model IntakeAnswer {
   questionId   String
   value        Json
   isDraft      Boolean            @default(true)
+  source       AnswerSource       @default(CLIENT)
+  sourceReference String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedById String?
+  verifiedAt   DateTime?
+  version      Int                @default(1)
   answeredById String?
   answeredAt   DateTime           @default(now())
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
   intake       Intake             @relation(fields: [intakeId], references: [id], onDelete: Cascade)
   question     QuestionDefinition @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  revisions    IntakeAnswerRevision[]
 
   @@unique([intakeId, questionId])
+}
+
+model IntakeAnswerRevision {
+  id                 String             @id @default(cuid())
+  answerId           String
+  version            Int
+  value              Json
+  source             AnswerSource
+  sourceReference    String?
+  verificationStatus VerificationStatus
+  changedById        String?
+  changedAt          DateTime           @default(now())
+  changeReason       String?
+  answer             IntakeAnswer       @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@unique([answerId, version])
+  @@index([answerId, changedAt])
 }
 
 model ServiceSelection {
@@ -749,6 +886,127 @@ model ProductionBrief {
   intake                 Intake    @relation(fields: [intakeId], references: [id], onDelete: Cascade)
 
   @@index([intakeId])
+}
+
+model DiscoveryMaterial {
+  id                 String             @id @default(cuid())
+  intakeId           String
+  assetId            String
+  category           String
+  description        String?
+  extractedData      Json?
+  extractionProvider String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedById       String?
+  verifiedAt         DateTime?
+  createdAt          DateTime           @default(now())
+  intake             Intake             @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+  asset              Asset              @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([intakeId, assetId])
+  @@index([intakeId, verificationStatus])
+}
+
+model DiscoveryClarification {
+  id                String              @id @default(cuid())
+  intakeId          String
+  questionId        String?
+  origin            AnswerSource
+  reasonCode        String
+  prompt            String
+  rationale         String?
+  status            ClarificationStatus @default(OPEN)
+  resolution        Json?
+  resolvedAt        DateTime?
+  createdAt         DateTime            @default(now())
+  intake            Intake              @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+
+  @@index([intakeId, status])
+}
+
+model DiscoveryRisk {
+  id          String                @id @default(cuid())
+  intakeId    String
+  code        String
+  title       String
+  description String
+  severity    DiscoveryRiskSeverity
+  category    String
+  blocking    Boolean               @default(false)
+  evidence    Json?
+  resolvedAt  DateTime?
+  resolvedById String?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  intake      Intake                @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+
+  @@unique([intakeId, code])
+  @@index([intakeId, blocking, severity])
+}
+
+model DiscoveryOutput {
+  id               String              @id @default(cuid())
+  intakeId         String
+  type             DiscoveryOutputType
+  version          Int
+  payload          Json
+  sourceAnswerKeys String[]
+  targetType       String?
+  targetId         String?
+  generatedBy      String
+  verifiedOnly     Boolean             @default(true)
+  createdAt        DateTime            @default(now())
+  intake           Intake              @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+
+  @@unique([intakeId, type, version])
+  @@index([intakeId, type])
+}
+
+model DiscoveryImpact {
+  id                   String                @id @default(cuid())
+  intakeId             String
+  answerKey            String
+  priorValue           Json?
+  newValue             Json
+  affectedAreas        String[]
+  affectedRecordIds    String[]
+  explanation          String
+  status               DiscoveryImpactStatus @default(OPEN)
+  reviewedById         String?
+  reviewedAt           DateTime?
+  createdAt            DateTime              @default(now())
+  intake               Intake                @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+
+  @@index([intakeId, status])
+}
+
+model DiscoveryCollaborator {
+  id          String   @id @default(cuid())
+  intakeId    String
+  name        String
+  email       String
+  role        String
+  permissions String[]
+  invitedById String?
+  acceptedAt  DateTime?
+  createdAt   DateTime @default(now())
+  intake      Intake   @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+
+  @@unique([intakeId, email])
+}
+
+model DiscoveryConfirmation {
+  id           String   @id @default(cuid())
+  intakeId     String
+  briefVersion Int
+  confirmedById String?
+  confirmerName String
+  confirmerEmail String
+  confirmedAt  DateTime @default(now())
+  confirmation Json
+  intake       Intake   @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+
+  @@unique([intakeId, briefVersion])
 }
 
 model ServicePackage {
@@ -1185,6 +1443,7 @@ model Project {
   generationEvents        GenerationEvent[]
   expenses                Expense[]
   contracts               Contract[]
+  discoveryIntakes        Intake[]
 
   @@index([organizationId, status])
   @@index([clientId])
@@ -1348,6 +1607,7 @@ model Asset {
   rights              AssetRight[]
   links               AssetLink[]
   deliverables        Deliverable[]
+  discoveryMaterials DiscoveryMaterial[]
 
   @@unique([ownerOrganizationId, storageKey])
   @@index([projectId, category])

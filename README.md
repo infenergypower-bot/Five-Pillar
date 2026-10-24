@@ -7,7 +7,7 @@ A standalone operating platform for Five Pillar Tech Ventures. It unifies CRM, c
 - Secure opaque database sessions, bcrypt credentials, durable login throttling, session revocation, password-reset records, and optional TOTP MFA.
 - Organization, client, role, and project authorization enforced by server services.
 - CRM for leads, stage history, clients, contacts, brands, products, and activity.
-- Versioned conditional intake definitions, answers, service selection, completeness, and production briefs.
+- Intelligent adaptive discovery with an administrator-configurable question bank, conditional branches, versioned/source-attributed answers, deterministic readiness gates, clarification recommendations, risk detection, verified answer reuse, uploaded-material extraction review, locked-decision impact analysis, and final client confirmation.
 - Decimal-safe quote engine with labor, direct costs, subscriptions, overhead, contingency, discounts, OpenArt credits, and margin protection.
 - Client-safe proposals, acceptance history, contracts, configurable payment schedules, invoices, and provider payment reconciliation.
 - Projects, teams, milestones, tasks, production bibles, scenes, shots, takes, generation attempts, reviews, approvals, revisions, change orders, and deliverables.
@@ -41,6 +41,20 @@ npm audit
 ```
 
 `npm run check` runs lint, tests, and the production build.
+
+## Adaptive discovery
+
+The **Discovery & intake** workspace asks only questions activated by the selected
+service and prior answers. Critical budget, deliverable, approval, rights, claims,
+and production requirements are evaluated deterministically; clarification
+recommendations supplement these rules but never bypass them.
+
+Verified information generates versioned business, brand, audience, creative,
+technical, script, character, scene, labor, pricing, readiness, and optional
+Alphi payloads. Document-extracted values remain unverified until a client or
+authorized staff member confirms them. Changes made after brief confirmation
+create explicit impact records instead of overwriting locked production
+decisions.
 
 ## Railway deployment
 

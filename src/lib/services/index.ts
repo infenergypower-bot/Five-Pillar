@@ -1,6 +1,7 @@
 export * from "./collections";
 export * from "./delivery";
 export * from "./delivery-payload";
+export * from "./discovery";
 export * from "./errors";
 export * from "./invariants";
 export * from "./jobs";
