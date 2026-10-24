@@ -35,8 +35,9 @@ function normalizeDashboard(data: DashboardResponse): DashboardData {
   const billed = data.invoices.reduce((sum, invoice) => sum + Number(invoice.billed), 0);
   const collected = data.invoices.reduce((sum, invoice) => sum + Number(invoice.collected), 0);
   const quotePipeline = Object.entries(data.quotes).filter(([status]) => !["ACCEPTED", "DECLINED", "EXPIRED", "ARCHIVED"].includes(status));
+  const quotePipelineCount = quotePipeline.reduce((sum, [, count]) => sum + count, 0);
   return {
-    pipelineValue: `${quotePipeline.reduce((sum, [, count]) => sum + count, 0)} quotes`,
+    pipelineValue: `${quotePipelineCount} quote${quotePipelineCount === 1 ? "" : "s"}`,
     qualifiedLeads: Object.values(data.leads).reduce((sum, count) => sum + count, 0),
     contractedRevenue: currency(billed),
     collectedRevenue: currency(collected),

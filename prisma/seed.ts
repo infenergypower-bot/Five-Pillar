@@ -341,7 +341,7 @@ async function main() {
   ) => {
     const quote = await prisma.quote.upsert({
       where: { id },
-      update: { status },
+      update: { clientId, projectTitle: title, servicePath: path, status },
       create: { id, organizationId: organization.id, clientId, projectTitle: title, servicePath: path, status, acceptedAt: status === QuoteStatus.ACCEPTED ? now : null },
     });
     const margin = (price - cost) / price;
@@ -616,8 +616,8 @@ async function main() {
   });
 
   // Scenario E: the $2,995 quote is below the 50% floor after costs rise; no approval is recorded.
-  const marginClient = await createClient("seed-client-margin", "Margin Protection Demo");
-  const marginQuote = await createQuote("seed-quote-margin", marginClient.id, "Cinema Package Cost Overrun", ServicePath.VISUAL_PRODUCTION, 1700, 2995, QuoteStatus.INTERNAL_REVIEW);
+  const marginQuote = await createQuote("seed-quote-margin", hybridClient.id, "Cinema Package Cost Overrun", ServicePath.VISUAL_PRODUCTION, 1700, 2995, QuoteStatus.INTERNAL_REVIEW);
+  await prisma.client.deleteMany({ where: { id: "seed-client-margin" } });
   await prisma.marginOverride.upsert({
     where: { id: "seed-margin-override-pending" },
     update: {},
