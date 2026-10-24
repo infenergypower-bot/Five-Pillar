@@ -4,5 +4,6 @@ import { demoModeEnabled } from "@/lib/demo-mode";
 
 export async function GET() {
   await connection();
-  return NextResponse.json({ enabled: demoModeEnabled() });
+  const enabled = demoModeEnabled();
+  return NextResponse.json({ enabled, writable: enabled, label: enabled ? "PUBLIC_WORKSPACE" : "AUTHENTICATED" });
 }

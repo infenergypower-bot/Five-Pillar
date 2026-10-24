@@ -202,7 +202,7 @@ export function DiscoveryWorkspace() {
         </div>
         <button className="secondary-button" onClick={() => void load()} type="button"><RefreshCw size={15} /> Refresh</button>
       </section>
-      {demoMode && <div className="discovery-callout"><ShieldCheck size={18} /><div><strong>Guided demonstration</strong><span>Explore three completed customer paths. Editing is disabled in the public demo.</span></div></div>}
+      {!demoMode && <div className="discovery-callout"><ShieldCheck size={18} /><div><strong>Production workspace</strong><span>Create, update, verify, and advance discovery records without signing in.</span></div></div>}
       {error && <div className="system-message error"><AlertCircle size={18} />{error}</div>}
       <section className="metric-grid">
         <div className="metric-card"><div className="metric-icon"><Sparkles size={17} /></div><span>Discovery sessions</span><strong>{totals.active}</strong><small>Resumable client and staff interviews</small></div>

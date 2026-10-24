@@ -15,7 +15,7 @@ export interface AuthPrincipal extends Principal {
   email: string;
 }
 
-async function getDemoPrincipal(): Promise<AuthPrincipal | null> {
+async function getPublicWorkspacePrincipal(): Promise<AuthPrincipal | null> {
   const demoUser = await db.user.findFirst({
     where: { organization: { slug: "five-pillar" }, role: "SUPER_ADMIN", active: true },
     orderBy: { createdAt: "asc" },
@@ -27,11 +27,11 @@ async function getDemoPrincipal(): Promise<AuthPrincipal | null> {
     select: { id: true },
   });
   return {
-    sessionId: "read-only-demo",
+    sessionId: "public-workspace",
     userId: demoUser.id,
     organizationId: demoUser.organizationId,
     role: demoUser.role,
-    name: "Demo workspace",
+    name: "Pillar One Operator",
     email: demoUser.email,
     clientId: demoClient?.id,
     assignedProjectIds: [],
@@ -76,7 +76,7 @@ export async function readSessionToken(): Promise<string | undefined> {
 export async function getPrincipal(): Promise<AuthPrincipal | null> {
   const token = await readSessionToken();
   if (!token && demoModeEnabled()) {
-    return getDemoPrincipal();
+    return getPublicWorkspacePrincipal();
   }
   if (!token) return null;
   const now = new Date();
@@ -92,7 +92,7 @@ export async function getPrincipal(): Promise<AuthPrincipal | null> {
   });
   if (!session || session.revokedAt || session.expiresAt <= now || !session.user.active) {
     if (demoModeEnabled()) {
-      return getDemoPrincipal();
+      return getPublicWorkspacePrincipal();
     }
     return null;
   }

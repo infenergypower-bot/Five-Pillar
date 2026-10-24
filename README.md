@@ -68,10 +68,12 @@ decisions.
 
 `/api/health` is the fast Railway liveness endpoint. `/api/ready` verifies PostgreSQL connectivity for operational readiness monitoring.
 
-Set `DEMO_MODE=true` to expose the seeded workspace without a sign-in screen.
-Demo mode supplies a read-only principal,
-hides persistence controls, and rejects non-read API methods with HTTP 403.
-The production container refreshes the idempotent demonstration dataset at startup only when demo mode is enabled.
+Set `DEMO_MODE=true` to expose a writable operator workspace without a sign-in
+screen. This mode supplies a server-side super-admin principal and must only be
+used when intentional public write access is acceptable. Normal deployments
+with `DEMO_MODE=false` retain session authentication and role-scoped access.
+The production container refreshes the idempotent starter dataset at startup
+when no-sign-in workspace mode is enabled.
 
 For a new empty production database, set `BOOTSTRAP_ADMIN_EMAIL` and a temporary
 `BOOTSTRAP_ADMIN_PASSWORD` of at least 14 characters, run

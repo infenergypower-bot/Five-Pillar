@@ -8,7 +8,7 @@ import {
   Search, Settings2, Sparkles, UsersRound, WandSparkles, Workflow,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useDemoMode } from "@/components/demo-mode-provider";
+import { useWorkspaceAccess } from "@/components/demo-mode-provider";
 
 const navigation = [
   { label: "Command center", href: "/", icon: Gauge },
@@ -51,7 +51,7 @@ function items(body: unknown): Array<Record<string, unknown>> {
 
 export function AppShell({ children, title, eyebrow }: { children: ReactNode; title: string; eyebrow: string }) {
   const pathname = usePathname();
-  const demoMode = useDemoMode();
+  const access = useWorkspaceAccess();
   const searchInput = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -132,7 +132,7 @@ export function AppShell({ children, title, eyebrow }: { children: ReactNode; ti
     <div className="app-frame">
       {mobileOpen && <button aria-label="Close menu" className="mobile-backdrop" onClick={() => setMobileOpen(false)} type="button" />}
       <aside className={`sidebar${mobileOpen ? " mobile-open" : ""}`}>
-        <Link className="brand" href="/" onClick={() => setMobileOpen(false)}><div className="brand-symbol"><i /><i /><i /><i /><i /></div><div><strong>PILLAR ONE</strong><span>{demoMode ? "READ-ONLY DEMO" : "OPERATING SYSTEM"}</span></div></Link>
+        <Link className="brand" href="/" onClick={() => setMobileOpen(false)}><div className="brand-symbol"><i /><i /><i /><i /><i /></div><div><strong>PILLAR ONE</strong><span>PRODUCTION COMMAND</span></div></Link>
         <nav>
           <p>Workspace</p>
           {links(navigation)}
@@ -142,7 +142,7 @@ export function AppShell({ children, title, eyebrow }: { children: ReactNode; ti
           <Link className={pathname === "/settings" ? "active" : ""} href="/settings" onClick={() => setMobileOpen(false)}><Settings2 size={17} />Settings</Link>
           <Link className={pathname === "/portal" ? "active" : ""} href="/portal" onClick={() => setMobileOpen(false)}><UsersRound size={17} />Client portal</Link>
         </nav>
-        <div className="sidebar-foot"><div className="avatar">P1</div><div><strong>{demoMode ? "Demo workspace" : "Authorized workspace"}</strong><span>{demoMode ? "View only" : "Role-scoped access"}</span></div>{!demoMode && <ChevronDown size={15} />}</div>
+        <div className="sidebar-foot"><div className="avatar">P1</div><div><strong>{access.publicAccess ? "Operator workspace" : "Authorized workspace"}</strong><span>{access.publicAccess ? "No sign-in required" : "Role-scoped access"}</span></div><ChevronDown size={15} /></div>
       </aside>
       <main className="workspace">
         <header className="topbar">
