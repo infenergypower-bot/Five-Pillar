@@ -13,6 +13,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
+    "db:bootstrap-admin": "node prisma/bootstrap-admin.mjs",
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

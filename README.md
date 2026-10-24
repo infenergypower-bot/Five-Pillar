@@ -54,6 +54,12 @@ npm audit
 
 `/api/health` is the fast Railway liveness endpoint. `/api/ready` verifies PostgreSQL connectivity for operational readiness monitoring.
 
+For a new empty production database, set `BOOTSTRAP_ADMIN_EMAIL` and a temporary
+`BOOTSTRAP_ADMIN_PASSWORD` of at least 14 characters, run
+`npm run db:bootstrap-admin` once, and then remove both variables. This creates
+only the Five Pillar organization, founder role, permissions, and founder user;
+it does not load demonstration data.
+
 ## External providers
 
 Provider operations remain pending until credentials are configured and a provider returns a durable external identifier. The application never reports a successful payment, signature, email, upload, generation, or Alphi synchronization merely because it attempted a request.
