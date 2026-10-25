@@ -49,11 +49,23 @@ export async function getClient(principal: AuthPrincipal, id: string) {
       contacts: { select: { id: true, name: true, email: true, phone: true, title: true, isPrimary: true, canApproveSpend: true, canApproveCreative: true } },
       brands: { select: { id: true, name: true, profile: true } },
       products: { select: { id: true, name: true, description: true, sku: true, price: true, currency: true, active: true } },
+      intakes: { select: { id: true, servicePath: true, status: true, completeness: true, readinessStatus: true, updatedAt: true }, orderBy: { updatedAt: "desc" } },
+      quotes: { select: { id: true, projectTitle: true, servicePath: true, status: true, currency: true, currentVersion: true, updatedAt: true }, orderBy: { updatedAt: "desc" } },
+      proposals: { select: { id: true, status: true, currentVersion: true, createdAt: true, quote: { select: { projectTitle: true } } }, orderBy: { createdAt: "desc" } },
+      contracts: { select: { id: true, number: true, title: true, status: true, signedAt: true, updatedAt: true }, orderBy: { updatedAt: "desc" } },
       projects: { select: { id: true, title: true, servicePath: true, status: true, dueAt: true }, orderBy: { updatedAt: "desc" } },
+      invoices: { select: { id: true, number: true, status: true, currency: true, total: true, amountPaid: true, dueAt: true }, orderBy: { createdAt: "desc" } },
+      serviceSubscriptions: { select: { id: true, packageName: true, status: true, monthlyFee: true, currency: true, startsAt: true, endsAt: true }, orderBy: { startsAt: "desc" } },
     },
   });
   if (!record) missing("Client");
-  return { ...record, products: record.products.map((product) => ({ ...product, price: product.price?.toString() ?? null })) };
+  return {
+    ...record,
+    products: record.products.map((product) => ({ ...product, price: product.price?.toString() ?? null })),
+    proposals: record.proposals.map(({ quote, ...proposal }) => ({ ...proposal, projectTitle: quote.projectTitle })),
+    invoices: record.invoices.map((invoice) => ({ ...invoice, total: money(invoice.total), amountPaid: money(invoice.amountPaid) })),
+    serviceSubscriptions: record.serviceSubscriptions.map((subscription) => ({ ...subscription, monthlyFee: money(subscription.monthlyFee) })),
+  };
 }
 
 export async function getIntake(principal: AuthPrincipal, id: string) {

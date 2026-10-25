@@ -3,16 +3,11 @@
 import { ArrowLeft, LoaderCircle, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { FriendlyData, humanLabel } from "@/components/friendly-data";
 import { WorkflowActions } from "@/components/workflow-actions";
 
 type DetailRecord = Record<string, unknown>;
-
-function printable(value: unknown): string {
-  if (value === null || value === undefined || value === "") return "—";
-  if (typeof value === "object") return JSON.stringify(value, null, 2);
-  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value)) return new Date(value).toLocaleString();
-  return String(value);
-}
+const hiddenKeys = new Set(["id", "clientId", "quoteId", "projectId", "organizationId", "questionnaireVersionId", "packageId"]);
 
 export function RecordDetail({ module, id, title }: { module: string; id: string; title: string }) {
   const [record, setRecord] = useState<DetailRecord>();
@@ -39,9 +34,12 @@ export function RecordDetail({ module, id, title }: { module: string; id: string
       {error && <div className="system-message error"><TriangleAlert size={18} />{error}</div>}
       {!record && !error && <div className="dashboard-loading"><LoaderCircle className="spin" /><span>Loading authorized record</span></div>}
       {record && <><section className="panel detail-panel">
-        <header><div><span className="kicker">Persisted record</span><h2>{String(record.title ?? record.displayName ?? record.businessName ?? record.name ?? id)}</h2></div>{module === "proposals" && <a className="secondary-button" download href={`/api/proposals/${encodeURIComponent(id)}/pdf`}>Download PDF</a>}</header>
-        <dl className="detail-grid">{Object.entries(record).filter(([key]) => !["passwordHash", "tokenHash", "secretCiphertext"].includes(key)).map(([key, value]) => <div key={key}><dt>{key.replaceAll(/([A-Z])/g, " $1")}</dt><dd className={typeof value === "object" ? "structured-value" : ""}>{printable(value)}</dd></div>)}</dl>
+        <header><div><span className="kicker">Saved and available across Pillar One</span><h2>{String(record.title ?? record.projectTitle ?? record.displayName ?? record.businessName ?? record.name ?? id)}</h2></div>{module === "proposals" && <a className="secondary-button" download href={`/api/proposals/${encodeURIComponent(id)}/pdf`}>Download PDF</a>}</header>
+        <dl className="detail-grid">{Object.entries(record).filter(([key, value]) => !hiddenKeys.has(key) && !["passwordHash", "tokenHash", "secretCiphertext"].includes(key) && (value === null || typeof value !== "object")).map(([key, value]) => <div key={key}><dt>{humanLabel(key)}</dt><dd><FriendlyData label={key} value={value} /></dd></div>)}</dl>
       </section><WorkflowActions module={module} id={id} record={record} /></>}
+      {record && Object.entries(record).filter(([key, value]) => !hiddenKeys.has(key) && value !== null && typeof value === "object").map(([key, value]) =>
+        <section className="panel detail-section" key={key}><header><div><span className="kicker">Linked information</span><h2>{humanLabel(key)}</h2></div>{Array.isArray(value) && <span className="count-badge">{value.length}</span>}</header><FriendlyData label={key} value={value} /></section>
+      )}
     </>
   );
 }

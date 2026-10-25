@@ -54,7 +54,7 @@ export async function listLeads(principal: AuthPrincipal, raw: PageInput = {}) {
       stage: true, serviceInterests: true, opportunityValue: true, currency: true,
       nextFollowUpAt: true, ownerId: true, createdAt: true, updatedAt: true,
     },
-    orderBy: { id: "asc" },
+    orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
@@ -93,7 +93,7 @@ export async function listClients(principal: AuthPrincipal, raw: PageInput = {})
       timezone: true, createdAt: true, updatedAt: true,
       contacts: { select: { id: true, name: true, email: true, phone: true, title: true, isPrimary: true } },
     },
-    orderBy: { id: "asc" },
+    orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
@@ -235,6 +235,7 @@ const quoteSelect = {
   acceptedAt: true,
   createdAt: true,
   updatedAt: true,
+  client: { select: { displayName: true } },
   versions: {
     select: {
       id: true,
@@ -256,8 +257,10 @@ const quoteSelect = {
 } satisfies Prisma.QuoteSelect;
 
 function quoteDto<T extends { versions: Array<{ subtotal: { toString(): string }; discount: { toString(): string }; finalPrice: { toString(): string }; lines: Array<{ quantity: { toString(): string }; clientUnitPrice: { toString(): string } | null }> }> }>(quote: T) {
+  const client = "client" in quote ? quote.client as { displayName?: string } | null : null;
   return {
     ...quote,
+    client: client?.displayName ?? null,
     versions: quote.versions.map((version) => ({
       ...version,
       subtotal: money(version.subtotal),
@@ -278,7 +281,7 @@ export async function listQuotes(principal: AuthPrincipal, raw: PageInput = {}) 
   const rows = await db.quote.findMany({
     where: { organizationId: principal.organizationId },
     select: quoteSelect,
-    orderBy: { id: "asc" },
+    orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
@@ -438,14 +441,16 @@ export async function listProjects(principal: AuthPrincipal, raw: PageInput = {}
     select: {
       id: true, clientId: true, quoteId: true, originalTitleId: true, title: true, servicePath: true,
       status: true, currency: true, budget: true, actualCost: true, startAt: true, dueAt: true, createdAt: true, updatedAt: true,
+      client: { select: { displayName: true } },
       scenes: { select: { shots: { select: { approvedTakeId: true } } } },
     },
-    orderBy: { id: "asc" },
+    orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
-  return nextCursor(rows.map(({ scenes, ...row }) => ({
+  return nextCursor(rows.map(({ scenes, client, ...row }) => ({
     ...row,
+    client: client?.displayName ?? null,
     budget: row.budget ? money(row.budget) : null,
     actualCost: money(row.actualCost),
     scenes: scenes.length,

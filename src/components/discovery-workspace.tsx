@@ -21,6 +21,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDemoMode } from "@/components/demo-mode-provider";
+import { FriendlyData } from "@/components/friendly-data";
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
@@ -485,7 +486,7 @@ export function DiscoverySession({ id }: { id: string }) {
       </div>}
 
       {tab === "outputs" && <section className="panel"><header><div><span className="kicker">Verified information only</span><h2>Generated operational records</h2></div><span className="count-badge">{data.latestOutputs.length}</span></header>
-        <div className="discovery-output-grid">{data.latestOutputs.map((output) => <article key={output.id}><span>{humanize(output.type)}</span><strong>Version {output.version}</strong><pre>{JSON.stringify(output.payload, null, 2)}</pre></article>)}</div>
+        <div className="discovery-output-grid">{data.latestOutputs.map((output) => <article key={output.id}><span>{humanize(output.type)}</span><strong>Version {output.version}</strong><FriendlyData value={output.payload} /></article>)}</div>
       </section>}
 
       {tab === "materials" && <div className="discovery-two-column">

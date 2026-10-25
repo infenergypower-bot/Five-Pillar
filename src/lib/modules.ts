@@ -74,7 +74,7 @@ export const modules: Record<string, ModuleDefinition> = {
   quotes: {
     slug: "quotes", title: "Quotes & estimates", eyebrow: "Margin protection", endpoint: "/api/quotes",
     description: "Build decimal-safe estimates, compare versions, and block ordinary approval below the configured minimum margin.",
-    columns: ["projectTitle", "servicePath", "status", "currentVersion", "expiresAt"],
+    columns: ["projectTitle", "client", "servicePath", "status", "currentVersion"],
     guidance: ["Default target margin is 55%.", "Below 50% requires an authorized audited exception.", "Internal costs never appear in client DTOs."],
   },
   proposals: {
@@ -92,13 +92,13 @@ export const modules: Record<string, ModuleDefinition> = {
   projects: {
     slug: "projects", title: "Projects", eyebrow: "Delivery operations", endpoint: "/api/projects",
     description: "Coordinate scope, team, schedule, budget, milestones, tasks, approvals, expenses, and final deliverables.",
-    columns: ["title", "servicePath", "status", "budget", "dueAt"],
+    columns: ["title", "client", "servicePath", "status", "budget"],
     guidance: ["Accepted quotes create one project transactionally.", "Production cannot start before required agreement and deposit conditions.", "Status overrides are authorized and audited."],
   },
   productions: {
     slug: "productions", title: "Productions", eyebrow: "Studio floor", endpoint: "/api/projects?production=true",
     description: "Manage production bibles, scenes, shots, takes, generation attempts, continuity, actual credits, and approved media.",
-    columns: ["title", "status", "scenes", "approvedShots", "actualCost"],
+    columns: ["title", "client", "status", "scenes", "approvedShots"],
     guidance: ["Failed generations remain visible.", "Shot-level planned and actual costs are separated.", "Locked creative decisions are versioned."],
   },
   tasks: {
