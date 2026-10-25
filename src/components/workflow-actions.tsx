@@ -9,6 +9,7 @@ type RecordData = Record<string, unknown>;
 
 const leadStages = ["NEW", "CONTACTED", "QUALIFIED", "DISCOVERY", "PROPOSAL", "NEGOTIATION", "WON", "LOST"];
 const quoteStatuses = ["DRAFT", "INTERNAL_REVIEW", "APPROVED", "SENT", "ACCEPTED", "DECLINED", "EXPIRED", "ARCHIVED"];
+const proposalStatuses = ["DRAFT", "INTERNAL_REVIEW", "SENT", "VIEWED", "ACCEPTED", "DECLINED", "EXPIRED"];
 const projectStatuses = ["INTAKE", "AWAITING_ASSETS", "DISCOVERY_COMPLETE", "CONCEPT_DEVELOPMENT", "SCRIPT_DEVELOPMENT", "SCRIPT_REVIEW", "VISUAL_DEVELOPMENT", "STORYBOARDING", "PRODUCTION_READY", "GENERATION", "EDITING", "INTERNAL_REVIEW", "CLIENT_REVIEW", "REVISIONS", "FINAL_APPROVAL", "AWAITING_FINAL_PAYMENT", "DELIVERY", "COMPLETED", "ARCHIVED", "ON_HOLD", "CANCELLED"];
 
 function message(body: unknown, fallback: string): string {
@@ -76,6 +77,7 @@ export function WorkflowActions({ module, id, record }: { module: string; id: st
       {(module === "projects" || module === "productions") && statusControl(projectStatuses, `/api/projects/${encodeURIComponent(id)}/transition`)}
       {module === "proposals" && <>
         <a className="secondary-button" href={`/api/proposals/${encodeURIComponent(id)}/pdf`}><Download size={15} /> Download PDF</a>
+        {statusControl(proposalStatuses, `/api/proposals/${encodeURIComponent(id)}/status`)}
         {record.status !== "ACCEPTED" && <form className="workflow-form" action={(formData) => void post(`/api/proposals/${encodeURIComponent(id)}/accept`, { name: String(formData.get("name") ?? ""), email: String(formData.get("email") ?? ""), accepted: true })}>
           <label>Authorized name<input name="name" required /></label><label>Email<input name="email" type="email" required /></label><button className="primary-button" disabled={working} type="submit"><Check size={15} /> Accept current version</button>
         </form>}

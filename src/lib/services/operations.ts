@@ -14,7 +14,7 @@ import { db } from "@/lib/db";
 import { assertProjectTransition } from "@/lib/workflow";
 import { ServiceError } from "./errors";
 import { assertOrganization, guard, money } from "./helpers";
-import { assertQuoteStatusTransition, assertRevisionInvariant, deriveInvoiceStatus } from "./invariants";
+import { assertProposalStatusTransition, assertQuoteStatusTransition, assertRevisionInvariant, deriveInvoiceStatus } from "./invariants";
 import {
   approvalCreateSchema,
   approvalDecisionSchema,
@@ -27,6 +27,7 @@ import {
   paymentSchema,
   projectTransitionSchema,
   proposalAcceptanceSchema,
+  proposalStatusSchema,
   quoteStatusSchema,
   revisionCreateSchema,
 } from "./inputs";
@@ -157,6 +158,33 @@ export async function acceptProposal(
     await tx.quote.update({ where: { id: proposal.quote.id }, data: { status: QuoteStatus.ACCEPTED, acceptedAt: acceptance.acceptedAt } });
     await audit(tx, principal, { action: "proposal.accepted", entityType: "Proposal", entityId: proposalId, after: { accepted: true } });
     return acceptance;
+  });
+}
+
+export async function transitionProposal(principal: AuthPrincipal, proposalId: string, raw: unknown) {
+  guard(principal, "pricing:approve");
+  const input = proposalStatusSchema.parse(raw);
+  return db.$transaction(async (tx) => {
+    const proposal = await tx.proposal.findUnique({
+      where: { id: proposalId },
+      select: { id: true, organizationId: true, status: true },
+    });
+    if (!proposal) throw new ServiceError("NOT_FOUND", "Proposal not found", 404);
+    assertOrganization(principal, proposal.organizationId);
+    if (proposal.status !== input.status) assertProposalStatusTransition(proposal.status, input.status);
+    const updated = await tx.proposal.update({
+      where: { id: proposalId },
+      data: { status: input.status },
+      select: { id: true, status: true },
+    });
+    await audit(tx, principal, {
+      action: "proposal.status_changed",
+      entityType: "Proposal",
+      entityId: proposalId,
+      before: { status: proposal.status },
+      after: { status: input.status },
+    });
+    return updated;
   });
 }
 

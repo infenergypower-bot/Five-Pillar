@@ -206,6 +206,7 @@ export const originalTitleCreateSchema = z.object({
 export const leadStageSchema = z.object({ stage: z.enum(LeadStage), reason: z.string().trim().max(1000).optional() });
 export const intakeStatusSchema = z.object({ status: z.enum(IntakeStatus) });
 export const quoteStatusSchema = z.object({ status: z.enum(QuoteStatus), reason: z.string().trim().max(1000).optional() });
+export const proposalStatusSchema = z.object({ status: z.enum(ProposalStatus) });
 export const proposalAcceptanceSchema = z.object({
   name: z.string().trim().min(1).max(160),
   email: z.email().trim().toLowerCase(),

@@ -1,4 +1,4 @@
-import { InvoiceStatus, QuoteStatus, RevisionCategory } from "@prisma/client";
+import { InvoiceStatus, ProposalStatus, QuoteStatus, RevisionCategory } from "@prisma/client";
 import { ServiceError } from "./errors";
 
 export function assertQuoteStatusTransition(from: QuoteStatus, to: QuoteStatus): void {
@@ -9,6 +9,15 @@ export function assertQuoteStatusTransition(from: QuoteStatus, to: QuoteStatus):
     SENT: [QuoteStatus.ACCEPTED, QuoteStatus.DECLINED, QuoteStatus.EXPIRED],
   };
   if (!allowed[from]?.includes(to)) throw new ServiceError("INVALID_TRANSITION", `Invalid quote transition: ${from} -> ${to}`, 409);
+}
+
+export function assertProposalStatusTransition(from: ProposalStatus, to: ProposalStatus): void {
+  const allowed: Partial<Record<ProposalStatus, readonly ProposalStatus[]>> = {
+    DRAFT: [ProposalStatus.INTERNAL_REVIEW],
+    INTERNAL_REVIEW: [ProposalStatus.DRAFT, ProposalStatus.SENT],
+    SENT: [ProposalStatus.DECLINED, ProposalStatus.EXPIRED],
+  };
+  if (!allowed[from]?.includes(to)) throw new ServiceError("INVALID_TRANSITION", `Invalid proposal transition: ${from} -> ${to}`, 409);
 }
 
 export function assertRevisionInvariant(input: {

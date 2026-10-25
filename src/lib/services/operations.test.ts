@@ -1,12 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { InvoiceStatus, QuoteStatus, RevisionCategory } from "@prisma/client";
-import { assertQuoteStatusTransition, assertRevisionInvariant, deriveInvoiceStatus } from "./invariants";
+import { InvoiceStatus, ProposalStatus, QuoteStatus, RevisionCategory } from "@prisma/client";
+import { assertProposalStatusTransition, assertQuoteStatusTransition, assertRevisionInvariant, deriveInvoiceStatus } from "./invariants";
 
 describe("transactional service invariants", () => {
   it("allows only explicit quote workflow transitions", () => {
     expect(() => assertQuoteStatusTransition(QuoteStatus.DRAFT, QuoteStatus.INTERNAL_REVIEW)).not.toThrow();
     expect(() => assertQuoteStatusTransition(QuoteStatus.DRAFT, QuoteStatus.ACCEPTED)).toThrow("Invalid quote transition");
     expect(() => assertQuoteStatusTransition(QuoteStatus.SENT, QuoteStatus.ACCEPTED)).not.toThrow();
+  });
+
+  it("requires proposal review before sending and client acceptance", () => {
+    expect(() => assertProposalStatusTransition(ProposalStatus.DRAFT, ProposalStatus.INTERNAL_REVIEW)).not.toThrow();
+    expect(() => assertProposalStatusTransition(ProposalStatus.INTERNAL_REVIEW, ProposalStatus.SENT)).not.toThrow();
+    expect(() => assertProposalStatusTransition(ProposalStatus.DRAFT, ProposalStatus.SENT)).toThrow("Invalid proposal transition");
+    expect(() => assertProposalStatusTransition(ProposalStatus.SENT, ProposalStatus.ACCEPTED)).toThrow("Invalid proposal transition");
   });
 
   it("requires billable out-of-scope revisions to have an estimate", () => {
