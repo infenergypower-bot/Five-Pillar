@@ -48,7 +48,9 @@ function scalar(value: unknown, key?: string): string {
 function titleFor(record: Record<string, unknown>, index: number): string {
   const title = record.title ?? record.projectTitle ?? record.displayName ?? record.businessName ??
     record.name ?? record.label ?? record.description ?? record.subject ?? record.email;
-  return typeof title === "string" && title ? title : `Item ${index + 1}`;
+  if (typeof title === "string" && title) return title;
+  if (typeof record.servicePath === "string") return `${humanLabel(record.servicePath)} discovery`;
+  return `Item ${index + 1}`;
 }
 
 function ObjectFields({ value }: { value: Record<string, unknown> }) {

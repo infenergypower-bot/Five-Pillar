@@ -54,7 +54,7 @@ export async function listLeads(principal: AuthPrincipal, raw: PageInput = {}) {
       stage: true, serviceInterests: true, opportunityValue: true, currency: true,
       nextFollowUpAt: true, ownerId: true, createdAt: true, updatedAt: true,
     },
-    orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
@@ -93,7 +93,7 @@ export async function listClients(principal: AuthPrincipal, raw: PageInput = {})
       timezone: true, createdAt: true, updatedAt: true,
       contacts: { select: { id: true, name: true, email: true, phone: true, title: true, isPrimary: true } },
     },
-    orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
@@ -140,7 +140,7 @@ export async function listIntakes(principal: AuthPrincipal, raw: PageInput = {})
       status: true, completeness: true, readiness: true, submittedAt: true, createdAt: true, updatedAt: true,
       client: { select: { displayName: true } },
     },
-    orderBy: { id: "asc" },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
@@ -281,7 +281,7 @@ export async function listQuotes(principal: AuthPrincipal, raw: PageInput = {}) 
   const rows = await db.quote.findMany({
     where: { organizationId: principal.organizationId },
     select: quoteSelect,
-    orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });
@@ -444,7 +444,7 @@ export async function listProjects(principal: AuthPrincipal, raw: PageInput = {}
       client: { select: { displayName: true } },
       scenes: { select: { shots: { select: { approvedTakeId: true } } } },
     },
-    orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: page.limit,
     ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
   });

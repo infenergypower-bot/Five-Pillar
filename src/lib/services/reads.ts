@@ -191,7 +191,7 @@ export async function listProposals(principal: AuthPrincipal, raw: PageInput = {
       id: true, clientId: true, quoteId: true, status: true, currentVersion: true, expiresAt: true, createdAt: true,
       quote: { select: { projectTitle: true } }, client: { select: { displayName: true } },
     },
-    orderBy: { id: "asc" }, take: input.limit,
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: input.limit,
     ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
   });
   return nextCursor(rows.map(({ quote, client, ...record }) => ({ ...record, projectTitle: quote.projectTitle, client: client?.displayName ?? null })), input.limit);
