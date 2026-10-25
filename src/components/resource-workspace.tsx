@@ -100,7 +100,9 @@ export function ResourceWorkspace({ module }: { module: ModuleDefinition }) {
     if (!module.endpoint) return;
     setError("");
     setNotice("");
-    const payload: Record<string, unknown> = Object.fromEntries(Array.from(formData.entries()).map(([key, value]) => [key, typeof value === "string" ? value.trim() : value]));
+    const payload: Record<string, unknown> = Object.fromEntries(Array.from(formData.entries())
+      .map(([key, value]) => [key, typeof value === "string" ? value.trim() : value] as const)
+      .filter(([, value]) => value !== ""));
     if (module.slug === "leads") {
       payload.serviceInterests = payload.servicePath ? [payload.servicePath] : [];
       delete payload.servicePath;
