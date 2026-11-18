@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { assembleGrowth, mergeProfile, type AgentTask } from "./agents";
 import { canApproveProfile, emptyProfile, profileProgress } from "./domain";
+import { infenergyBaseline } from "./infenergy-baseline";
 
 describe("business research evidence gates", () => {
   it("starts with every Five Pillar question unanswered", () => {
@@ -26,6 +27,18 @@ describe("business research evidence gates", () => {
     expect(canApproveProfile(merged).ready).toBe(true);
   });
 
+  it("keeps a qualitative best estimate clearly marked as a low-confidence hypothesis", () => {
+    const data = emptyProfile();
+    const tasks: AgentTask[] = [{ lane: "audience", status: "COMPLETE", result: {
+      summary: "", recommendations: [], competitors: [], segments: [], findings: [
+        { field: "content_consumption", topic: "Audience", value: "Likely uses product comparisons; validate with survey and campaign analytics", kind: "INFERRED", confidence: 0.8, rationale: "No direct segment study", evidenceUrls: [] },
+      ],
+    } }];
+    const answer = mergeProfile(data, tasks, []).answers.find(a => a.questionId === "content_consumption");
+    expect(answer).toMatchObject({ kind: "HYPOTHESIS", confidence: 0.3, sourceIds: [], status: "DRAFT" });
+    expect(answer?.value).toContain("validate");
+  });
+
   it("only produces opportunities tied to source-linked findings", () => {
     const task: AgentTask = { lane: "competitors", status: "COMPLETE", result: {
       summary: "", competitors: [], segments: [], findings: [
@@ -42,4 +55,15 @@ describe("business research evidence gates", () => {
     expect(audit.opportunities[0].impact).toBeNull();
     expect(audit.opportunities[0].bookRefs[0].pages).toContain(20);
   });
+
+  it("drafts every Infenergy question from the dated public baseline and preserves owner edits", () => {
+    const original = emptyProfile();
+    const baseline = infenergyBaseline(original);
+    expect(profileProgress(baseline)).toEqual({ total: 46, answered: 46, approved: 0 });
+    expect(baseline.answers.every(answer => answer.value && answer.sourceIds.every(id => baseline.sources.some(source => source.id === id)))).toBe(true);
+    expect(baseline.answers.find(answer => answer.questionId === "gross_margin")?.kind).toBe("HYPOTHESIS");
+    const reviewed = { ...original, answers: original.answers.map(answer => answer.questionId === "brand_promise" ? { ...answer, value: "Owner-approved promise", status: "APPROVED" as const } : answer) };
+    expect(infenergyBaseline(reviewed).answers.find(answer => answer.questionId === "brand_promise")?.value).toBe("Owner-approved promise");
+  });
 });
+
