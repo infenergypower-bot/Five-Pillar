@@ -115,7 +115,7 @@ export async function startResearchRun(principal: AuthPrincipal, id: string, sta
   if (demoModeEnabled()) throw new ServiceError("RESEARCH_DISABLED_IN_DEMO", "Live paid research is disabled in the public demonstration workspace", 403);
   if (!process.env.OPENAI_API_KEY) throw new ServiceError("PROVIDER_UNAVAILABLE", "Configure OPENAI_API_KEY to run live research", 503);
   if (stage === "GROWTH" && p.status !== "APPROVED") throw new ServiceError("PROFILE_REVIEW_REQUIRED", "Approve the business profile before starting the growth audit", 409);
-  const active = p.runs.find(r => r.stage === stage && (r.status === "QUEUED" || r.status === "RUNNING"));
+  const active = await db.businessResearchRun.findFirst({ where: { profileId: id, stage, status: { in: ["QUEUED", "RUNNING"] } }, orderBy: { createdAt: "desc" } });
   if (active) return { id: active.id, status: active.status };
   const today = new Date(); today.setUTCHours(0, 0, 0, 0);
   const dailyRuns = await db.businessResearchRun.count({ where: { profile: { organizationId: principal.organizationId }, createdAt: { gte: today } } });
@@ -186,7 +186,7 @@ export async function processResearchQueue(limit = 2) {
 
 export async function reviewGrowthOpportunity(principal: AuthPrincipal, profileId: string, runId: string, body: unknown) {
   const p = await scoped(principal, profileId, true);
-  const run = p.runs.find(r => r.id === runId && r.stage === "GROWTH");
+  const run = await db.businessResearchRun.findFirst({ where: { id: runId, profileId: p.id, stage: "GROWTH" } });
   if (!run?.result) throw new ServiceError("NOT_FOUND", "Growth audit not found", 404);
   if (p.status !== "APPROVED" || run.profileVersion !== p.version) throw new ServiceError("STALE_PROFILE", "Reapprove the current profile and rerun the growth audit before approving opportunities", 409);
   const input = z.object({ opportunityId: z.string(), status: z.enum(["APPROVED", "REJECTED", "DRAFT"]) }).parse(body);
@@ -200,3 +200,4 @@ export async function reviewGrowthOpportunity(principal: AuthPrincipal, profileI
   ]);
   return { id: target.id, status: input.status };
 }
+

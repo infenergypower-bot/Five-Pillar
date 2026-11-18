@@ -40,7 +40,9 @@ CREATE INDEX "BusinessResearchProfile_organizationId_updatedAt_idx" ON "Business
 CREATE INDEX "BusinessResearchProfile_clientId_idx" ON "BusinessResearchProfile"("clientId");
 CREATE INDEX "BusinessResearchRun_profileId_createdAt_idx" ON "BusinessResearchRun"("profileId", "createdAt");
 CREATE INDEX "BusinessResearchRun_status_updatedAt_idx" ON "BusinessResearchRun"("status", "updatedAt");
+CREATE UNIQUE INDEX "BusinessResearchRun_active_profile_stage_key" ON "BusinessResearchRun"("profileId", "stage") WHERE "status" IN ('QUEUED', 'RUNNING');
 
 ALTER TABLE "BusinessResearchProfile" ADD CONSTRAINT "BusinessResearchProfile_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "BusinessResearchProfile" ADD CONSTRAINT "BusinessResearchProfile_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "BusinessResearchRun" ADD CONSTRAINT "BusinessResearchRun_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "BusinessResearchProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
