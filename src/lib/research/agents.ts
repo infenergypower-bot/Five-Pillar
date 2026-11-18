@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { questions, type BusinessProfileData, type EvidenceKind, type GrowthAudit, type GrowthOpportunity, type ResearchAnswer, type ResearchFinding, type ResearchSource } from "./domain";
-import { methodRef } from "./books";
+import { bookMethods, methodRef } from "./books";
 
 export interface AgentTask {
   lane: string;
@@ -101,7 +101,7 @@ function prompt(stage: "PROFILE" | "GROWTH", lane: string, business: { businessN
   if (stage === "PROFILE") {
     const selected = profileLanes.find(x => x.lane === lane);
     const bank = questions.filter(q => q.pillar === selected?.pillar);
-    return `${context}\nResearch lane: ${lane}. Search current public sources, prioritizing official company pages, then independent sources. Answer these questionnaire fields: ${JSON.stringify(bank.map(q => ({ field: q.id, question: q.prompt })))}. Use the exact field IDs. For private operational or financial questions with no public answer, return UNKNOWN/null. Return competitors, segments, and recommendations as empty arrays. Do not infer customer demographics or media affinities from stereotypes. JSON only.`;
+    return `${context}\nResearch lane: ${lane}. Search current public sources, prioritizing official company pages, then independent sources. Answer these questionnaire fields: ${JSON.stringify(bank.map(q => ({ field: q.id, question: q.prompt })))}. Use the exact field IDs. Discovery method: ${bookMethods.find(m => m.key === "discovery")?.use}. For private operational or financial questions with no public answer, return UNKNOWN/null. Return competitors, segments, and recommendations as empty arrays. Do not infer customer demographics or media affinities from stereotypes. JSON only.`;
   }
   const profile = business.profileData as BusinessProfileData;
   const reviewed = profile.answers.filter(a => a.status === "APPROVED" && a.kind !== "UNKNOWN").map(a => ({ field: a.questionId, value: a.value, kind: a.kind }));
@@ -112,7 +112,7 @@ function prompt(stage: "PROFILE" | "GROWTH", lane: string, business: { businessN
     channels: "Audit search, site conversion, social, content, sales path, retention, referrals, and partnerships. Distinguish site observation from performance data that only the owner can supply.",
     strategy: "Investigate underserved nonbuyers, adjacent offers, partnerships, category shifts, and strategic risks. Compare plausible opportunities with alternatives.",
   };
-  return `${context}\nReviewed profile facts: ${JSON.stringify(reviewed).slice(0, 16000)}\nResearch lane: ${lane}. ${laneGuide[lane]} Search recent sources and cite URLs in evidenceUrls. Provide precise findings and a few testable recommendations. sourceFields must refer to field values returned in this lane. bookKey may be one of discovery, positioning, unitEconomics, metrics, referrals, lifecycle, partnerships, sales, noncustomers, or empty. Do not claim ROI or private habits without data. JSON only.`;
+  return `${context}\nReviewed profile facts: ${JSON.stringify(reviewed).slice(0, 16000)}\nResearch lane: ${lane}. ${laneGuide[lane]} Method library: ${JSON.stringify(bookMethods.map(m => ({ key: m.key, title: m.title, use: m.use, pdfPages: m.pages })))}. Use a method only when it fits the client evidence; the books are not evidence about this company. Search recent sources and cite URLs in evidenceUrls. Provide precise findings and a few testable recommendations. sourceFields must refer to field values returned in this lane. bookKey must match an applicable method key or be empty. Do not claim ROI or private habits without data. JSON only.`;
 }
 
 async function openai(url: string, init?: RequestInit) {
@@ -203,8 +203,19 @@ export function assembleGrowth(tasks: AgentTask[], sourceList: ResearchSource[],
     rationale: f.rationale, sourceIds: f.evidenceUrls.map(urlKey), status: "DRAFT" as const,
   })));
   const byLane = new Map(tasks.map(t => [t.lane, t]));
-  const competitors = tasks.flatMap(t => (t.result?.competitors || []).map(c => ({ ...c, sourceIds: c.evidenceUrls.map(urlKey) }))).map(({ evidenceUrls: _evidenceUrls, ...c }) => c);
-  const segments = tasks.flatMap(t => (t.result?.segments || []).map(s => ({ ...s, sourceIds: s.evidenceUrls.map(urlKey) }))).map(({ evidenceUrls: _evidenceUrls, ...s }) => s);
+  const competitors = tasks.flatMap(t => (t.result?.competitors || []).map(c => ({
+    name: c.name, website: c.website, type: c.type, positioning: c.positioning,
+    offers: c.offers, pricing: c.pricing, advantages: c.advantages, gaps: c.gaps,
+    sourceIds: c.evidenceUrls.map(urlKey),
+  })));
+  const segments = tasks.flatMap(t => (t.result?.segments || []).map(s => ({
+    name: s.name, description: s.description, geography: s.geography, sample: s.sample,
+    demographics: s.demographics, psychographics: s.psychographics, needs: s.needs,
+    triggers: s.triggers, objections: s.objections, lifestyle: s.lifestyle,
+    adjacentOwnership: s.adjacentOwnership, contentHabits: s.contentHabits,
+    entertainmentAffinities: s.entertainmentAffinities, confidence: s.confidence,
+    sourceIds: s.evidenceUrls.map(urlKey),
+  })));
   const opportunities: GrowthOpportunity[] = tasks.flatMap(task => (task.result?.recommendations || []).flatMap((rec, i) => {
     const evidence = findings.filter(f => f.id.startsWith(`${task.lane}-`) && rec.sourceFields.includes(f.field) &&
       f.sourceIds.length && (f.kind === "VERIFIED" || f.kind === "INFERRED"));

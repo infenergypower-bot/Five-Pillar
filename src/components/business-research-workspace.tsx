@@ -77,7 +77,13 @@ export function ResearchDetail({ id }: { id: string }) {
   const [notice, setNotice] = useState("");
   const advancing = useRef(false);
   const reload = useCallback(async () => { setDetail(await request<Detail>(`/api/business-research/${id}`)); }, [id]);
-  useEffect(() => { void reload().catch(e => setError(e instanceof Error ? e.message : "Unable to load profile")); }, [reload]);
+  useEffect(() => {
+    const controller = new AbortController();
+    void request<Detail>(`/api/business-research/${id}`, { signal: controller.signal })
+      .then(setDetail)
+      .catch(e => { if (!(e instanceof DOMException && e.name === "AbortError")) setError(e instanceof Error ? e.message : "Unable to load profile"); });
+    return () => controller.abort();
+  }, [id]);
   const active = detail?.runs.find(r => r.status === "QUEUED" || r.status === "RUNNING");
   const activeRunId = active?.id;
   const activeStatus = active?.status;
@@ -169,7 +175,8 @@ export function ResearchDetail({ id }: { id: string }) {
       {growth.profileVersion !== detail.version && <p className={styles.error}>This audit used profile version {growth.profileVersion}; the current profile is version {detail.version}. Rerun growth intelligence before approving its opportunities.</p>}
       <p>{growth.result.findings.length} findings · {growth.result.opportunities.length} evidence-linked opportunities. Every recommendation is a draft until reviewed.</p>
       <h3>Competitor landscape</h3><div className={styles.auditColumns}>{growth.result.competitors.length ? growth.result.competitors.map((c, i) => <article className={styles.finding} key={`${c.name}-${i}`}><div className={styles.tag}>{c.type}</div><h4>{c.name}</h4><p><strong>Position:</strong> {c.positioning}<br /><strong>Offers:</strong> {c.offers}<br /><strong>Pricing:</strong> {c.pricing}<br /><strong>Advantages:</strong> {c.advantages}<br /><strong>Gaps to investigate:</strong> {c.gaps}</p><SourceLinks ids={c.sourceIds} sources={growth.result!.sources} /></article>) : <p>Competitor details are still unknown.</p>}</div>
-      <h3>Audience segments</h3><div className={styles.auditColumns}>{growth.result.segments.length ? growth.result.segments.map((s, i) => <article className={styles.finding} key={`${s.name}-${i}`}><div className={styles.tag}>{s.geography} · {s.sample} · {Math.round(s.confidence * 100)}% confidence</div><h4>{s.name}</h4><p>{s.description}</p><dl className={styles.facets}>{([
+      <h3>Audience evidence map</h3>{growth.result.segments.length > 0 && <div className={styles.segmentMap}>{growth.result.segments.map((s, i) => <div key={`${s.name}-map-${i}`}><span>{s.name}</span><div className={styles.bar}><i style={{ width: `${s.confidence * 100}%` }} /></div><small>{s.sourceIds.length} linked sources · {Math.round(s.confidence * 100)}% stated confidence</small></div>)}</div>}
+      <div className={styles.auditColumns}>{growth.result.segments.length ? growth.result.segments.map((s, i) => <article className={styles.finding} key={`${s.name}-${i}`}><div className={styles.tag}>{s.geography} · {s.sample} · {Math.round(s.confidence * 100)}% confidence</div><h4>{s.name}</h4><p>{s.description}</p><dl className={styles.facets}>{([
         ["Demographics", s.demographics], ["Psychographics and values", s.psychographics], ["Needs", s.needs], ["Buying triggers", s.triggers], ["Objections", s.objections], ["Lifestyle", s.lifestyle], ["Adjacent ownership", s.adjacentOwnership], ["Content habits", s.contentHabits], ["Entertainment affinities", s.entertainmentAffinities],
       ] as const).map(([label, val]) => <div key={label}><dt>{label}</dt><dd>{val}</dd></div>)}</dl><SourceLinks ids={s.sourceIds} sources={growth.result!.sources} /></article>) : <p>Audience segments require further evidence.</p>}</div>
       <div className={styles.auditColumns}><div><h3>Research findings</h3>{growth.result.findings.map(f => <article className={styles.finding} key={f.id}><div className={styles.tag}>{f.topic} · {f.kind} · {Math.round(f.confidence * 100)}% confidence</div><h4>{f.field}</h4><p>{f.value || "Unknown — client or audience research required."}</p><small>{f.rationale}</small><SourceLinks ids={f.sourceIds} sources={growth.result!.sources} /></article>)}</div>

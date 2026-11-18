@@ -53,6 +53,10 @@
 .sources { display: flex; flex-wrap: wrap; gap: .55rem; margin: .8rem 0; font-size: .76rem; }
 .sources a { text-decoration: underline; overflow-wrap: anywhere; }
 .auditColumns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; align-items: start; }
+.segmentMap { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: .7rem; margin: .7rem 0 1.2rem; }
+.segmentMap > div { border: 1px solid #394154; border-radius: .7rem; background: #101724; padding: .8rem; display: grid; gap: .55rem; }
+.segmentMap span { font-size: .85rem; font-weight: 700; }
+.segmentMap small { color: #adb6c6; font-size: .7rem; }
 .finding { border: 1px solid #394154; border-radius: .75rem; background: #101724; padding: 1rem; margin-bottom: .75rem; }
 .finding h4 { font-size: 1rem; margin: .8rem 0 .3rem; }
 .finding p { white-space: pre-wrap; font-size: .85rem; }
