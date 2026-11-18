@@ -42,6 +42,10 @@ npm audit
 
 `npm run check` runs lint, tests, and the production build.
 
+## Business research and growth intelligence
+
+The internal [Business research workspace](docs/BUSINESS-RESEARCH.md) creates sourced company profiles from a business name and description, coordinates specialist web research, and offers a second competitor, audience, brand, and growth audit after staff approval. Configure `OPENAI_API_KEY` to enable live research and schedule `/api/jobs/research` for unattended progress. The public demonstration mode does not permit paid research.
+
 ## Adaptive discovery
 
 The **Discovery & intake** workspace asks only questions activated by the selected
@@ -115,3 +119,4 @@ Required production integrations:
 ## Configuration still required
 
 Package prices, labor rates, overhead, subscription invoices, model-credit rates, managed-service tiers, contract language, retention policy, provider credentials, and actual OpenArt plan details are intentionally administrator-configurable and must be verified before selling or processing production work.
+
