@@ -19,6 +19,8 @@ const schema = z.object({
   ALPHI_API_URL: optionalUrl,
   ALPHI_API_KEY: z.string().optional(),
   JOB_RUNNER_SECRET: z.string().min(32).optional(),
+  OPENAI_API_KEY: z.string().optional(),
+  OPENAI_RESEARCH_MODEL: z.string().optional(),
   DEMO_MODE: z.enum(["true", "false"]).optional(),
 });
 
@@ -46,3 +48,4 @@ export function integrationConfigured(name: "storage" | "email" | "payment" | "s
   if (name === "signature") return Boolean(config.SIGNATURE_PROVIDER_API_KEY);
   return Boolean(config.ALPHI_API_URL && config.ALPHI_API_KEY);
 }
+

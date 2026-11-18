@@ -30,6 +30,7 @@ const navigation = [
 ];
 
 const intelligence = [
+  { label: "Business research", href: "/business-research", icon: Search },
   { label: "Creative studio", href: "/creative", icon: WandSparkles },
   { label: "Original entertainment", href: "/original-ip", icon: Clapperboard },
   { label: "Alphi AI integration", href: "/integrations", icon: Sparkles },
@@ -168,3 +169,4 @@ export function AppShell({ children, title, eyebrow }: { children: ReactNode; ti
     </div>
   );
 }
+

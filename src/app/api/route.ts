@@ -13,6 +13,7 @@ export function GET() {
       "/api/projects": ["GET", "POST"],
       "/api/invoices": ["GET", "POST"],
       "/api/original-titles": ["GET", "POST"],
+      "/api/business-research": ["GET", "POST"],
     },
     summaries: ["/api/dashboard", "/api/portal"],
     mutations: [
@@ -29,7 +30,13 @@ export function GET() {
       "/api/change-orders/:id/status",
       "/api/invoices/:id/payments",
       "/api/assets",
+      "/api/business-research/:id/answers",
+      "/api/business-research/:id/approve",
+      "/api/business-research/:id/runs",
+      "/api/business-research/:id/runs/:runId/advance",
+      "/api/business-research/:id/runs/:runId/opportunities",
       "/api/outbox",
     ],
   });
 }
+

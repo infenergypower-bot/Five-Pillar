@@ -390,6 +390,7 @@ model Organization {
   connections    IntegrationConnection[]
   automations    AutomationRule[]
   auditEvents    AuditEvent[]
+  researchProfiles BusinessResearchProfile[]
 }
 
 model User {
@@ -606,6 +607,7 @@ model Client {
   projects             Project[]
   invoices             Invoice[]
   serviceSubscriptions ServiceSubscription[]
+  researchProfiles     BusinessResearchProfile[]
 
   @@unique([organizationId, displayName])
   @@index([organizationId])
@@ -2182,3 +2184,60 @@ model AuditEvent {
   @@index([organizationId, createdAt])
   @@index([correlationId])
 }
+
+enum ResearchRunStage {
+  PROFILE
+  GROWTH
+}
+
+enum ResearchRunStatus {
+  QUEUED
+  RUNNING
+  READY
+  PARTIAL
+  FAILED
+}
+
+model BusinessResearchProfile {
+  id             String                @id @default(cuid())
+  organizationId String
+  clientId       String?
+  businessName   String
+  description    String
+  website        String?
+  location       String?
+  status         String                @default("DRAFT")
+  version        Int                   @default(1)
+  profileData    Json
+  approvedAt     DateTime?
+  approvedBy     String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client         Client?               @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  runs           BusinessResearchRun[]
+
+  @@index([organizationId, updatedAt])
+  @@index([clientId])
+}
+
+model BusinessResearchRun {
+  id          String                  @id @default(cuid())
+  profileId   String
+  profileVersion Int
+  stage       ResearchRunStage
+  status      ResearchRunStatus       @default(QUEUED)
+  tasks       Json
+  result      Json?
+  error       String?
+  leaseUntil  DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  profile     BusinessResearchProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, createdAt])
+  @@index([status, updatedAt])
+}
+
