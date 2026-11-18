@@ -101,10 +101,10 @@ function prompt(stage: "PROFILE" | "GROWTH", lane: string, business: { businessN
   if (stage === "PROFILE") {
     const selected = profileLanes.find(x => x.lane === lane);
     const bank = questions.filter(q => q.pillar === selected?.pillar);
-    return `${context}\nResearch lane: ${lane}. Search current public sources, prioritizing official company pages, then independent sources. Answer these questionnaire fields: ${JSON.stringify(bank.map(q => ({ field: q.id, question: q.prompt })))}. Use the exact field IDs. Discovery method: ${bookMethods.find(m => m.key === "discovery")?.use}. For private operational or financial questions with no public answer, return UNKNOWN/null. Return competitors, segments, and recommendations as empty arrays. Do not infer customer demographics or media affinities from stereotypes. JSON only.`;
+    return `${context}\nResearch lane: ${lane}. Search current public sources, prioritizing official company pages, then independent sources. Return exactly one finding for EVERY questionnaire field: ${JSON.stringify(bank.map(q => ({ field: q.id, question: q.prompt })))}. Use the exact field IDs. Discovery method: ${bookMethods.find(m => m.key === "discovery")?.use}. For each field, provide the closest useful answer. Use VERIFIED for directly supported company facts, INFERRED for reasoned conclusions grounded in cited company or market evidence, and HYPOTHESIS for an explicit best estimate or research gap with a concrete validation path. If a private metric such as actual revenue, margin, repeat rate, or conversion is unavailable, state that it is not public and give a defensible proxy or calculation and the exact internal data needed; never fabricate a company-specific number. An unsupported hypothesis may have an empty evidenceUrls array and must have low confidence. Use UNKNOWN/null only if no meaningful answer, proxy, or validation path is possible. Return competitors, segments, and recommendations as empty arrays. Do not infer customer demographics or media affinities from stereotypes. JSON only.`;
   }
   const profile = business.profileData as BusinessProfileData;
-  const reviewed = profile.answers.filter(a => a.status === "APPROVED" && a.kind !== "UNKNOWN").map(a => ({ field: a.questionId, value: a.value, kind: a.kind }));
+  const reviewed = profile.answers.filter(a => a.value && a.kind !== "UNKNOWN").map(a => ({ field: a.questionId, value: a.value, kind: a.kind, review: a.status, confidence: a.confidence }));
   const laneGuide: Record<string, string> = {
     competitors: "Fill the competitors array with direct, indirect, and emerging competitors. Compare specific offers, pricing if public, positioning, customer experience, proof, and observable gaps. Record each competitor by name in findings too.",
     audience: "Fill the segments array with evidence-backed segments and granular fields: aggregate demographics, psychographics, needs, values, triggers, objections, lifestyle, adjacent ownership, content formats, media, entertainment, movies, celebrities, and characters only where segment-specific sources support them. Use 'Unknown' for unsupported fields. Record sample and geography. Add key insights as findings.",
@@ -112,7 +112,7 @@ function prompt(stage: "PROFILE" | "GROWTH", lane: string, business: { businessN
     channels: "Audit search, site conversion, social, content, sales path, retention, referrals, and partnerships. Distinguish site observation from performance data that only the owner can supply.",
     strategy: "Investigate underserved nonbuyers, adjacent offers, partnerships, category shifts, and strategic risks. Compare plausible opportunities with alternatives.",
   };
-  return `${context}\nReviewed profile facts: ${JSON.stringify(reviewed).slice(0, 16000)}\nResearch lane: ${lane}. ${laneGuide[lane]} Method library: ${JSON.stringify(bookMethods.map(m => ({ key: m.key, title: m.title, use: m.use, pdfPages: m.pages })))}. Use a method only when it fits the client evidence; the books are not evidence about this company. Search recent sources and cite URLs in evidenceUrls. Provide precise findings and a few testable recommendations. sourceFields must refer to field values returned in this lane. bookKey must match an applicable method key or be empty. Do not claim ROI or private habits without data. JSON only.`;
+  return `${context}\nProfile research draft (review field shows whether an owner approved it): ${JSON.stringify(reviewed).slice(0, 16000)}\nResearch lane: ${lane}. ${laneGuide[lane]} Treat unreviewed hypotheses as provisional leads to validate, not established company facts. Method library: ${JSON.stringify(bookMethods.map(m => ({ key: m.key, title: m.title, use: m.use, pdfPages: m.pages })))}. Use a method only when it fits the client evidence; the books are not evidence about this company. Search recent sources and cite URLs in evidenceUrls. Provide precise findings and a few testable recommendations. sourceFields must refer to field values returned in this lane. bookKey must match an applicable method key or be empty. Do not claim ROI or private habits without data. JSON only.`;
 }
 
 async function openai(url: string, init?: RequestInit) {
@@ -183,13 +183,15 @@ export function mergeProfile(data: BusinessProfileData, tasks: AgentTask[], sour
   const sourceMap = new Map([...data.sources, ...sourceList].map(s => [s.id, s]));
   const answerMap = new Map(data.answers.map(a => [a.questionId, a]));
   const knownQuestions = new Set(questions.map(q => q.id));
+  const privateMetrics = new Set(["revenue_mix", "purchase_frequency", "gross_margin", "funnel_counts", "channel_mix", "creative_performance"]);
   for (const task of tasks) for (const finding of task.result?.findings || []) {
     if (!knownQuestions.has(finding.field)) continue;
     const old = answerMap.get(finding.field);
     if (old?.status === "APPROVED") continue;
     const sourceIds = finding.evidenceUrls.map(urlKey).filter(id => sourceMap.has(id));
-    const kind: EvidenceKind = finding.value === null ? "UNKNOWN" : sourceIds.length ? finding.kind : finding.kind === "HYPOTHESIS" ? "HYPOTHESIS" : "UNKNOWN";
-    const next: ResearchAnswer = { questionId: finding.field, value: kind === "UNKNOWN" ? null : finding.value, kind, sourceIds, confidence: finding.confidence, rationale: finding.rationale, status: "DRAFT" };
+    const unsupportedPrivateNumber = privateMetrics.has(finding.field) && !sourceIds.length && /\d|\$|%/.test(finding.value || "");
+    const kind: EvidenceKind = finding.value === null || unsupportedPrivateNumber ? "UNKNOWN" : sourceIds.length ? finding.kind : "HYPOTHESIS";
+    const next: ResearchAnswer = { questionId: finding.field, value: kind === "UNKNOWN" ? null : finding.value, kind, sourceIds, confidence: sourceIds.length ? finding.confidence : Math.min(finding.confidence, 0.3), rationale: finding.rationale, status: "DRAFT" };
     if (!old || next.confidence > old.confidence || old.kind === "UNKNOWN") answerMap.set(finding.field, next);
   }
   return { ...data, answers: questions.map(q => answerMap.get(q.id)!), sources: [...sourceMap.values()] };
@@ -236,3 +238,4 @@ export function assembleGrowth(tasks: AgentTask[], sourceList: ResearchSource[],
     ],
   };
 }
+
