@@ -132,7 +132,8 @@ export function ResearchDetail({ id }: { id: string }) {
   const answer = detail?.profile.answers.find(a => a.questionId === selected);
   const growth = detail?.runs.find(r => r.stage === "GROWTH" && r.result);
   const latestProfileRun = detail?.runs.find(r => r.stage === "PROFILE");
-  const readyForGrowth = detail?.status === "APPROVED" || ((latestProfileRun?.status === "READY" || latestProfileRun?.status === "PARTIAL") && !!detail?.progress.answered);
+  const hasInfenergyBaseline = !!detail?.profile.sources.some(source => source.id === "infenergy:about") && detail?.progress.answered === detail?.progress.total;
+  const readyForGrowth = detail?.status === "APPROVED" || (((latestProfileRun?.status === "READY" || latestProfileRun?.status === "PARTIAL") || hasInfenergyBaseline) && !!detail?.progress.answered);
   const progress = detail?.progress;
   const groups = useMemo(() => detail ? Array.from(new Set(detail.questions.map(q => q.pillar))).map(pillar => ({ pillar, items: detail.questions.filter(q => q.pillar === pillar) })) : [], [detail]);
   function pick(q: Question) {
