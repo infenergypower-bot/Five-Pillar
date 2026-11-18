@@ -8,6 +8,7 @@ async function ResearchDetailContent({ params }: { params: Promise<{ id: string 
 }
 
 export default function BusinessResearchDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  return <AppShell title="Business intelligence" eyebrow="Company research"><Suspense fallback={<p>Loading company research.</p>}><ResearchDetailContent params={params} /></Suspense></AppShell>;
+  return <Suspense fallback={<p>Loading company research...</p>}><AppShell title="Business intelligence" eyebrow="Company research"><ResearchDetailContent params={params} /></AppShell></Suspense>;
 }
+
 
