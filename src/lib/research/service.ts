@@ -137,7 +137,9 @@ export async function startResearchRun(principal: AuthPrincipal, id: string, sta
   if (!process.env.OPENAI_API_KEY) throw new ServiceError("PROVIDER_UNAVAILABLE", "Configure OPENAI_API_KEY to run live research", 503);
   if (stage === "GROWTH" && p.status !== "APPROVED") {
     const completedProfileResearch = await db.businessResearchRun.findFirst({ where: { profileId: id, stage: "PROFILE", status: { in: ["READY", "PARTIAL"] } }, select: { id: true } });
-    if (!completedProfileResearch || !profileProgress(dataOf(p.profileData)).answered) throw new ServiceError("PROFILE_RESEARCH_REQUIRED", "Complete company research before starting the growth audit", 409);
+    const data = dataOf(p.profileData);
+    const researchedBaseline = data.sources.some(source => source.id === "infenergy:about") && profileProgress(data).answered === questions.length;
+    if ((!completedProfileResearch && !researchedBaseline) || !profileProgress(data).answered) throw new ServiceError("PROFILE_RESEARCH_REQUIRED", "Complete company research before starting the growth audit", 409);
   }
   const active = await db.businessResearchRun.findFirst({ where: { profileId: id, stage, status: { in: ["QUEUED", "RUNNING"] } }, orderBy: { createdAt: "desc" } });
   if (active) return { id: active.id, status: active.status };
