@@ -1,6 +1,6 @@
 # Business research and growth intelligence
 
-The internal **Business research** workspace is at `/business-research`. Create a profile from a business name and description; website and location are optional. The questionnaire spans the five pillars and keeps unanswered questions visible. Five specialist profile agents research company facts, market, brand, audience, and channels. After staff review the sourced answers and approve the profile, five specialist growth agents analyze competitors, audience, brand, channels, and strategy. The growth audit creates evidence-linked draft opportunities and an exportable handoff.
+The internal **Business research** workspace is at `/business-research`. Create a profile from a business name and description; website and location are optional. Creation immediately queues five specialist profile agents when live research is configured. An unavailable provider leaves the profile saved and displays the exact configuration reason. The questionnaire spans the five pillars and keeps unanswered questions visible. After staff review the sourced answers and approve the profile, choose that company in the Tool 2 selector to open the growth workspace. Five specialist growth agents analyze competitors, audience, brand, channels, and strategy. The growth audit creates evidence-linked draft opportunities and an exportable handoff.
 
 ## Configuration and operation
 

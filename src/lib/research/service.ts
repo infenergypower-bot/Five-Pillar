@@ -60,13 +60,20 @@ export async function createResearchProfile(principal: AuthPrincipal, body: unkn
   const profile = await db.businessResearchProfile.create({
     data: { organizationId: principal.organizationId, clientId: input.clientId, businessName: input.businessName, description: input.description, website: input.website || null, location: input.location || null, profileData: json(emptyProfile()) },
   });
-  return { id: profile.id };
+  // Creation is the user's request to research the company. Queue the first run
+  // immediately, but preserve the profile if the provider is not configured.
+  try {
+    const research = await startResearchRun(principal, profile.id, "PROFILE");
+    return { id: profile.id, research };
+  } catch (error) {
+    return { id: profile.id, research: null, researchError: error instanceof Error ? error.message : "Research could not start" };
+  }
 }
 
 export async function getResearchProfile(principal: AuthPrincipal, id: string) {
   const p = await scoped(principal, id);
   const data = dataOf(p.profileData);
-  return { id: p.id, businessName: p.businessName, description: p.description, website: p.website, location: p.location, clientId: p.clientId, status: p.status, version: p.version, approvedAt: p.approvedAt, profile: data, progress: profileProgress(data), questions, runs: p.runs.map(r => ({ id: r.id, profileVersion: r.profileVersion, stage: r.stage, status: r.status, tasks: r.tasks, result: r.result, error: r.error, createdAt: r.createdAt, completedAt: r.completedAt })) };
+  return { id: p.id, businessName: p.businessName, description: p.description, website: p.website, location: p.location, clientId: p.clientId, status: p.status, version: p.version, approvedAt: p.approvedAt, researchAvailable: !!process.env.OPENAI_API_KEY && !demoModeEnabled(), researchUnavailableReason: demoModeEnabled() ? "Live research is disabled in demonstration mode." : !process.env.OPENAI_API_KEY ? "Live research needs OPENAI_API_KEY configured on the server." : null, profile: data, progress: profileProgress(data), questions, runs: p.runs.map(r => ({ id: r.id, profileVersion: r.profileVersion, stage: r.stage, status: r.status, tasks: r.tasks, result: r.result, error: r.error, createdAt: r.createdAt, completedAt: r.completedAt })) };
 }
 
 export async function reviewResearchAnswer(principal: AuthPrincipal, id: string, body: unknown) {
