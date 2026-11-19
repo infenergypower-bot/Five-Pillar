@@ -6,8 +6,9 @@ import { ServiceError } from "@/lib/services/errors";
 import { guard } from "@/lib/services/helpers";
 import { demoModeEnabled } from "@/lib/demo-mode";
 import { assembleGrowth, initialTasks, launchAgent, mergeProfile, pollAgent, type AgentTask } from "./agents";
-import { canApproveProfile, emptyProfile, profileProgress, questions, type BusinessProfileData, type GrowthAudit, type ResearchSource } from "./domain";
+import { canApproveProfile, emptyProfile, profileProgress, questions, signOffSourcedAnswers, type BusinessProfileData, type GrowthAudit, type ResearchSource } from "./domain";
 import { infenergyBaseline, isInfenergyProfile } from "./infenergy-baseline";
+import { infenergyGrowthBaseline } from "./infenergy-growth";
 
 const newProfile = z.object({
   businessName: z.string().trim().min(2).max(180),
@@ -74,7 +75,7 @@ export async function createResearchProfile(principal: AuthPrincipal, body: unkn
 export async function getResearchProfile(principal: AuthPrincipal, id: string) {
   const p = await scoped(principal, id);
   const data = dataOf(p.profileData);
-  return { id: p.id, businessName: p.businessName, description: p.description, website: p.website, location: p.location, clientId: p.clientId, status: p.status, version: p.version, approvedAt: p.approvedAt, researchAvailable: !!process.env.OPENAI_API_KEY && !demoModeEnabled(), researchUnavailableReason: demoModeEnabled() ? "Live research is disabled in demonstration mode." : !process.env.OPENAI_API_KEY ? "Live research needs OPENAI_API_KEY configured on the server." : null, profile: data, progress: profileProgress(data), questions, runs: p.runs.map(r => ({ id: r.id, profileVersion: r.profileVersion, stage: r.stage, status: r.status, tasks: r.tasks, result: r.result, error: r.error, createdAt: r.createdAt, completedAt: r.completedAt })) };
+  return { id: p.id, businessName: p.businessName, description: p.description, website: p.website, location: p.location, clientId: p.clientId, status: p.status, version: p.version, approvedAt: p.approvedAt, researchAvailable: !!process.env.OPENAI_API_KEY && !demoModeEnabled(), baselineGrowthAvailable: isInfenergyProfile(p.businessName, p.website) && data.sources.some(source => source.id === "infenergy:about"), researchUnavailableReason: demoModeEnabled() ? "Live research is disabled in demonstration mode." : !process.env.OPENAI_API_KEY ? "Live research needs OPENAI_API_KEY configured on the server." : null, profile: data, progress: profileProgress(data), questions, runs: p.runs.map(r => ({ id: r.id, profileVersion: r.profileVersion, stage: r.stage, status: r.status, tasks: r.tasks, result: r.result, error: r.error, createdAt: r.createdAt, completedAt: r.completedAt })) };
 }
 
 export async function applyInfenergyResearchBaseline(principal: AuthPrincipal, id: string) {
@@ -122,19 +123,19 @@ export async function reviewResearchAnswer(principal: AuthPrincipal, id: string,
 
 export async function approveResearchProfile(principal: AuthPrincipal, id: string) {
   const p = await scoped(principal, id, true);
-  const check = canApproveProfile(dataOf(p.profileData));
-  if (!check.ready) throw new ServiceError("NOT_READY", "Review the sourced business facts before approval", 409, check.errors);
+  const signed = signOffSourcedAnswers(dataOf(p.profileData), principal.userId, new Date().toISOString());
+  const check = canApproveProfile(signed);
+  if (!check.ready) throw new ServiceError("NOT_READY", "Research needs at least one source-backed verified fact before approval", 409, check.errors);
   await db.$transaction([
-    db.businessResearchProfile.update({ where: { id }, data: { status: "APPROVED", approvedAt: new Date(), approvedBy: principal.userId } }),
-    db.auditEvent.create({ data: { organizationId: principal.organizationId, actorId: principal.userId, action: "research.profile.approve", entityType: "BusinessResearchProfile", entityId: id, after: json({ version: p.version }) } }),
+    db.businessResearchProfile.update({ where: { id }, data: { profileData: json(signed), status: "APPROVED", approvedAt: new Date(), approvedBy: principal.userId } }),
+    db.auditEvent.create({ data: { organizationId: principal.organizationId, actorId: principal.userId, action: "research.profile.approve", entityType: "BusinessResearchProfile", entityId: id, after: json({ version: p.version, sourcedAnswers: profileProgress(signed).approved }) } }),
   ]);
   return { id, status: "APPROVED", version: p.version };
 }
 
 export async function startResearchRun(principal: AuthPrincipal, id: string, stage: ResearchRunStage) {
   const p = await scoped(principal, id, true);
-  if (demoModeEnabled()) throw new ServiceError("RESEARCH_DISABLED_IN_DEMO", "Live paid research is disabled in the public demonstration workspace", 403);
-  if (!process.env.OPENAI_API_KEY) throw new ServiceError("PROVIDER_UNAVAILABLE", "Configure OPENAI_API_KEY to run live research", 503);
+  const liveResearchAvailable = !!process.env.OPENAI_API_KEY && !demoModeEnabled();
   if (stage === "GROWTH" && p.status !== "APPROVED") {
     const completedProfileResearch = await db.businessResearchRun.findFirst({ where: { profileId: id, stage: "PROFILE", status: { in: ["READY", "PARTIAL"] } }, select: { id: true } });
     const data = dataOf(p.profileData);
@@ -143,6 +144,15 @@ export async function startResearchRun(principal: AuthPrincipal, id: string, sta
   }
   const active = await db.businessResearchRun.findFirst({ where: { profileId: id, stage, status: { in: ["QUEUED", "RUNNING"] } }, orderBy: { createdAt: "desc" } });
   if (active) return { id: active.id, status: active.status };
+  if (stage === "GROWTH" && !liveResearchAvailable && isInfenergyProfile(p.businessName, p.website) && dataOf(p.profileData).sources.some(source => source.id === "infenergy:about")) {
+    const prior = await db.businessResearchRun.findFirst({ where: { profileId: id, stage: "GROWTH", status: "READY", profileVersion: p.version }, orderBy: { createdAt: "desc" } });
+    if (prior) return { id: prior.id, status: prior.status };
+    const result = infenergyGrowthBaseline();
+    const baseline = await db.businessResearchRun.create({ data: { profileId: id, profileVersion: p.version, stage, status: "READY", tasks: json([]), result: json(result), completedAt: new Date() } });
+    return { id: baseline.id, status: baseline.status };
+  }
+  if (demoModeEnabled()) throw new ServiceError("RESEARCH_DISABLED_IN_DEMO", "Live paid research is disabled in the public demonstration workspace", 403);
+  if (!process.env.OPENAI_API_KEY) throw new ServiceError("PROVIDER_UNAVAILABLE", "Configure OPENAI_API_KEY to run live research", 503);
   const today = new Date(); today.setUTCHours(0, 0, 0, 0);
   const dailyRuns = await db.businessResearchRun.count({ where: { profile: { organizationId: principal.organizationId }, createdAt: { gte: today } } });
   if (dailyRuns >= 8) throw new ServiceError("RESEARCH_LIMIT", "Daily research limit reached; try again tomorrow", 429);
