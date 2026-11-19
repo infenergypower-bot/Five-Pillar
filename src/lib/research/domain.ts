@@ -168,3 +168,12 @@ export function canApproveProfile(profile: BusinessProfileData): { ready: boolea
   if (!profile.answers.some(a => a.status === "APPROVED" && a.kind === "VERIFIED")) errors.push("At least one sourced, reviewed fact is required");
   return { ready: errors.length === 0, errors };
 }
+
+export function signOffSourcedAnswers(profile: BusinessProfileData, reviewerId: string, reviewedAt: string): BusinessProfileData {
+  const sourceIds = new Set(profile.sources.map(source => source.id));
+  return { ...profile, answers: profile.answers.map(answer => {
+    if (!answer.value || !["VERIFIED", "INFERRED"].includes(answer.kind) || !answer.sourceIds.length || answer.sourceIds.some(id => !sourceIds.has(id))) return answer;
+    return { ...answer, status: "APPROVED" as const, reviewedBy: reviewerId, reviewedAt };
+  }) };
+}
+
