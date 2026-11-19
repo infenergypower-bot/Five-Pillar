@@ -7,6 +7,7 @@ import { guard } from "@/lib/services/helpers";
 import { demoModeEnabled } from "@/lib/demo-mode";
 import { assembleGrowth, initialTasks, launchAgent, mergeProfile, pollAgent, type AgentTask } from "./agents";
 import { canApproveProfile, emptyProfile, profileProgress, questions, type BusinessProfileData, type GrowthAudit, type ResearchSource } from "./domain";
+import { infenergyBaseline, isInfenergyProfile } from "./infenergy-baseline";
 
 const newProfile = z.object({
   businessName: z.string().trim().min(2).max(180),
@@ -76,6 +77,19 @@ export async function getResearchProfile(principal: AuthPrincipal, id: string) {
   return { id: p.id, businessName: p.businessName, description: p.description, website: p.website, location: p.location, clientId: p.clientId, status: p.status, version: p.version, approvedAt: p.approvedAt, researchAvailable: !!process.env.OPENAI_API_KEY && !demoModeEnabled(), researchUnavailableReason: demoModeEnabled() ? "Live research is disabled in demonstration mode." : !process.env.OPENAI_API_KEY ? "Live research needs OPENAI_API_KEY configured on the server." : null, profile: data, progress: profileProgress(data), questions, runs: p.runs.map(r => ({ id: r.id, profileVersion: r.profileVersion, stage: r.stage, status: r.status, tasks: r.tasks, result: r.result, error: r.error, createdAt: r.createdAt, completedAt: r.completedAt })) };
 }
 
+export async function applyInfenergyResearchBaseline(principal: AuthPrincipal, id: string) {
+  const p = await scoped(principal, id, true);
+  if (!isInfenergyProfile(p.businessName, p.website)) throw new ServiceError("NOT_FOUND", "Infenergy research baseline does not apply to this company", 404);
+  const data = dataOf(p.profileData);
+  if (data.sources.some(source => source.id === "infenergy:about")) return getResearchProfile(principal, id);
+  const next = infenergyBaseline(data);
+  await db.$transaction([
+    db.businessResearchProfile.update({ where: { id }, data: { profileData: json(next), status: "DRAFT", approvedAt: null, approvedBy: null, version: { increment: 1 } } }),
+    db.auditEvent.create({ data: { organizationId: principal.organizationId, actorId: principal.userId, action: "research.infenergy.baseline", entityType: "BusinessResearchProfile", entityId: id, after: json({ answered: profileProgress(next).answered, sourceCount: next.sources.length }) } }),
+  ]);
+  return getResearchProfile(principal, id);
+}
+
 export async function reviewResearchAnswer(principal: AuthPrincipal, id: string, body: unknown) {
   const p = await scoped(principal, id, true);
   const input = reviewAnswerInput.parse(body);
@@ -121,7 +135,12 @@ export async function startResearchRun(principal: AuthPrincipal, id: string, sta
   const p = await scoped(principal, id, true);
   if (demoModeEnabled()) throw new ServiceError("RESEARCH_DISABLED_IN_DEMO", "Live paid research is disabled in the public demonstration workspace", 403);
   if (!process.env.OPENAI_API_KEY) throw new ServiceError("PROVIDER_UNAVAILABLE", "Configure OPENAI_API_KEY to run live research", 503);
-  if (stage === "GROWTH" && p.status !== "APPROVED") throw new ServiceError("PROFILE_REVIEW_REQUIRED", "Approve the business profile before starting the growth audit", 409);
+  if (stage === "GROWTH" && p.status !== "APPROVED") {
+    const completedProfileResearch = await db.businessResearchRun.findFirst({ where: { profileId: id, stage: "PROFILE", status: { in: ["READY", "PARTIAL"] } }, select: { id: true } });
+    const data = dataOf(p.profileData);
+    const researchedBaseline = data.sources.some(source => source.id === "infenergy:about") && profileProgress(data).answered === questions.length;
+    if ((!completedProfileResearch && !researchedBaseline) || !profileProgress(data).answered) throw new ServiceError("PROFILE_RESEARCH_REQUIRED", "Complete company research before starting the growth audit", 409);
+  }
   const active = await db.businessResearchRun.findFirst({ where: { profileId: id, stage, status: { in: ["QUEUED", "RUNNING"] } }, orderBy: { createdAt: "desc" } });
   if (active) return { id: active.id, status: active.status };
   const today = new Date(); today.setUTCHours(0, 0, 0, 0);
@@ -195,7 +214,7 @@ export async function reviewGrowthOpportunity(principal: AuthPrincipal, profileI
   const p = await scoped(principal, profileId, true);
   const run = await db.businessResearchRun.findFirst({ where: { id: runId, profileId: p.id, stage: "GROWTH" } });
   if (!run?.result) throw new ServiceError("NOT_FOUND", "Growth audit not found", 404);
-  if (p.status !== "APPROVED" || run.profileVersion !== p.version) throw new ServiceError("STALE_PROFILE", "Reapprove the current profile and rerun the growth audit before approving opportunities", 409);
+  if (run.profileVersion !== p.version) throw new ServiceError("STALE_PROFILE", "The company profile changed. Rerun growth intelligence before approving opportunities", 409);
   const input = z.object({ opportunityId: z.string(), status: z.enum(["APPROVED", "REJECTED", "DRAFT"]) }).parse(body);
   const audit = run.result as unknown as GrowthAudit;
   const target = audit.opportunities.find(o => o.id === input.opportunityId);

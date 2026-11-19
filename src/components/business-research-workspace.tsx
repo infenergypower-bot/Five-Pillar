@@ -48,7 +48,7 @@ export function ResearchHome() {
     } catch (e) { setError(e instanceof Error ? e.message : "Unable to create profile"); setCreating(false); }
   }
   return <div className={styles.space}>
-    <section className={styles.hero}><span className={styles.kicker}>Five Pillar Firm intelligence</span><h1>Business research</h1><p>Build a sourced company profile, review its answers, then hand it to the growth intelligence audit.</p></section>
+    <section className={styles.hero}><span className={styles.kicker}>Five Pillar Firm intelligence</span><h1>Business research</h1><p>Research drafts the full company questionnaire. You can refine any answer, then use the profile in the growth intelligence audit.</p></section>
     {error && <p className={styles.error} role="alert">{error}</p>}
     <div className={styles.columns}>
       <form className={styles.card} onSubmit={create}>
@@ -64,7 +64,7 @@ export function ResearchHome() {
       </section>
     </div>
     <section className="research-handoff" aria-labelledby="research-handoff-heading">
-      <div className="research-handoff-copy"><span className={styles.kicker}>Tool 2 / Growth intelligence</span><h2 id="research-handoff-heading">Choose a company. Find its next move.</h2><p>Hand an approved business profile to competitor, positioning, brand, audience, and channel research. Draft profiles can be opened for review first.</p></div>
+      <div className="research-handoff-copy"><span className={styles.kicker}>Tool 2 / Growth intelligence</span><h2 id="research-handoff-heading">Choose a company. Find its next move.</h2><p>Once company research finishes, pass its draft to competitor, positioning, brand, audience, and channel research. Edit or sign off on answers whenever you need to.</p></div>
       <div className="research-handoff-controls"><label htmlFor="growth-profile">Company profile</label><select id="growth-profile" value={growthSelection} onChange={e => setGrowthSelection(e.target.value)}><option value="">Select a company profile</option>{items.map(item => <option key={item.id} value={item.id}>{item.businessName} / {item.status}</option>)}</select><button className={styles.primary} type="button" disabled={!growthSelection} onClick={() => router.push(`/business-research/${growthSelection}?view=growth`)}>Open growth intelligence</button></div>
     </section>
   </div>;
@@ -89,6 +89,7 @@ export function ResearchDetail({ id }: { id: string }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const advancing = useRef(false);
+  const baselineRequested = useRef(false);
   const reload = useCallback(async () => { setDetail(await request<Detail>(`/api/business-research/${id}`)); }, [id]);
   useEffect(() => {
     const controller = new AbortController();
@@ -102,6 +103,15 @@ export function ResearchDetail({ id }: { id: string }) {
       document.getElementById("growth-intelligence")?.scrollIntoView({ block: "start", behavior: "smooth" });
     }
   }, [detail?.id]);
+  useEffect(() => {
+    if (!detail || baselineRequested.current || detail.profile.sources.some(s => s.id === "infenergy:about")) return;
+    const isInfenergy = detail.businessName.trim().toLowerCase() === "infenergy power" || detail.website?.includes("infenergypower.com");
+    if (!isInfenergy) return;
+    baselineRequested.current = true;
+    void request<Detail>(`/api/business-research/${id}/baseline`, payload("POST"))
+      .then(setDetail)
+      .catch(e => setError(e instanceof Error ? e.message : "Unable to load the Infenergy research baseline"));
+  }, [detail, id]);
   const active = detail?.runs.find(r => r.status === "QUEUED" || r.status === "RUNNING");
   const activeRunId = active?.id;
   const activeStatus = active?.status;
@@ -122,6 +132,8 @@ export function ResearchDetail({ id }: { id: string }) {
   const answer = detail?.profile.answers.find(a => a.questionId === selected);
   const growth = detail?.runs.find(r => r.stage === "GROWTH" && r.result);
   const latestProfileRun = detail?.runs.find(r => r.stage === "PROFILE");
+  const hasInfenergyBaseline = !!detail?.profile.sources.some(source => source.id === "infenergy:about") && detail?.progress.answered === detail?.progress.total;
+  const readyForGrowth = detail?.status === "APPROVED" || (((latestProfileRun?.status === "READY" || latestProfileRun?.status === "PARTIAL") || hasInfenergyBaseline) && !!detail?.progress.answered);
   const progress = detail?.progress;
   const groups = useMemo(() => detail ? Array.from(new Set(detail.questions.map(q => q.pillar))).map(pillar => ({ pillar, items: detail.questions.filter(q => q.pillar === pillar) })) : [], [detail]);
   function pick(q: Question) {
@@ -145,7 +157,7 @@ export function ResearchDetail({ id }: { id: string }) {
   }
   async function approve() {
     setBusy("approve"); setError("");
-    try { await request(`/api/business-research/${id}/approve`, payload("POST")); await reload(); setNotice("Profile approved for growth research."); }
+    try { await request(`/api/business-research/${id}/approve`, payload("POST")); await reload(); setNotice("Profile signed off. You can still revise its answers."); }
     catch (e) { setError(e instanceof Error ? e.message : "Unable to approve profile"); }
     finally { setBusy(""); }
   }
@@ -170,24 +182,24 @@ export function ResearchDetail({ id }: { id: string }) {
     {error && <p className={styles.error} role="alert">{error}</p>}{notice && <p className={styles.notice} role="status">{notice}</p>}
     <div className={styles.actionBar}>
       <button className={styles.primary} disabled={!!busy || !!active || !detail.researchAvailable} onClick={() => void run("PROFILE")}>{latestProfileRun ? "Refresh company research" : "Start company research"}</button>
-      <button className={styles.secondary} disabled={!!busy || !!active || detail.status !== "APPROVED"} onClick={() => void run("GROWTH")}>Run growth intelligence</button>
-      <button className={styles.secondary} disabled={!!busy || detail.status === "APPROVED"} onClick={() => void approve()}>Approve profile</button>
+      <button className={styles.secondary} disabled={!!busy || !!active || !readyForGrowth || !detail.researchAvailable} onClick={() => void run("GROWTH")}>Run growth intelligence</button>
+      <button className={styles.secondary} disabled={!!busy || detail.status === "APPROVED"} onClick={() => void approve()}>Sign off profile (optional)</button>
       <button className={styles.secondary} onClick={exportProfile}>Export research</button>
     </div>
     {active && <section className={styles.card}><h2>{active.stage === "PROFILE" ? "Company research" : "Growth intelligence"} in progress</h2><div className={styles.tasks}>{active.tasks.map(t => <span key={t.lane}>{t.lane}: {t.status}{t.error ? `  ${t.error}` : ""}</span>)}</div><p className={styles.muted}>Research continues while this page is open. A scheduled job can also advance it when you leave.</p></section>}
     {!active && latestProfileRun && (latestProfileRun.status === "FAILED" || latestProfileRun.status === "PARTIAL") && <section className={styles.error} role="alert"><strong>Company research {latestProfileRun.status.toLowerCase()}.</strong><p>{latestProfileRun.tasks.filter(t => t.error).map(t => `${t.lane}: ${t.error}`).join(" / ") || latestProfileRun.error || "Some agents did not finish. Retry research."}</p></section>}
-    <section className="research-stage" id="growth-intelligence"><div><span className={styles.kicker}>02 / Growth intelligence</span><h2>{detail.status === "APPROVED" ? "Ready to investigate the market" : "Next: review and hand off this profile"}</h2><p>{detail.status === "APPROVED" ? "Run the competitor, brand, audience, channel, and strategic gap audit using this approved company profile." : "Review sourced answers below, approve the profile, then launch the second research tool for this company."}</p></div><button className={styles.primary} disabled={!!busy || !!active || detail.status !== "APPROVED" || !detail.researchAvailable} onClick={() => void run("GROWTH")}>Research growth opportunities</button></section>
+    <section className="research-stage" id="growth-intelligence"><div><span className={styles.kicker}>02 / Growth intelligence</span><h2>{readyForGrowth ? "Ready to investigate the market" : "Company research comes first"}</h2><p>{readyForGrowth ? "Run the competitor, brand, audience, channel, and strategic gap audit from this researched profile. Unreviewed estimates remain marked provisional." : "The questionnaire will fill as the company research completes. You can edit answers at any time; manual approval is optional for this handoff."}</p></div><button className={styles.primary} disabled={!!busy || !!active || !readyForGrowth || !detail.researchAvailable} onClick={() => void run("GROWTH")}>Research growth opportunities</button></section>
     <div className={styles.stats}>{groups.map(g => {
-      const approved = g.items.filter(q => detail.profile.answers.find(a => a.questionId === q.id)?.status === "APPROVED").length;
-      return <div className={styles.stat} key={g.pillar}><strong>{approved}/{g.items.length}</strong><span>{g.pillar.replaceAll("_", " ").toLowerCase()}</span><div className={styles.bar}><i style={{ width: `${approved / g.items.length * 100}%` }} /></div></div>;
+      const drafted = g.items.filter(q => !!detail.profile.answers.find(a => a.questionId === q.id)?.value).length;
+      return <div className={styles.stat} key={g.pillar}><strong>{drafted}/{g.items.length}</strong><span>{g.pillar.replaceAll("_", " ").toLowerCase()}</span><div className={styles.bar}><i style={{ width: `${drafted / g.items.length * 100}%` }} /></div></div>;
     })}</div>
-    <section className={styles.card}><span className={styles.kicker}>01 / Reviewed questionnaire</span><h2>Five Pillar company profile</h2><p>{progress?.answered}/{progress?.total} answered  {progress?.approved} reviewed and approved. Unknowns remain visible for owner follow-up.</p>
+    <section className={styles.card}><span className={styles.kicker}>01 / Research drafted questionnaire</span><h2>Five Pillar company profile</h2><p>{progress?.answered}/{progress?.total} research answers. {progress?.approved} manually reviewed. Estimates are labeled and can be corrected.</p>
       <div className="research-pillars" role="tablist" aria-label="Five Pillar questions">{groups.map(g => <button type="button" role="tab" aria-selected={selectedPillar === g.pillar} className={selectedPillar === g.pillar ? "active" : ""} key={g.pillar} onClick={() => { setSelectedPillar(g.pillar); setSelected(""); }}>{g.pillar.replaceAll("_", " ").toLowerCase()}</button>)}</div>
       <div className={styles.questionLayout}><div className={styles.questionList}>{groups.filter(g => g.pillar === selectedPillar).map(g => <div key={g.pillar}><h3>{g.pillar.replaceAll("_", " ")}</h3>{g.items.map(q => {
         const a = detail.profile.answers.find(x => x.questionId === q.id);
-        return <button key={q.id} className={selected === q.id ? styles.selected : ""} onClick={() => pick(q)}><span>{q.prompt}</span><small>{a?.status === "APPROVED" ? "Reviewed" : a?.kind === "UNKNOWN" ? "Unknown" : "Needs review"}</small></button>;
+        return <button key={q.id} className={selected === q.id ? styles.selected : ""} onClick={() => pick(q)}><span>{q.prompt}</span><small>{a?.status === "APPROVED" ? "Reviewed" : a?.value ? `${a.kind.toLowerCase()} / ${Math.round(a.confidence * 100)}%` : "Research pending"}</small></button>;
       })}</div>)}</div>
-      <div className={styles.editor}>{question ? <><span className={styles.kicker}>{question.category}</span><h3>{question.prompt}</h3><p>{answer?.value || "No answer yet."}</p><SourceLinks ids={answer?.sourceIds || []} sources={detail.profile.sources} />
+      <div className={styles.editor}>{question ? <><span className={styles.kicker}>{question.category}</span><h3>{question.prompt}</h3><div className={styles.tag}>{answer?.kind || "UNKNOWN"} / {Math.round((answer?.confidence || 0) * 100)}% confidence / {answer?.status === "APPROVED" ? "owner reviewed" : "research draft"}</div><p>{answer?.value || "Research is still pending for this question."}</p>{answer?.rationale && <p className={styles.muted}>{answer.rationale}</p>}<SourceLinks ids={answer?.sourceIds || []} sources={detail.profile.sources} />
         <form onSubmit={saveAnswer}><label>Answer<textarea rows={5} value={value} onChange={e => setValue(e.target.value)} disabled={kind === "UNKNOWN"} /></label>
           <div className={styles.two}><label>Evidence status<select value={kind} onChange={e => setKind(e.target.value as ResearchAnswer["kind"])}><option>VERIFIED</option><option>INFERRED</option><option>HYPOTHESIS</option><option>UNKNOWN</option></select></label>
           <label>Source type<select value={sourceType} onChange={e => setSourceType(e.target.value as ResearchSource["type"])}><option value="PUBLIC_WEB">Public web</option><option value="CLIENT_STATEMENT">Client statement</option><option value="CLIENT_DOCUMENT">Client document</option></select></label></div>

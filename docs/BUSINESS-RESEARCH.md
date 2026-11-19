@@ -1,6 +1,8 @@
 # Business research and growth intelligence
 
-The internal **Business research** workspace is at `/business-research`. Create a profile from a business name and description; website and location are optional. Creation immediately queues five specialist profile agents when live research is configured. An unavailable provider leaves the profile saved and displays the exact configuration reason. The questionnaire spans the five pillars and keeps unanswered questions visible. After staff review the sourced answers and approve the profile, choose that company in the Tool 2 selector to open the growth workspace. Five specialist growth agents analyze competitors, audience, brand, channels, and strategy. The growth audit creates evidence-linked draft opportunities and an exportable handoff.
+The internal **Business research** workspace is at `/business-research`. Create a profile from a business name and description; website and location are optional. Creation immediately queues five specialist profile agents when live research is configured. Each agent drafts every question in its pillar, distinguishing sourced facts, evidence-based inferences, and low-confidence best estimates. Private metrics receive a calculation and validation path instead of invented values. Manual editing and signoff are optional for handing a completed research draft to Tool 2. Choose the company in the selector to open the growth workspace; five specialist growth agents then analyze competitors, audience, brand, channels, and strategy.
+
+The existing **Infenergy Power** profile receives a dated public research baseline automatically when it opens. This fills all 46 fields using Infenergy's About, catalog, product, comparison, and support pages while preserving any owner-approved answers. Private financials, customer behavior, demographics, and entertainment affinities are clearly marked provisional with a way to validate them. The baseline works without an API key; live refresh and the growth audit still require one.
 
 ## Configuration and operation
 
@@ -12,7 +14,7 @@ Run `prisma migrate deploy` and `prisma generate` during deployment. No book PDF
 
 ## Evidence and review
 
-Research agents return structured findings with source URLs. The server accepts URLs only when the provider reports those pages among its web-search sources. Unsupported findings are downgraded to hypotheses. Staff must review and approve individual questionnaire answers. Unknown private financials or customer behavior cannot be filled from generic public research. A profile may be approved with unknown fields so an audit can proceed, but its open questions remain visible.
+Research agents return structured findings with source URLs. The server accepts URLs only when the provider reports those pages among its web-search sources. Unsupported findings are downgraded to hypotheses. Staff may edit and approve answers before external delivery. A completed research draft with meaningful answers can proceed to the audit without manual questionnaire approval. Public research cannot establish actual private financials or customer behavior; provisional answers are labeled and include a validation path.
 
 Growth opportunities require at least one source-linked competitor or market finding. All begin as drafts, with unscored impact, effort, uncertainty, and ROI; staff can approve or reject them. The profile and audit can be exported as JSON. All routes require an authenticated internal CRM role and organization scope; client portal roles cannot access this workspace.
 
