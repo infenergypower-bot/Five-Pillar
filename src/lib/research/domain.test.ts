@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { assembleGrowth, mergeProfile, type AgentTask } from "./agents";
-import { canApproveProfile, emptyProfile, profileProgress } from "./domain";
+import { canApproveProfile, emptyProfile, profileProgress, signOffSourcedAnswers } from "./domain";
 import { infenergyBaseline } from "./infenergy-baseline";
+import { infenergyGrowthBaseline } from "./infenergy-growth";
 
 describe("business research evidence gates", () => {
   it("starts with every Five Pillar question unanswered", () => {
@@ -64,6 +65,22 @@ describe("business research evidence gates", () => {
     expect(baseline.answers.find(answer => answer.questionId === "gross_margin")?.kind).toBe("HYPOTHESIS");
     const reviewed = { ...original, answers: original.answers.map(answer => answer.questionId === "brand_promise" ? { ...answer, value: "Owner-approved promise", status: "APPROVED" as const } : answer) };
     expect(infenergyBaseline(reviewed).answers.find(answer => answer.questionId === "brand_promise")?.value).toBe("Owner-approved promise");
+  });
+
+  it("approves sourced facts in one action while leaving private estimates provisional", () => {
+    const signed = signOffSourcedAnswers(infenergyBaseline(emptyProfile()), "owner", "2026-11-19T00:00:00Z");
+    expect(canApproveProfile(signed).ready).toBe(true);
+    expect(profileProgress(signed).approved).toBeGreaterThan(0);
+    expect(signed.answers.find(a => a.questionId === "gross_margin")?.status).toBe("DRAFT");
+  });
+
+  it("provides a source-linked Infenergy market baseline without inventing audience measurements", () => {
+    const audit = infenergyGrowthBaseline("2026-11-19T00:00:00Z");
+    expect(audit.competitors).toHaveLength(4);
+    expect(audit.segments).toHaveLength(3);
+    expect(audit.opportunities.length).toBeGreaterThan(0);
+    expect(audit.findings.every(f => f.sourceIds.every(id => audit.sources.some(s => s.id === id)))).toBe(true);
+    expect(audit.segments.every(s => s.entertainmentAffinities === "Unknown" || s.entertainmentAffinities.startsWith("Unknown"))).toBe(true);
   });
 });
 
