@@ -114,7 +114,18 @@ function portalAction(act,el){let id=el?.dataset?.id;switch(act){
  case 'create-incident':if(!db.sentinelRule){toast('Configure the detection first.','bad');return}db.sentinelIncident=true;record('Sentinel sample incident assigned to Security Team');save();toast('Incident triage recorded','good');render();return;
  case 'fix-storage':db.cloudRemediated=true;record('Cloud finding: public storage disabled');save();toast('Storage exposure reduced','good');render();return;
  case 'fix-owner':db.cloudLeast=true;record('Cloud finding: workload owner grant removed');save();toast('Workload privilege reduced','good');render();return;
- case 'reset-practice':if(confirm('Reset the entire fictional tenant and all practice changes? Lesson progress and exam scores will remain.')){const keep={completed:db.completed,labDone:db.labDone,answers:db.answers,examHistory:db.examHistory,notes:db.notes};db=initialDb();Object.assign(db,keep);save();render()}return;
+ case 'reset-practice':if(confirm('Reset the fictional tenant resources? Your completed lessons, assessments, study notes and learning history will remain. Current connected-mission attempts will end and must be restarted.')){
+   const savedKeys=['completed','labDone','answers','examHistory','notes','lessonReveal','lessonChecks','portfolio','v6','v7','v8','v9','v10','v11','v12'];
+   const keep={};for(const key of savedKeys)if(Object.prototype.hasOwnProperty.call(db,key))keep[key]=db[key];
+   if(keep.v12){keep.v12.active={};keep.v12.last=null;}
+   if(keep.v11)keep.v11.coach=null;
+   if(keep.v8){keep.v8.coach=null;keep.v8.attempt={};}
+   const fresh={...initialDb(),...keep};
+   for(const key of Object.keys(db))delete db[key];
+   Object.assign(db,fresh);
+   record('Fictional tenant reset; completed learning records preserved');
+   save();toast('Tenant reset. Learning progress kept; start a new practical mission.','good');render();
+  }return;
  }return false;
 }
 const inputField=(f)=>{let [name,label,type,def]=f;const lookup={user:db.users.map(x=>[x.id,x.name]),group:db.groups.map(x=>[x.id,x.name]),app:db.apps.map(x=>[x.id,x.name]),reg:db.regs.map(x=>[x.id,x.name]),managed:db.managed.map(x=>[x.id,x.name]),gsa:db.gsa.map(x=>[x.id,x.name]),agent:db.agents.map(x=>[x.id,x.name]),principal:[...db.users.map(x=>[x.id,x.name+' (user)']),...db.groups.map(x=>[x.id,x.name+' (group)'])]};let values=type==='options'?def:(lookup[type]||null);let html=values?`<select name="${name}" required>${values.map(v=>{let pair=Array.isArray(v)?v:[v,v];return `<option value="${safe(pair[0])}" ${pair[0]===def?'selected':''}>${safe(pair[1])}</option>`}).join('')}</select>`:`<input name="${name}" type="${type||'text'}" placeholder="${safe(def||'')}" value="${(type==='email'||type==='number')&&def?safe(def):''}" required>`;return `<label class="field">${label}${html}</label>`};
