@@ -162,8 +162,13 @@ window.addEventListener("DOMContentLoaded",function(){
    test("Extra employee in dedicated group fails the onboarding condition",()=>{
       const a=__V12_TESTS.getAttempt("joiner"),v=__V12_TESTS.labels(__V12_TESTS.getMission("joiner"),a),uid="qa-other";
       db.users.push({id:uid,name:"Unauthorized Extra",email:"extra@training.test",type:"Member",role:"User",licenses:[]});
-      db.groups.push({id:"qa-g-"+a.code,name:v.GROUP,members:[uid]});
-      return __V12_TESTS.stepResult(__V12_TESTS.getMission("joiner"),a,2).ok===false;
+      const learner={id:"qa-learner-"+a.code,name:v.USER,email:"learner-"+a.code+"@training.test",type:"Member",role:"User",licenses:[]};
+      db.users.push(learner);
+      db.groups.push({id:"qa-g-"+a.code,name:v.GROUP,members:[uid,learner.id]});
+      const m=__V12_TESTS.getMission("joiner"),failing=__V12_TESTS.stepResult(m,a,2).ok===false;
+      db.groups.find(g=>g.name===v.GROUP).members=[learner.id];
+      const recovered=__V12_TESTS.stepResult(m,a,2).ok===true;
+      return failing&&recovered;
    });
    test("Guest inherits denied Finance access through any other group",()=>{
       const a=__V12_TESTS.getAttempt("contractor"),v=__V12_TESTS.labels(__V12_TESTS.getMission("contractor"),a);
