@@ -76,9 +76,10 @@
     return {ok:!!ok,reason,actual,step:index,check:key};
   }
   function all(m,a){return m.steps.map((_,i)=>stepResult(m,a,i));}
+  const shuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
   function start(m,mode){
     const code=(Math.random().toString(36).slice(2,7)+Date.now().toString(36).slice(-2)).toUpperCase();
-    state().active[m.id]={code,mode,step:0,checked:{},started:Date.now(),submitted:false,questions:{},hiddenHint:{},done:false};
+    state().active[m.id]={code,mode,step:0,checked:{},started:Date.now(),submitted:false,questions:{},orders:Object.fromEntries(m.questions.map((q,i)=>[i,shuffle(q.options.map((_,j)=>j))])),hiddenHint:{},done:false};
     if(db.v8)db.v8.coach=null;
     if(db.v11)db.v11.coach=null;
     if(db.v6)db.v6.activeTutor=null;
@@ -163,7 +164,7 @@
   function quizView(m,a){
     const allOk=a.results?.every(x=>x.ok),questions=m.questions;
     return `<div class="panel" style="margin-top:17px"><div class="eyebrow">TROUBLESHOOT AND MASTER · TWO SEPARATE QUESTIONS</div><h3>Show you understand the cause, not only the clicks</h3><p>Answer both cases. A correct configuration and correct reasoning are recorded separately.</p>
-    ${questions.map((q,idx)=>{const k=a.questions[idx],order=[...q.options.map((_,i)=>i)];
+    ${questions.map((q,idx)=>{const k=a.questions[idx],order=a.orders?.[idx]||[...q.options.map((_,i)=>i)];
       return `<div style="padding:13px 0;border-bottom:1px solid #d6e1ec"><p><b>${idx+1}. ${esc(q.q)}</b></p><form id="v12-quiz" data-id="${m.id}" data-index="${idx}">
       ${order.map(i=>`<label class="v12-choice"><input type="radio" name="answer" value="${i}" ${k?.choice===i?"checked":""} required> ${esc(q.options[i])}</label>`).join("")}
       <button class="btn primary" type="submit">Explain my answer →</button></form>
