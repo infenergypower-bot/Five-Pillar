@@ -36,7 +36,7 @@ completeLesson=function(id){let l=ACADEMY.lessons.find(x=>x.id===Number(id));if(
  let proved=related.length>0&&related.some(m=>(m.requires||[]).every(([label,fn])=>{try{return !!fn()}catch(e){return false}}));
  if(!allQuiz){toast('Answer every knowledge-check question correctly before requesting mastery.');return}
  if(!allLab){toast('Complete the entire practical checklist and verification before requesting mastery.');return}
- if(!proved){toast('A simulated state-verified mission must pass; this lesson remains study-complete but not mastery-verified.');return}
+ if(!proved){currentCourse().studyCompleted ||= {};currentCourse().studyCompleted[id]=true;save();toast('Study complete. Objective mastery awaits a verified simulator mission and authorized real-tenant practice.');render();return}
  state.lessonDone[id]=true;save();toast('Lesson completed with quiz, checklist and simulator evidence. Real tenant validation remains separate.');render();
 };
 // Preserve all earlier answers and records; no destructive migration or automatic mass-completion.
@@ -45,7 +45,7 @@ const beforeRender=render;
 render=function(){let route=String(state.route||'home');if(route.startsWith('objective:')||route==='v5-readiness'){
  $('sidenav').innerHTML=navSidebar();$('bladenav').innerHTML=modernBladeNav();$('content').innerHTML=route==='v5-readiness'?progressDashboard():skillDetail(route.split(':')[1]);$('coachroot').innerHTML='';return;
  }
- beforeRender();if(route==='academy-home'||route==='objectives'){
+ beforeRender();if(route.startsWith('lesson:')){let id=route.split(':')[1],r=currentCourse().studyCompleted?.[id];let content=$('content');if(content){let badge=r?'Study complete: practical mastery still pending':'Study the concepts, complete the checklist, then demonstrate your skills.';content.insertAdjacentHTML('afterbegin',`<div class="v5-top-notice"><strong>${badge}</strong> A lesson quiz is foundational practice, not Microsoft certification evidence.</div>`);content.querySelectorAll('[data-completelesson]').forEach(b=>{if(!state.lessonDone[id])b.textContent='Check lesson evidence'});}}if(route==='academy-home'||route==='objectives'){
  let c=$('content');if(c){let h=`<div class="v5-top-notice"><strong>MD-102 guided skill labs:</strong> 83 skill-specific plans, 400 original scenario candidates across legacy and new sources; none claim independent SME approval. <button class="btn small" data-route="v5-readiness">Audit actual mastery</button></div>`;c.insertAdjacentHTML('afterbegin',h)}
  }
 };
