@@ -9,9 +9,10 @@
     <button class="navitem" data-route="v6/academy"><span class="navicon">◫</span>Deep learning academy</button>
     <button class="navitem" data-route="v6/blueprint"><span class="navicon">☷</span>2026 exam blueprint</button>
     <button class="navitem" data-route="v6/cases"><span class="navicon">◉</span>Advanced case assessment</button>
-    <button class="navitem" data-route="v6/readiness"><span class="navicon">◴</span>Verified readiness</button>`;}
+    <button class="navitem" data-route="v6/readiness"><span class="navicon">◴</span>Verified readiness</button>
+    <a class="navitem" href="./real-labs.html"><span class="navicon">▣</span>Real-tenant guided labs</a>`;}
   shell=function(content,where){let html=oldShell(content,where);return html.replace('<div class="sidefoot">',v6Nav()+'<div class="sidefoot">')};
-  home=function(){return oldHome().replace('<section class="hero">',`<div class="panel" style="border-left:4px solid #2374a8;margin-bottom:18px"><div class="eyebrow">V6 exam preparation — in progress</div><h3>Learn by watching, following, practicing and troubleshooting</h3><p class="muted small">Eight new deep SC-300 lessons, official objective group inventory, connected practice checks and additional original case questions. This is not yet a complete SC-300/SC-900/SC-100 exam curriculum.</p><div class="flex wrap"><button class="btn primary" data-route="v6/academy">Start visual guided lessons →</button><button class="btn" data-route="v6/blueprint">Inspect exam coverage</button></div></div><section class="hero">`)};
+  home=function(){return oldHome().replace('<section class="hero">',`<div class="panel" style="border-left:4px solid #2374a8;margin-bottom:18px"><div class="eyebrow">V6 exam preparation — in progress</div><h3>Learn by watching, following, practicing and troubleshooting</h3><p class="muted small">Eight new deep SC-300 lessons, official objective group inventory, connected practice checks and additional original case questions. This is not yet a complete SC-300/SC-900/SC-100 exam curriculum.</p><div class="flex wrap"><button class="btn primary" data-route="v6/academy">Start visual guided lessons →</button><button class="btn" data-route="v6/blueprint">Inspect exam coverage</button><a class="btn" href="./real-labs.html">Real Entra lab companion ↗</a></div></div><section class="hero">`)};
   function allSkillGroups(exam){return V6_BLUEPRINT.filter(x=>exam==="All"||x.exam===exam);}
   const linkMap={
     "tenant":"identity","identities":"identity","external":"external","hybrid":"external",
