@@ -120,13 +120,29 @@
       <div class="explanation"><b>Why:</b> ${esc(q.why)}</div><p class="small"><a href="${esc(q.source)}" target="_blank" rel="noopener">Microsoft Learn official exam skills ↗</a></p></div></details>`;}).join("")}
    <button class="btn primary" data-route="v7/advanced-exam">Choose another independent assessment</button>${footer()}</div>`;
  }
+ let clock=null;
+ function startExamClock(){
+  if(clock!==null){clearInterval(clock);clock=null;}
+  const s=db.v7.advancedExam;
+  if(!s||s.submitted||!s.minutes)return;
+  const update=()=>{
+   const remain=s.minutes*60-Math.floor((Date.now()-s.started)/1000);
+   const el=document.getElementById("v7-time");
+   if(el)el.textContent=remain>0?`Remaining ${Math.floor(remain/60)}:${String(remain%60).padStart(2,"0")}`:"Time finished";
+   if(remain<=0){if(clock!==null)clearInterval(clock);clock=null;submit();}
+  };
+  update();
+  if(!s.submitted)clock=setInterval(update,1000);
+ }
  const prevShell=shell,prevRender=render,prevAction=action;
  shell=function(content,where){return prevShell(content,where).replace('<div class="sidefoot">','<div class="sectioncap">Examination practice</div><button class="navitem" data-route="v7/advanced-exam"><span class="navicon">◈</span>Mixed-format assessment lab</button><div class="sidefoot">');};
  render=function(){const r=current();if(r==="v7/advanced-exam"||r==="v7/advanced-exam/session"){
    $("root").innerHTML=shell(r.endsWith("/session")?attempt():hub(),r);
    document.title="Identity Architect Academy · Original assessment";
-   lastRenderedHash=location.hash;window.scrollTo(0,0);return;}
-  prevRender();
+   lastRenderedHash=location.hash;window.scrollTo(0,0);
+   if(r.endsWith("/session"))startExamClock();else if(clock!==null){clearInterval(clock);clock=null;}
+   return;}
+  if(clock!==null){clearInterval(clock);clock=null;}prevRender();
  };
  function collect(){
   const s=db.v7.advancedExam;if(!s||s.submitted)return;
