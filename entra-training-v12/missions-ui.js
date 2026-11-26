@@ -146,7 +146,7 @@
      <div class="flex wrap"><button class="btn primary" data-action="v12-start" data-id="${m.id}" data-mode="guided">Learn with coach →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="exam">Try independently →</button>${a?`<button class="btn" data-route="v12/mission/${m.id}">Resume attempt →</button>`:""}</div>
     </div>`}).join("")}</div>
     <div class="panel" style="margin-top:17px"><h3>What an independent pass means here</h3><p>The required fictional records and links existed at submission, and you answered the corresponding reasoning questions. This is a controlled local simulation, not an official exam score or real enterprise tenant validation.</p>
-    <button class="btn" data-route="v12/results">Review saved mission results →</button><button class="btn" data-action="v12-export">Export this mission learning record ↓</button></div>${footer()}</div>`;
+    <button class="btn" data-route="v12/results">Review saved mission results →</button><button class="btn" data-action="v12-export">Export this mission learning record ↓</button><a class="btn" href="./qa-connected.html">Run free browser and iPad workflow checks →</a></div>${footer()}</div>`;
   }
   function stepContent(m,a){
     const i=a.step,s=m.steps[i],status=stepResult(m,a,i),names=labNames(m,a);
@@ -193,15 +193,26 @@
          <textarea name="notes" rows="5" placeholder="I configured… because… I verified… A safe rollback would…">${esc(state().notes[m.id]||"")}</textarea></label><button class="btn primary" type="submit">Save evidence notes</button></form>
        <p class="small muted">Notes are not automatically certified as technically correct. Do not enter actual credentials or organization secrets.</p></div>${footer()}</div>`;
   }
+  function openAction(m,a){
+    const key=m.steps[a.step]?.check,actionFor={
+      user:"new-user",guest:"new-guest",group:"new-group",member:"group-add-member",
+      app:m.id==="contractor"&&!db.apps.some(x=>x.name==="Vendor Portal")?"new-app":"assign-app",
+      license:"user-license",policy:"new-policy",whatif:"go-whatif",
+      managed:"new-managed",grant:"assign-managed",reg:"new-reg",
+      permission:"set-reg-permission",consent:"consent-reg",package:"new-package",review:"new-review"
+    };
+    return actionFor[key]||null;
+  }
   function coach(){
     const active=state().last,a=get(active),m=find(active);
     if(!a||!m||a.submitted||a.mode!=="guided")return "";
     const step=m.steps[a.step],status=stepResult(m,a,a.step);
+    const control=openAction(m,a);
     return `<section class="v12-coach" aria-label="Active in-console SC-300 instructor"><b>🧭 Practical mission coach · Step ${a.step+1}/${m.steps.length}</b>
       <h3>${esc(step.title)}</h3><p>${esc(replace(step.do,m,a))}</p>
       <div class="v12-why"><b>Why:</b> ${esc(step.why)}</div>
       <p class="small">${status.ok?"✓ Current saved fictional state meets this condition.":"Current fictional configuration does not yet satisfy this condition."}</p>
-      <div class="flex wrap"><button class="btn primary" data-action="v12-coach-check" data-id="${m.id}">Check this step</button><button class="btn" data-route="v12/mission/${m.id}">Return to instruction and advance →</button><button class="btn xs" data-action="v12-coach-hide">Close coach</button></div></section>`;
+      <div class="flex wrap">${control?`<button class="btn primary" data-action="v12-coach-open" data-id="${m.id}">Open ${esc(control.replace(/-/g," "))} form →</button>`:""}<button class="btn" data-action="v12-coach-check" data-id="${m.id}">Check this step</button><button class="btn" data-route="v12/mission/${m.id}">Return to instruction and advance →</button><button class="btn xs" data-action="v12-coach-hide">Close coach</button></div></section>`;
   }
   function results(){
     const hist=[...state().history].reverse();
@@ -238,6 +249,14 @@
     if(name==="v12-submit"&&m){submit(m);return;}
     if(name==="v12-reopen"&&m){const a=get(m.id);a.submitted=false;a.step=all(m,a).findIndex(x=>!x.ok);if(a.step<0)a.step=0;save();render();return;}
     if(name==="v12-goto"&&m){const a=get(m.id),i=Number(el.dataset.index);if(a&&!a.submitted&&i>=0&&i<m.steps.length){a.step=i;save();render();}return;}
+    if(name==="v12-coach-open"&&m){
+      const a=get(m.id),control=a&&openAction(m,a);
+      if(control&&a?.mode==="guided"){
+        const u=db.users.find(x=>x.name===labNames(m,a).USER);
+        portalAction(control,{dataset:{id:control==="user-license"?u?.id:""}});
+      }
+      return;
+    }
     if(name==="v12-coach-check"&&m){const a=get(m.id);if(a)check(m,a.step);return;}
     if(name==="v12-coach-hide"){state().last=null;save();render();return;}
     if(name==="v12-copy"&&m){const a=get(m.id);if(a&&navigator?.clipboard?.writeText)navigator.clipboard.writeText(labNames(m,a)[el.dataset.key]||"").then(()=>toast("Copied training name","good")).catch(()=>toast("Select and copy the visible name instead","bad"));return;}
