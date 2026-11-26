@@ -3,9 +3,11 @@
  const clinics=[...V11_CLINICS_A,...V11_CLINICS_B];
  if(clinics.length!==17||new Set(clinics.map(x=>x.id)).size!==17)throw Error("Advanced clinic curriculum unavailable");
  db.v11=db.v11||{current:null,views:{},quiz:{},attempts:{},practice:{},notes:{},coach:null,filter:"All",history:[]};
+ db.v11.orders=db.v11.orders||{};
  const S=db.v11,oldRender=render,oldShell=shell,oldAction=action,esc=x=>safe(String(x??""));
  const find=id=>clinics.find(x=>x.id===id);
  const getView=id=>S.views[id]||(S.views[id]={stage:0,step:0,mode:"watch"});
+ const optionOrder=c=>{let a=S.orders[c.id];if(!Array.isArray(a)||a.length!==c.options.length){a=c.options.map((_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}S.orders[c.id]=a;save();}return a;};
  const supported=new Set(["custom-attributes","cloudsync-choice","gsa-connectivity","app-proxy","defender-cloud-apps","entitlement-tou","pim-groups","diagnostic-kql"]);
  const isRealCheck=id=>supported.has(id);
  const css=`<style>
@@ -108,7 +110,7 @@
     ${a?`<p class="small">Current attempt: ${esc(a.code)} · ${esc(a.mode)} · ${a.finished?(a.passed?"Fictional check passed":"Not verified"):"In progress"}</p><button class="btn" data-route="v11/practice/${c.id}">Resume attempt</button>`:""}
    </div><div class="panel"><div class="eyebrow">TROUBLESHOOT · Diagnose an incident</div><p><b>Symptom:</b> ${esc(c.incident)}</p><details><summary><b>Reveal the most likely cause only after forming your own hypothesis</b></summary><p>${esc(c.diagnosis)}</p></details>
     <button class="btn" style="margin-top:12px" data-route="portal/logs" data-v11-open="${c.id}">Inspect fictional sign-in logs →</button></div></div>
-   <div class="panel" style="margin-top:16px"><div class="eyebrow">MASTER · Reason through a real-world failure</div><h3>${esc(c.incident)}</h3><form id="v11-quiz" data-id="${c.id}"><fieldset><legend>Which next action is the most defensible?</legend>${c.options.map((answer,k)=>`<label class="clinic-choice"><input type="radio" name="answer" value="${k}" required> ${esc(answer)}</label>`).join("")}</fieldset><button class="btn primary" type="submit">Check my reasoning and explain why</button></form>
+   <div class="panel" style="margin-top:16px"><div class="eyebrow">MASTER · Reason through a real-world failure</div><h3>${esc(c.incident)}</h3><form id="v11-quiz" data-id="${c.id}"><fieldset><legend>Which next action is the most defensible?</legend>${optionOrder(c).map(k=>`<label class="clinic-choice"><input type="radio" name="answer" value="${k}" required> ${esc(c.options[k])}</label>`).join("")}</fieldset><button class="btn primary" type="submit">Check my reasoning and explain why</button></form>
      ${q?`<div class="${q.correct?"scenario":"clinic-warn"}" role="status" style="padding:15px;margin-top:14px"><b>${q.correct?"✓ Correct conclusion":"Not quite — study the cause and try again"}</b><p>${esc(c.diagnosis)}</p><p>Correct action: ${esc(c.options[c.correct])}</p></div>`:""}
    </div>
    <div class="panel" style="margin-top:16px"><div class="eyebrow">PROVE · What an independent reviewer should see</div><p>${esc(c.evidence)}</p>
@@ -133,7 +135,7 @@
   return `<div class="page clinic-root">${css}<div class="eyebrow">SC-300 · ADVANCED CLINIC LEARNING</div><h1>What you understand versus what you can actually administer</h1>
    <div class="grid3"><div class="panel"><div class="statnum">${right}/${clinics.length}</div><div class="statlabel">Correct knowledge checks</div></div><div class="panel"><div class="statnum">${guided}</div><div class="statlabel">Guided fictional-state checks</div></div><div class="panel"><div class="statnum">${exam}</div><div class="statlabel">Independent fictional-state checks</div></div></div>
    <div class="clinic-warn" style="margin-top:16px">No recorded score in this learning app is Microsoft exam certification or validation of all 98 subskills. Design-only activities and simulated policy features require further evidence.</div>
-   <div class="panel" style="margin-top:16px"><h3>Resume and back up learning</h3><button class="btn primary" data-route="${S.current?"v11/clinic/"+S.current:"v11/clinics"}">Resume studying →</button><button class="btn" data-action="v11-export">Export clinic progress JSON ↓</button></div>
+   <div class="panel" style="margin-top:16px"><h3>Resume and back up learning</h3><button class="btn primary" data-route="${S.current?"v11/clinic/"+S.current:"v11/clinics"}">Resume studying →</button><button class="btn" data-action="v11-export">Export clinic progress JSON ↓</button><label class="btn" for="v11-import">Import saved clinic progress</label><input id="v11-import" type="file" accept=".json,application/json" style="display:none"/></div>
    <div class="panel" style="margin-top:16px"><h3>Targeted remediation</h3>${clinics.map(c=>{const a=S.quiz[c.id],hist=S.history.filter(x=>x.id===c.id&&!x.correct).length;return `<div class="flex between wrap" style="padding:10px 0;border-bottom:1px solid #dde7ef"><div><b>${esc(c.topic)}</b><p class="small muted">${a?.correct?"Concept check correct":"Concept check pending"} · ${hist} incorrect or incomplete attempts</p></div><button class="btn xs" data-route="v11/clinic/${c.id}">${hist?"Review mistakes →":"Study →"}</button></div>`}).join("")}</div>${footer()}</div>`;
  }
  function coach(){
@@ -195,6 +197,23 @@
   if(db.v8)db.v8.coach=null;if(db.v6)db.v6.activeTutor=null;
   save();
  },true);
+ document.addEventListener("change",e=>{
+  if(e.target?.id!=="v11-import")return;
+  const file=e.target.files?.[0];if(!file||file.size>2000000){toast("Choose a clinic JSON backup under 2 MB","bad");return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+     const parsed=JSON.parse(String(reader.result||""));
+     if(parsed.type!=="identity-architect-v11-learning"||!parsed.learning||typeof parsed.learning.quiz!=="object"||typeof parsed.learning.notes!=="object")throw Error("Invalid clinic backup");
+     const data=parsed.learning;
+     S.current=typeof data.current==="string"&&find(data.current)?data.current:null;
+     S.quiz=data.quiz||{};S.notes=data.notes||{};S.views=data.views||{};S.practice=data.practice||{};
+     S.history=Array.isArray(data.history)?data.history.slice(-300):[];
+     S.orders={};S.attempts={};S.coach=null;S.filter="All";save();toast("Advanced clinic progress restored on this device","good");go("v11/progress");
+    }catch(err){toast("Could not import this learning backup: "+String(err.message||err),"bad");}
+  };
+  reader.readAsText(file);
+ });
  document.addEventListener("submit",e=>{
   const form=e.target;if(form?.id==="v11-quiz"){
    e.preventDefault();const c=find(form.dataset.id);if(!c)return;
