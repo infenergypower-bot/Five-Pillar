@@ -5,6 +5,7 @@
  if(!Array.isArray(V11_CHECKPOINTS)||V11_CHECKPOINTS.length!==17||V11_CHECKPOINTS.some(x=>!clinics.find(c=>c.id===x.id)))throw Error("Second advanced reasoning checkpoints missing");
  db.v11=db.v11||{current:null,views:{},quiz:{},attempts:{},practice:{},notes:{},coach:null,filter:"All",history:[]};
  db.v11.orders=db.v11.orders||{};
+ db.v11.teachback=db.v11.teachback||{};
  for(const state of Object.values(db.v11.quiz||{})){if(state&&state.first===undefined){state.first=!!state.correct;state.second=false;state.correct=false;}}
  const S=db.v11,oldRender=render,oldShell=shell,oldAction=action,esc=x=>safe(String(x??""));
  const find=id=>clinics.find(x=>x.id===id);
@@ -159,6 +160,17 @@
    <div class="panel" style="margin-top:16px"><div class="eyebrow">PROVE · What an independent reviewer should see</div><p>${esc(c.evidence)}</p>
      <form id="v11-note" data-id="${c.id}"><label class="field">My procedure, expected output, actual evidence and rollback (fictional data only)<textarea name="notes" rows="5" placeholder="I would configure…, then observe…, and test failure by…, recovering via…">${esc(S.notes[c.id]||"")}</textarea></label><button class="btn primary" type="submit">Save my explanation</button></form>
      <a href="${esc(c.src)}" target="_blank" rel="noopener">Microsoft Learn subject reference ↗</a></div>
+   <div class="panel" style="margin-top:16px"><div class="eyebrow">TEACH IT BACK · Explain the work in your own words</div>
+    <p>This is deliberate practice. Four specific answers help reveal whether you truly understand the procedure. Your answers are stored in this browser but are not automatically judged technically correct.</p>
+    <form id="v11-teachback" data-id="${c.id}">
+     <label class="field">1. What would you actually configure?<textarea name="configured" rows="2" required placeholder="Name the resource, setting and approved scope.">${esc(S.teachback[c.id]?.configured||"")}</textarea></label>
+     <label class="field">2. Why does that setting matter?<textarea name="reason" rows="2" required placeholder="Describe the threat, business requirement, or access decision it changes.">${esc(S.teachback[c.id]?.reason||"")}</textarea></label>
+     <label class="field">3. How will you prove the result works?<textarea name="verification" rows="2" required placeholder="Expected result, log, negative test, and which user/resource to inspect.">${esc(S.teachback[c.id]?.verification||"")}</textarea></label>
+     <label class="field">4. How would you fix or roll back a mistake?<textarea name="rollback" rows="2" required placeholder="Safe recovery procedure and who must approve it.">${esc(S.teachback[c.id]?.rollback||"")}</textarea></label>
+     <button class="btn primary" type="submit">Save my four-part learning evidence</button>
+    </form>
+    <p class="small muted" role="status">${S.teachback[c.id]?"✓ Explanation drafted, but not independently reviewed.":"Responses must be specific enough to justify the configuration; do not enter real credentials or tenant identifiers."}</p>
+   </div>
    <div class="flex wrap" style="margin-top:15px"><button class="btn" data-route="v11/clinics">All advanced topics</button><button class="btn primary" data-route="v11/clinic/${clinics[Math.min(clinics.length-1,clinics.indexOf(c)+1)].id}">Next clinic →</button></div>${footer()}</div>`;
  }
  function practice(c){
@@ -179,6 +191,7 @@
    <div class="grid3"><div class="panel"><div class="statnum">${right}/${clinics.length}</div><div class="statlabel">Correct knowledge checks</div></div><div class="panel"><div class="statnum">${guided}</div><div class="statlabel">Guided fictional-state checks</div></div><div class="panel"><div class="statnum">${exam}</div><div class="statlabel">Independent fictional-state checks</div></div></div>
    <div class="clinic-warn" style="margin-top:16px">No recorded score in this learning app is Microsoft exam certification or validation of all 98 subskills. Design-only activities and simulated policy features require further evidence.</div>
    <div class="panel" style="margin-top:16px"><h3>Resume and back up learning</h3><button class="btn primary" data-route="${S.current?"v11/clinic/"+S.current:"v11/clinics"}">Resume studying →</button><button class="btn" data-action="v11-export">Export clinic progress JSON ↓</button><a class="btn" href="./qa-advanced-clinics.html">Run Safari and browser interaction tests →</a><label class="btn" for="v11-import">Import saved clinic progress</label><input id="v11-import" type="file" accept=".json,application/json" style="display:none"/></div>
+   <div class="panel" style="margin-top:16px"><h3>Explain your configuration in writing</h3><p><b>${clinics.filter(c=>!!S.teachback[c.id]).length} of ${clinics.length}</b> four-part teach-back records drafted. Written evidence is not automatically verified.</p><button class="btn" data-route="v11/clinics">Continue teach-back exercises →</button></div>
    <div class="panel" style="margin-top:16px"><h3>Targeted remediation</h3>${clinics.map(c=>{const a=S.quiz[c.id],hist=S.history.filter(x=>x.id===c.id&&!x.correct).length;return `<div class="flex between wrap" style="padding:10px 0;border-bottom:1px solid #dde7ef"><div><b>${esc(c.topic)}</b><p class="small muted">${a?.correct?"Concept check correct":"Concept check pending"} · ${hist} incorrect or incomplete attempts</p></div><button class="btn xs" data-route="v11/clinic/${c.id}">${hist?"Review mistakes →":"Study →"}</button></div>`}).join("")}</div>${footer()}</div>`;
  }
  function coach(){
@@ -260,7 +273,7 @@
      if(parsed.type!=="identity-architect-v11-learning"||!parsed.learning||typeof parsed.learning.quiz!=="object"||typeof parsed.learning.notes!=="object")throw Error("Invalid clinic backup");
      const data=parsed.learning;
      S.current=typeof data.current==="string"&&find(data.current)?data.current:null;
-     S.quiz=data.quiz||{};S.notes=data.notes||{};S.views=data.views||{};S.practice=data.practice||{};
+     S.quiz=data.quiz||{};S.notes=data.notes||{};S.views=data.views||{};S.practice=data.practice||{};S.teachback=data.teachback||{};
      S.history=Array.isArray(data.history)?data.history.slice(-300):[];
      S.orders={};S.attempts={};S.coach=null;S.filter="All";save();toast("Advanced clinic progress restored on this device","good");go("v11/progress");
     }catch(err){toast("Could not import this learning backup: "+String(err.message||err),"bad");}
@@ -280,6 +293,14 @@
    const answer=Number(new FormData(form).get("second")),correct=answer===q.answer,old=S.quiz[c.id]||{};
    S.quiz[c.id]={...old,second:correct,correct:correct&&!!old.first,secondAnswered:answer,date:new Date().toISOString()};
    S.history.push({id:c.id,mode:"reasoning-second",correct,time:new Date().toISOString()});save();render();toast(correct?"Second scenario correct":"Review the alternative reasoning",correct?"good":"bad");
+  }
+  if(form?.id==="v11-teachback"){
+   e.preventDefault();const c=find(form.dataset.id);if(!c)return;
+   const raw=Object.fromEntries(new FormData(form).entries());
+   const fields=["configured","reason","verification","rollback"];
+   if(fields.some(k=>String(raw[k]||"").trim().length<25)){toast("Expand each explanation to at least one meaningful sentence","bad");return;}
+   S.teachback[c.id]=Object.fromEntries(fields.map(k=>[k,String(raw[k]).trim().slice(0,2000)]));
+   S.teachback[c.id].date=new Date().toISOString();save();toast("Teach-back evidence saved; independent review still required","good");render();
   }
   if(form?.id==="v11-note"){
    e.preventDefault();const c=find(form.dataset.id);if(!c)return;
