@@ -69,6 +69,15 @@ window.addEventListener("DOMContentLoaded",function(){
       action("v12-submit",{dataset:{id:"joiner"}});
       return __V12_TESTS.getAttempt("joiner").passed===true;
    });
+   test("Previously passed configuration becomes unverified after application access is removed",()=>{
+      const m=__V12_TESTS.getMission("joiner"),a=__V12_TESTS.getAttempt("joiner");
+      const group=db.groups.find(x=>x.name==="Lab Finance "+code),app=db.apps.find(x=>x.name==="Finance Reports");
+      if(!group||!app||!__V12_TESTS.stillValid(m,a))return false;
+      app.assignees=app.assignees.filter(x=>x!==group.id);
+      const denied=__V12_TESTS.stillValid(m,a)===false;
+      app.assignees.push(group.id);
+      return denied&&__V12_TESTS.stillValid(m,a)===true;
+   });
    test("Learning reasoning answers can be checked independently",()=>{
       go("v12/mission/joiner");
       for(let i=0;i<2;i++){
