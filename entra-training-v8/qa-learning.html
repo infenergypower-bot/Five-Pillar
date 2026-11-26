@@ -1,0 +1,83 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SC-300 Learning Studio — Browser QA</title><link rel="stylesheet" href="./styles.css"/>
+<style>body{background:#f0f4f9;font-family:system-ui,sans-serif}.qa{max-width:870px;margin:25px auto;background:white;padding:26px;border:1px solid #d1e0ed;border-radius:14px}.qrow{padding:10px;border-bottom:1px solid #e8ecf2}.pass{color:#167245}.fail{color:#ae2030}#root{position:absolute;left:-10000px;top:0;width:1200px;visibility:hidden}#modal{display:none}</style></head>
+<body><main class="qa"><h1>SC-300 Visual Learning Studio — On-device QA</h1><p>This page checks the learning controls in your actual browser, including Safari on iPad. It uses a temporary fictional tenant, and restores your training record after the tests. It does not connect to a live Microsoft Entra tenant or charge another service.</p><h2 id="summary">Preparing checks…</h2><div id="results" role="status" aria-live="polite"></div><p><a href="./#/v8/academy">Return to the learning academy</a></p><small>Note: passing these checks is not proof of exam readiness. A physical iPad validation requires you to open this page on your own device.</small></main>
+<div id="root" aria-hidden="true"></div><div id="modal"></div>
+<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script>
+<script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-content-expanded.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script><script src="./v6-tutor.js" defer></script>
+<script src="./granular-blueprint-data.js" defer></script><script src="./granular-skills-ui.js" defer></script><script src="./integrated-case-labs.js" defer></script>
+<script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script><script src="./ca-masterclass-data.js" defer></script><script src="./ca-masterclass-ui.js" defer></script>
+<script src="./deep-learning-data.js" defer></script><script src="./learning-studio.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded',function(){
+ const out=[],storedHash=location.hash;let original,originalSave;
+ const run=(name,fn)=>{try{const ok=fn();if(!ok)throw Error('Expected result was not observed');out.push({name,ok:true});}catch(err){out.push({name,ok:false,reason:String(err?.message||err)});}};
+ try{
+  original=db;originalSave=save;db=JSON.parse(JSON.stringify(db));save=function(){};
+  run("14 authored instructional units are loaded",()=>V8_LESSONS.length===14);
+  run("Four SC-300 learning domains are present",()=>new Set(V8_LESSONS.map(x=>x.domain)).size===4);
+  run("Every lesson has a visual explanation and hands-on steps",()=>V8_LESSONS.every(x=>x.visual.length===5&&x.steps.length>=4&&x.beginner.length>200&&x.technical.length>400));
+  run("Learning homepage opens without an error",()=>{go('v8/academy');return document.getElementById('root').textContent.includes('Learn by seeing, doing, and understanding why')});
+  run("Course navigation opens a detailed lesson",()=>{go('v8/learn/group-app-access');return document.getElementById('root').textContent.includes('Groups, assignments, and effective application access')});
+  run("Vocabulary tap-to-expand controls are present",()=>document.querySelectorAll('.v8-term').length>=4);
+  run("Interactive diagram advances",()=>{action('v8-node-next',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].node===1});
+  run("Diagram can be replayed",()=>{action('v8-node-replay',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].node===0});
+  run("Guided console step advances",()=>{action('v8-step-next',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].step===1});
+  run("Knowledge check accepts the correct reasoning",()=>{
+    const lesson=V8_LESSONS.find(x=>x.id==='group-app-access');go('v8/learn/group-app-access');
+    const form=document.querySelector('#v8-quiz');if(!form)return false;
+    const choice=form.querySelector('input[value="'+lesson.answer+'"]');choice.checked=true;form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+    return db.v8.passed['group-app-access']===true;
+  });
+  run("Guided practice creates a unique fictional attempt",()=>{
+    action('v8-start',{dataset:{id:'group-app-access',mode:'guided'}});
+    return !!db.v8.attempt['group-app-access']?.code&&db.v8.attempt['group-app-access'].mode==='guided';
+  });
+  run("Unchanged tenant data cannot pass a lab",()=>{
+    action('v8-grade',{dataset:{id:'group-app-access'}});
+    return db.v8.attempt['group-app-access'].result?.valid===false;
+  });
+  run("New guided practice can validate connected records",()=>{
+    action('v8-start',{dataset:{id:'group-app-access',mode:'guided'}});
+    const code=db.v8.attempt['group-app-access'].code,uid='qa_'+code,gid='qa_group_'+code;
+    db.users.push({id:uid,name:'V8 Analyst '+code,email:'qa-'+code+'@training.test',type:'Member',role:'User',licenses:[],revoked:false,tap:false});
+    db.groups.push({id:gid,name:'V8 Finance '+code,members:[uid]});
+    const app=db.apps.find(x=>x.name==='Finance Reports');
+    app.assignees.push(gid);
+    action('v8-grade',{dataset:{id:'group-app-access'}});
+    return db.v8.attempt['group-app-access'].result?.valid===true&&db.v8.simulation['group-app-access']?.guided===true;
+  });
+  run("Independent Exam mode hides the guided instructor",()=>{
+    action('v8-start',{dataset:{id:'group-app-access',mode:'exam'}});
+    const btn=document.querySelector('button[data-v8-start="group-app-access"]');
+    if(!btn)return false;btn.click();
+    return db.v8.coach===null&&db.v8.attempt['group-app-access'].mode==='exam';
+  });
+  run("Independent exam still requires newly changed simulated state",()=>{
+    const code=db.v8.attempt['group-app-access'].code,uid='qa_i'+code,gid='qa_g'+code;
+    db.users.push({id:uid,name:'V8 Analyst '+code,email:'qa-'+code+'@training.test',type:'Member',role:'User',licenses:[],revoked:false,tap:false});
+    db.groups.push({id:gid,name:'V8 Finance '+code,members:[uid]});db.apps.find(x=>x.name==='Finance Reports').assignees.push(gid);
+    action('v8-grade',{dataset:{id:'group-app-access'}});
+    return db.v8.simulation['group-app-access']?.independent===true;
+  });
+  run("Evidence notes can be saved",()=>{
+    go('v8/learn/group-app-access');const form=document.querySelector('#v8-note');if(!form)return false;
+    form.querySelector('textarea').value='QA fictional evidence: access checked';
+    form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+    return db.v8.notes['group-app-access']==='QA fictional evidence: access checked';
+  });
+  run("Progress dashboard shows separate knowledge and simulation results",()=>{
+    go('v8/progress');return document.getElementById('root').textContent.includes('Independent simulator passes');
+  });
+  run("All official subskills remain conservatively marked unverified",()=>V7_SKILLS.length===237&&V7_SKILLS.every(x=>x.status==='Not verified'));
+ }catch(err){out.push({name:'Unexpected test startup failure',ok:false,reason:String(err?.message||err)});}
+ finally{
+  if(original){db=original;save=originalSave;}
+  history.replaceState(null,'',location.pathname+location.search+storedHash);
+ }
+ const passed=out.filter(x=>x.ok).length,failed=out.length-passed;
+ document.getElementById('summary').textContent=passed+' passed · '+failed+' failed · '+out.length+' tests';
+ document.getElementById('summary').className=failed?'fail':'pass';
+ document.getElementById('results').innerHTML=out.map(x=>'<div class="qrow '+(x.ok?'pass':'fail')+'">'+(x.ok?'✓ ':'✕ ')+x.name+(x.reason?': '+x.reason.replace(/</g,'&lt;'):'')+'</div>').join('');
+ window.__v8TestReport={passed,failed,tests:out};
+});
+</script></body></html>
