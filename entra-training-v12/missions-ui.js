@@ -137,6 +137,15 @@
   .v12-coach{border:2px solid #277da5;border-radius:14px;background:#eaf6fd;padding:16px;color:#153f59}
   .v12-choice{display:block;border:1px solid #cedce9;padding:14px;border-radius:9px;margin:7px 0;cursor:pointer}
   .v12-choice:has(input:checked){background:#e6f4ff;border-color:#1687b7}
+  .v13-screen{background:#f8fbfe;border:1px solid #bed4e6;border-radius:12px;overflow:hidden;margin:14px 0}
+  .v13-nav{display:flex;flex-wrap:wrap;gap:6px;padding:10px;background:#e7f1f8;color:#17466a;font-size:11px}
+  .v13-path{padding:14px;border-bottom:1px solid #d0dfeb;color:#193d56;font-size:13px;overflow-wrap:anywhere}
+  .v13-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:13px}
+  .v13-grid>section{border:1px solid #d0dfea;background:white;padding:13px;border-radius:9px}
+  .v13-grid h4{margin:0 0 7px;font-size:13px;color:#1a547a}.v13-grid p{margin:5px 0;font-size:13px;line-height:1.5;color:#253e51}
+  .v13-more{border-top:1px solid #d0dfeb;padding:12px;background:#f5f9fc}
+  .v13-more details{padding:9px 0}.v13-more summary{font-weight:700;color:#1b4b69;cursor:pointer}
+  @media(max-width:650px){.v13-grid{grid-template-columns:1fr}}
   @media(max-width:820px){.v12-layout{grid-template-columns:1fr}.v12-side{position:static}}
   </style>`;
   const head=()=>`<div class="v12-banner"><div class="eyebrow">SC-300 CONNECTED SKILL PRACTICE · REAL FICTIONAL CONFIGURATION</div><h1>Practice the whole workflow, not just one setting</h1><p>Create users, groups, application access, policies and governance resources using the SAME practice directory. The instructor tells you why each action matters, while the checks inspect what was actually saved.</p><div class="v12-why"><b>Not Microsoft cloud:</b> no real credentials or subscriptions are used. Every result is limited to the fictional model; success does not certify a production configuration.</div></div>`;
@@ -152,13 +161,25 @@
     <div class="panel" style="margin-top:17px"><h3>What an independent pass means here</h3><p>The required fictional records and links existed at submission, and you answered the corresponding reasoning questions. This is a controlled local simulation, not an official exam score or real enterprise tenant validation.</p>
     <button class="btn" data-route="v12/results">Review saved mission results →</button><button class="btn" data-action="v12-export">Export this mission learning record ↓</button><a class="btn" href="./qa-connected.html">Run free browser and iPad workflow checks →</a></div>${footer()}</div>`;
   }
+  function visualGuide(s,includeTroubleshooting=true){
+    if(!s.path)return "";
+    return `<div class="v13-screen" aria-label="Annotated administrative procedure">
+      <div class="v13-nav"><b>IDENTITY PRACTICE CONSOLE</b><span>›</span><span>SIMULATION</span><span>›</span><span>CONFIGURATION</span></div>
+      <div class="v13-path"><b>Where to look:</b> ${esc(s.path)}</div>
+      <div class="v13-grid">
+       <section><h4>WATCH · What you are working with</h4><p>${esc(s.observe)}</p></section>
+       <section><h4>VERIFY · What success looks like</h4><p>${esc(s.expected)}</p></section>
+      </div>
+      ${includeTroubleshooting?`<div class="v13-more"><details><summary>Common mistake and its consequence</summary><p>${esc(s.pitfall)}</p></details><details><summary>How to diagnose and safely recover</summary><p>${esc(s.recovery)}</p></details></div>`:""}
+     </div>`;
+  }
   function stepContent(m,a){
     const i=a.step,s=m.steps[i],status=stepResult(m,a,i),names=labNames(m,a);
     const content=replace(s.do,m,a),where=s.where,passed=status.ok;
     return `<div class="v12-task"><div class="eyebrow">STEP ${i+1} / ${m.steps.length} · ${a.mode==="guided"?"GUIDED INSTRUCTION":a.mode==="practice"?"PRACTICE — OPTIONAL HINTS":"INDEPENDENT ASSESSMENT"}</div>
-     <h2>${esc(s.title)}</h2>${a.mode==="guided"?`<p><b>Do this:</b> ${esc(content)}</p><div class="v12-why"><b>Why this matters</b><p>${esc(s.why)}</p></div>`:a.mode==="practice"?`<p>Complete this stage using the business requirement and named training records. You can request an optional clue, but the coach will not complete any setting for you.</p>
+     <h2>${esc(s.title)}</h2>${a.mode==="guided"?`<p><b>Do this:</b> ${esc(content)}</p><div class="v12-why"><b>Why this matters</b><p>${esc(s.why)}</p></div>${visualGuide(s)}`:a.mode==="practice"?`<p>Complete this stage using the business requirement and named training records. You can request an optional clue, but the coach will not complete any setting for you.</p>
       <button class="btn" data-action="v12-hint" data-id="${m.id}" data-index="${i}">${a.hiddenHint?.[i]?"Hide optional hint":"Show a hint for this step"}</button>
-      ${a.hiddenHint?.[i]?`<div class="v12-why"><b>Practice hint</b><p>${esc(content)}</p><p><b>Why:</b> ${esc(s.why)}</p></div>`:""}`: `<p>Use the business requirement and your own knowledge. The required procedure stays hidden until submission.</p>`}
+      ${a.hiddenHint?.[i]?`<div class="v12-why"><b>Practice hint</b><p>${esc(content)}</p><p><b>Why:</b> ${esc(s.why)}</p></div>${visualGuide(s,false)}`:""}`: `<p>Use the business requirement and your own knowledge. The required procedure stays hidden until submission.</p>`}
      <div class="flex wrap"><button class="btn primary" data-route="${esc(where)}" data-v12-open="${m.id}">Open the matching Entra-style practice screen →</button><button class="btn" data-action="v12-check" data-id="${m.id}" data-index="${i}">Check saved configuration</button></div>
      ${a.checked[i]?`<div class="${a.checked[i].ok?"v12-evidence":"v12-errors"}"><b>${a.checked[i].ok?"✓ Requirement currently satisfied":"Not satisfied yet"}</b>
        ${a.mode==="guided"||a.mode==="practice"&&a.hiddenHint?.[i]||a.submitted?`<p>${esc(status.reason)}</p><p class="small">Observed: ${esc(status.actual)}</p>`:`<p>Review the fictional resource and its relationships, then try again.</p>`}</div>`:""}
@@ -188,7 +209,7 @@
       <div class="v12-steps" aria-label="Administrative mission steps">${m.steps.map((s,i)=>`<button data-action="v12-goto" data-id="${m.id}" data-index="${i}" class="${completed[i].ok?"complete":""} ${a.step===i?"current":""}" aria-label="Step ${i+1}: ${esc(s.title)}, ${completed[i].ok?"satisfied":"pending"}">${completed[i].ok?"✓":i+1}</button>`).join("")}</div>
       <p class="small muted">Green means the current fictional tenant meets the modeled requirement, regardless of whether this button was previously clicked. The actual state is rechecked after every configuration change.</p></div>
       ${a.submitted?`<div class="${a.passed?"v12-evidence":"v12-errors"}"><h3>${a.passed?"Configuration check passed":"Configuration check needs more work"}</h3><p>${n}/${m.steps.length} of the expected fictional state conditions are currently met.</p>
-       ${a.results.map((r,i)=>`<details style="margin:7px 0"><summary>${r.ok?"✓":"✕"} Step ${i+1}: ${esc(m.steps[i].title)}</summary><p>${esc(r.reason)}</p><p>Observed: ${esc(r.actual)}</p></details>`).join("")}
+       ${a.results.map((r,i)=>`<details style="margin:7px 0"><summary>${r.ok?"✓":"✕"} Step ${i+1}: ${esc(m.steps[i].title)}</summary><p>${esc(r.reason)}</p><p>Observed: ${esc(r.actual)}</p>${m.steps[i].path?`<p><b>Expected:</b> ${esc(m.steps[i].expected)}</p><p><b>Common mistake:</b> ${esc(m.steps[i].pitfall)}</p><p><b>Recovery:</b> ${esc(m.steps[i].recovery)}</p>`:""}</details>`).join("")}
        ${!a.passed?`<button class="btn" data-action="v12-reopen" data-id="${m.id}">Continue correcting the configuration →</button>`:""}</div>${quizView(m,a)}`:
         `<div class="v12-layout"><div>${stepContent(m,a)}</div><aside class="v12-side"><div class="v12-coach"><b>${mode==="guided"?"Your instructor":mode==="practice"?"Independent practice with optional hints":"Independent exam assessment"}</b>
           <p>${mode==="guided"?"I will show the target screen, the exact action and why the setting matters. You must perform it. Use Check configuration before moving on.":mode==="practice"?"Practice using the business requirement. Reveal a hint only when needed. Your fictional configuration is checked just like the other modes.":"Use the business requirement, your knowledge and the fictional console. I will not reveal the expected configuration until you submit."}</p>
@@ -216,7 +237,7 @@
     const control=openAction(m,a);
     return `<section class="v12-coach" aria-label="Active in-console SC-300 instructor"><b>🧭 Practical mission coach · Step ${a.step+1}/${m.steps.length}</b>
       <h3>${esc(step.title)}</h3><p>${esc(replace(step.do,m,a))}</p>
-      <div class="v12-why"><b>Why:</b> ${esc(step.why)}</div>
+      <div class="v12-why"><b>Why:</b> ${esc(step.why)}</div><div class="v12-why"><b>Look for:</b> ${esc(step.observe||"Open the corresponding fictional configuration screen.")}<p><b>Expected:</b> ${esc(step.expected||"Confirm the saved record matches the task.")}</p></div>
       <p class="small">${status.ok?"✓ Current saved fictional state meets this condition.":"Current fictional configuration does not yet satisfy this condition."}</p>
       <div class="flex wrap">${control?`<button class="btn primary" data-action="v12-coach-open" data-id="${m.id}">Open ${esc(control.replace(/-/g," "))} form →</button>`:""}<button class="btn" data-action="v12-coach-check" data-id="${m.id}">Check this step</button><button class="btn" data-route="v12/mission/${m.id}">Return to instruction and advance →</button><button class="btn xs" data-action="v12-coach-hide">Close coach</button></div></section>`;
   }
