@@ -17,6 +17,13 @@ window.addEventListener('DOMContentLoaded',function(){
   run("Four SC-300 learning domains are present",()=>new Set(V8_LESSONS.map(x=>x.domain)).size===4);
   run("Every lesson has a visual explanation and hands-on steps",()=>V8_LESSONS.every(x=>x.visual.length===5&&x.steps.length>=4&&x.beginner.length>200&&x.technical.length>400));
   run("Learning homepage opens without an error",()=>{go('v8/academy');return document.getElementById('root').textContent.includes('Learn by seeing, doing, and understanding why')});
+  for(const unit of V8_LESSONS){
+    run("Lesson route loads: "+unit.id,()=>{go("v8/learn/"+unit.id);return document.getElementById("root").textContent.includes(unit.title)&&!!document.querySelector("#v8-quiz");});
+    run("Guided step can advance: "+unit.id,()=>{
+      db.v8.screen[unit.id]={node:0,step:0,stage:"follow"};action("v8-step-next",{dataset:{id:unit.id}});
+      return db.v8.screen[unit.id].step===1;
+    });
+  }
   run("Course navigation opens a detailed lesson",()=>{go('v8/learn/group-app-access');return document.getElementById('root').textContent.includes('Groups, assignments, and effective application access')});
   run("Vocabulary tap-to-expand controls are present",()=>document.querySelectorAll('.v8-term').length>=4);
   run("Interactive diagram advances",()=>{action('v8-node-next',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].node===1});
