@@ -2,12 +2,16 @@
 (function installV11Clinics(){
  const clinics=[...V11_CLINICS_A,...V11_CLINICS_B];
  if(clinics.length!==17||new Set(clinics.map(x=>x.id)).size!==17)throw Error("Advanced clinic curriculum unavailable");
+ if(!Array.isArray(V11_CHECKPOINTS)||V11_CHECKPOINTS.length!==17||V11_CHECKPOINTS.some(x=>!clinics.find(c=>c.id===x.id)))throw Error("Second advanced reasoning checkpoints missing");
  db.v11=db.v11||{current:null,views:{},quiz:{},attempts:{},practice:{},notes:{},coach:null,filter:"All",history:[]};
  db.v11.orders=db.v11.orders||{};
+ for(const state of Object.values(db.v11.quiz||{})){if(state&&state.first===undefined){state.first=!!state.correct;state.second=false;state.correct=false;}}
  const S=db.v11,oldRender=render,oldShell=shell,oldAction=action,esc=x=>safe(String(x??""));
  const find=id=>clinics.find(x=>x.id===id);
+ const checkpoint=id=>V11_CHECKPOINTS.find(x=>x.id===id);
  const getView=id=>S.views[id]||(S.views[id]={stage:0,step:0,mode:"watch"});
  const optionOrder=c=>{let a=S.orders[c.id];if(!Array.isArray(a)||a.length!==c.options.length){a=c.options.map((_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}S.orders[c.id]=a;save();}return a;};
+ const orderSecond=c=>{const q=checkpoint(c.id);if(!q)return [];const key=c.id+"-second";let a=S.orders[key];if(!Array.isArray(a)||a.length!==q.choices.length){a=q.choices.map((_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}S.orders[key]=a;save();}return a;};
  const supported=new Set(["custom-attributes","cloudsync-choice","gsa-connectivity","app-proxy","defender-cloud-apps","entitlement-tou","pim-groups","diagnostic-kql"]);
  const isRealCheck=id=>supported.has(id);
  const css=`<style>
@@ -113,7 +117,17 @@
    </div><div class="panel"><div class="eyebrow">TROUBLESHOOT · Diagnose an incident</div><p><b>Symptom:</b> ${esc(c.incident)}</p><details><summary><b>Reveal the most likely cause only after forming your own hypothesis</b></summary><p>${esc(c.diagnosis)}</p></details>
     <button class="btn" style="margin-top:12px" data-route="portal/logs" data-v11-open="${c.id}">Inspect fictional sign-in logs →</button></div></div>
    <div class="panel" style="margin-top:16px"><div class="eyebrow">MASTER · Reason through a real-world failure</div><h3>${esc(c.incident)}</h3><form id="v11-quiz" data-id="${c.id}"><fieldset><legend>Which next action is the most defensible?</legend>${optionOrder(c).map(k=>`<label class="clinic-choice"><input type="radio" name="answer" value="${k}" required> ${esc(c.options[k])}</label>`).join("")}</fieldset><button class="btn primary" type="submit">Check my reasoning and explain why</button></form>
-     ${q?`<div class="${q.correct?"scenario":"clinic-warn"}" role="status" style="padding:15px;margin-top:14px"><b>${q.correct?"✓ Correct conclusion":"Not quite — study the cause and try again"}</b><p>${esc(c.diagnosis)}</p><p>Correct action: ${esc(c.options[c.correct])}</p></div>`:""}
+     ${q?.first!==undefined?`<div class="${q.first?"scenario":"clinic-warn"}" role="status" style="padding:15px;margin-top:14px"><b>${q.first?"✓ First reasoning check correct":"Review the diagnosis and try again"}</b><p>${esc(c.diagnosis)}</p><p>Best next action: ${esc(c.options[c.correct])}</p></div>`:""}
+   <div class="panel" style="margin-top:16px"><div class="eyebrow">TRANSFER THE SKILL · A second independent question</div>
+     <p>Apply the same technical principle to a different workplace situation. Both reasoning checks must be correct to earn the knowledge badge.</p>
+     <h3>${esc(checkpoint(c.id).question)}</h3>
+     <form id="v11-checkpoint" data-id="${c.id}"><fieldset><legend>Which option best matches the requirements?</legend>
+       ${orderSecond(c).map(k=>`<label class="clinic-choice"><input type="radio" name="second" value="${k}" required> ${esc(checkpoint(c.id).choices[k])}</label>`).join("")}
+       </fieldset><button class="btn primary" type="submit">Grade second reasoning problem</button></form>
+     ${q?.second!==undefined?`<div class="${q.second?"scenario":"clinic-warn"}" role="status" style="padding:14px;margin-top:12px"><b>${q.second?"✓ Second scenario correct":"Incorrect — review and retry"}</b>
+       <p>${esc(checkpoint(c.id).explain)}</p>${q.second?"":`<p>${esc(checkpoint(c.id).wrong)}</p>`}</div>`:""}
+     <p class="small">${q?.correct?"✓ Both reasoning problems solved":"Knowledge badge pending: solve both scenarios. Fictional administrative competence is measured separately."}</p>
+   </div>
    </div>
    <div class="panel" style="margin-top:16px"><div class="eyebrow">PROVE · What an independent reviewer should see</div><p>${esc(c.evidence)}</p>
      <form id="v11-note" data-id="${c.id}"><label class="field">My procedure, expected output, actual evidence and rollback (fictional data only)<textarea name="notes" rows="5" placeholder="I would configure…, then observe…, and test failure by…, recovering via…">${esc(S.notes[c.id]||"")}</textarea></label><button class="btn primary" type="submit">Save my explanation</button></form>
@@ -230,8 +244,15 @@
   const form=e.target;if(form?.id==="v11-quiz"){
    e.preventDefault();const c=find(form.dataset.id);if(!c)return;
    const answer=Number(new FormData(form).get("answer")),correct=answer===c.correct;
-   S.quiz[c.id]={correct,answered:answer,date:new Date().toISOString()};
-   S.history.push({id:c.id,mode:"reasoning",correct,time:new Date().toISOString()});save();render();toast(correct?"Correct diagnosis":"Review the root cause and retry",correct?"good":"bad");
+   const old=S.quiz[c.id]||{};
+   S.quiz[c.id]={...old,first:correct,correct:correct&&!!old.second,answered:answer,date:new Date().toISOString()};
+   S.history.push({id:c.id,mode:"reasoning-first",correct,time:new Date().toISOString()});save();render();toast(correct?"First reasoning check correct":"Review the root cause and retry",correct?"good":"bad");
+  }
+  if(form?.id==="v11-checkpoint"){
+   e.preventDefault();const c=find(form.dataset.id),q=checkpoint(c?.id);if(!c||!q)return;
+   const answer=Number(new FormData(form).get("second")),correct=answer===q.answer,old=S.quiz[c.id]||{};
+   S.quiz[c.id]={...old,second:correct,correct:correct&&!!old.first,secondAnswered:answer,date:new Date().toISOString()};
+   S.history.push({id:c.id,mode:"reasoning-second",correct,time:new Date().toISOString()});save();render();toast(correct?"Second scenario correct":"Review the alternative reasoning",correct?"good":"bad");
   }
   if(form?.id==="v11-note"){
    e.preventDefault();const c=find(form.dataset.id);if(!c)return;
