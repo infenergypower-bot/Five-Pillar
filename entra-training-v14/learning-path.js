@@ -12,7 +12,9 @@
  const passLesson=id=>!!db.v8?.passed?.[id],passClinic=id=>!!db.v11?.quiz?.[id]?.correct,missionAttempt=id=>db.v12?.active?.[id]||null;
  function stats(m){
   const studied=m.lessons.filter(passLesson).length,checked=m.clinics.filter(passClinic).length,attempt=missionAttempt(m.mission);
-  return {studied,checked,attempt,guided:!!(attempt?.submitted&&attempt.passed&&attempt.mode==="guided"),independent:!!(attempt?.submitted&&attempt.passed&&attempt.knowledge&&attempt.mode==="exam")};
+  const engine=window.__V12_TESTS,mapped=engine?.getMission?.(m.mission);
+  const current=!!attempt&&!!attempt.submitted&&(mapped&&engine?.stillValid?engine.stillValid(mapped,attempt):!!attempt.passed);
+  return {studied,checked,attempt,current,guided:current&&attempt?.mode==="guided",independent:current&&!!attempt?.knowledge&&attempt?.mode==="exam"};
  }
  function nextStep(m){
   const l=m.lessons.find(id=>!passLesson(id));if(l)return {route:"v8/learn/"+l,label:"Learn the next concept",why:"Build your mental model before changing fictional tenant settings."};
@@ -91,7 +93,7 @@
   <h2 style="margin-top:20px">2. Apply the deeper reasoning</h2><p>These clinics provide additional technical workflows, tricky failures, and two independent reasoning questions per topic. ${x.checked} of ${m.clinics.length} advanced checks recorded.</p>
   <div class="v14-topic-list">${topicList(m.clinics,"v11")}</div>
   <div class="panel" style="margin-top:20px"><div class="eyebrow">3. DO · CONNECTED FICTIONAL TENANT</div><h3>Guided → Practice with hints → Independent Exam</h3><p>Use the same employee, group, application, policy and audit records through a whole business workflow. The evaluation rechecks the actual saved fictional state, including unauthorized permissions.</p>
-    <p class="small"><b>Current evidence:</b> ${x.attempt?.submitted?(x.attempt.passed?"configuration passed":"configuration incomplete"):"not submitted"} · ${x.attempt?.knowledge?"reasoning questions correct":"reasoning pending"} · ${x.attempt?.mode?esc(x.attempt.mode)+" mode":"no active attempt"}</p>
+    <p class="small"><b>Current evidence:</b> ${x.attempt?.submitted?(x.current?"configuration still satisfies modeled requirements":"configuration requires repair or review"):"not submitted"} · ${x.attempt?.knowledge?"reasoning questions correct":"reasoning pending"} · ${x.attempt?.mode?esc(x.attempt.mode)+" mode":"no active attempt"}</p>
     <div class="flex wrap"><button class="btn primary" data-route="v12/missions">Open all three mission modes →</button>${x.attempt?`<button class="btn" data-route="v12/mission/${m.mission}">Resume this mission →</button>`:""}</div>
   </div>
   <div class="v14-warning" style="margin-top:15px"><b>4. PROVE · Independent real-world validation</b><p>Even after a simulated pass, verify an approved real Microsoft tenant where licensing permits, complete fresh objective-balanced mock assessments, and review Microsoft’s current study guide. These requirements have not been automatically signed off.</p></div>
