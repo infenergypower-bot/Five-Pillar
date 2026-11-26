@@ -37,21 +37,23 @@
     const members=Array.isArray(r.group?.members)?r.group.members:[];
     const assignees=Array.isArray(r.app?.assignees)?r.app.assignees:[];
     const finance=db.apps.find(x=>x.name==="Finance Reports");
-    const excluded=!(finance?.assignees||[]).some(id=>id===r.guest?.id||id===r.group?.id);
+    const contractorGroups=db.groups.filter(g=>r.guest&&Array.isArray(g.members)&&g.members.includes(r.guest.id));
+    const excluded=!!r.guest&&!(finance?.assignees||[]).some(id=>id===r.guest.id||contractorGroups.some(g=>g.id===id));
+    const dedicatedOnly=(person)=>!!person&&members.length===1&&members[0]===person.id;
     const safeRole=(u)=>!!u&&!/(administrator|admin|owner)/i.test(String(u.role||""))&&!db.roles.some(x=>x.user===u.name&&!/reader/i.test(x.role||""));
     let ok=false,reason="",actual="";
     if(m.id==="joiner"){
       if(key==="user"){ok=!!r.user&&r.user.type==="Member"&&r.user.email?.toLowerCase().includes(a.code.toLowerCase());reason="Create a Member with the exact lab display name and a unique training-only sign-in.";actual=r.user?`${r.user.name}, ${r.user.email}, type ${r.user.type}`:"No attempt-specific member identity found";}
       if(key==="group"){ok=!!r.group;reason="Create the exact dedicated Finance group.";actual=r.group?`Group ${r.group.name} exists`:"Group not yet created";}
-      if(key==="member"){ok=!!r.user&&members.includes(r.user.id);reason="Select the employee and correct security group in Add group member.";actual=members.length?`${members.length} group member(s), employee included: ${ok}`:"Group has no members";}
+      if(key==="member"){ok=dedicatedOnly(r.user);reason="The dedicated Finance group should contain only the new employee, with no unapproved additional members.";actual=members.length?`${members.length} group member(s), employee included: ${ok}`:"Group has no members";}
       if(key==="app"){ok=!!r.app&&!!r.group&&assignees.includes(r.group.id);reason="Assign Finance Reports to the dedicated group, not All Staff.";actual=`Finance Reports assignees: ${assignees.length}`;}
       if(key==="license"){ok=!!r.user&&r.user.licenses?.length>0;reason="Assign a simulated Microsoft service license to the new employee.";actual=`Licenses for this employee: ${(r.user?.licenses||[]).join(", ")||"none"}`;}
-      if(key==="least"){ok=safeRole(r.user)&&members.includes(r.user.id)&&assignees.includes(r.group?.id)&&!members.includes("u0");reason="No directory administration or emergency member in the dedicated group; ordinary group-based app entitlement is sufficient.";actual=r.user?`Role ${r.user.role||"none"}; emergency excluded: ${!members.includes("u0")}`:"User missing";}
+      if(key==="least"){ok=safeRole(r.user)&&dedicatedOnly(r.user)&&assignees.includes(r.group?.id)&&!members.includes("u0");reason="No directory administration or emergency member in the dedicated group; ordinary group-based app entitlement is sufficient.";actual=r.user?`Role ${r.user.role||"none"}; emergency excluded: ${!members.includes("u0")}`:"User missing";}
     }
     if(m.id==="pilot"){
       if(key==="user"){ok=!!r.user&&r.user.type==="Member"&&r.user.email?.toLowerCase().includes(a.code.toLowerCase());reason="Create the unique pilot Member identity.";actual=r.user?`${r.user.name}, ${r.user.type}`:"Pilot not created";}
       if(key==="group"){ok=!!r.group&&r.group.name!=="All Staff";reason="Create the dedicated pilot group.";actual=r.group?`Group ${r.group.name}`:"No pilot group";}
-      if(key==="member"){ok=!!r.user&&members.includes(r.user.id)&&!members.includes("u0");reason="Include only the pilot identity; never Training Emergency.";actual=`Included user: ${!!r.user&&members.includes(r.user.id)}; emergency included: ${members.includes("u0")}`;}
+      if(key==="member"){ok=dedicatedOnly(r.user)&&!members.includes("u0");reason="Include only the pilot identity; never Training Emergency or other unapproved people.";actual=`Included user: ${!!r.user&&members.includes(r.user.id)}; emergency included: ${members.includes("u0")}`;}
       if(key==="policy"){ok=!!r.policy&&r.policy.group===r.group?.name&&r.policy.app==="Finance Reports"&&r.policy.control==="Require MFA"&&r.policy.state==="Report-only";reason="Create an MFA policy for the exact group and Finance Reports, state Report-only.";actual=r.policy?`Scope ${r.policy.group}; app ${r.policy.app}; control ${r.policy.control}; state ${r.policy.state}`:"Policy not created";}
       if(key==="whatif"){ok=!!r.user&&db.whatif?.user===r.user.name&&db.whatif?.app==="Finance Reports";reason="Run What If as the created pilot user against Finance Reports.";actual=db.whatif?`${db.whatif.user} → ${db.whatif.app} (${db.whatif.result})`:"No What If evaluation recorded";}
       if(key==="scope"){ok=!!r.policy&&r.policy.group===r.group?.name&&r.policy.app==="Finance Reports"&&r.policy.control==="Require MFA"&&r.policy.state==="Report-only"&&!members.includes("u0");reason="Keep the exact targeted policy in Report-only and emergency account excluded.";actual=r.policy?`Policy state ${r.policy.state}; emergency excluded ${!members.includes("u0")}`:"Policy missing";}
@@ -67,11 +69,11 @@
     if(m.id==="contractor"){
       if(key==="guest"){ok=!!r.guest&&r.guest.type==="Guest"&&r.guest.email?.toLowerCase().includes(a.code.toLowerCase());reason="Invite the named fictional user as Guest using a unique training-only email.";actual=r.guest?`${r.guest.name}, type ${r.guest.type}`:"Guest not created";}
       if(key==="group"){ok=!!r.group;reason="Create a dedicated contractor security group.";actual=r.group?`Group ${r.group.name}`:"Group missing";}
-      if(key==="member"){ok=!!r.guest&&members.includes(r.guest.id);reason="Add the contractor guest, not an internal administrator, to the dedicated group.";actual=`Guest included: ${!!r.guest&&members.includes(r.guest.id)}`;}
+      if(key==="member"){ok=dedicatedOnly(r.guest);reason="Only the invited contractor belongs in the dedicated project group.";actual=`Guest included: ${!!r.guest&&members.includes(r.guest.id)}`;}
       if(key==="app"){ok=!!r.app&&!!r.group&&assignees.includes(r.group.id);reason="Create Vendor Portal if absent and assign the exact contractor group.";actual=`Vendor Portal exists: ${!!r.app}; group assigned: ${!!r.group&&assignees.includes(r.group.id)}`;}
       if(key==="package"){ok=!!r.pkg&&r.pkg.approval==="Required"&&Number(r.pkg.expiry)===30;reason="Create the attempt-specific access package with Required approval and exactly 30-day expiry.";actual=r.pkg?`Approval ${r.pkg.approval}; expiry ${r.pkg.expiry} days`:"Package missing";}
       if(key==="review"){ok=!!r.group&&db.reviews.some(x=>x.target===r.group.name&&x.reviewer);reason="Create a review targeting the contractor group with a named responsible reviewer.";actual=`Review count: ${db.reviews.filter(x=>x.target===r.group?.name).length}`;}
-      if(key==="least"){ok=excluded&&!!r.guest&&!!r.group&&members.includes(r.guest.id)&&!!r.app&&assignees.includes(r.group.id)&&!members.includes("u0");reason="Verify Vendor Portal access while preventing direct or group-assigned Finance Reports access.";actual=`No Finance Reports assignment: ${excluded}; Vendor Portal assigned: ${!!r.app&&assignees.includes(r.group.id)}`;}
+      if(key==="least"){ok=excluded&&!!r.guest&&safeRole(r.guest)&&!!r.group&&dedicatedOnly(r.guest)&&!!r.app&&assignees.includes(r.group.id)&&!members.includes("u0");reason="Verify Vendor Portal access while preventing direct or group-assigned Finance Reports access.";actual=`No Finance Reports assignment: ${excluded}; Vendor Portal assigned: ${!!r.app&&assignees.includes(r.group.id)}`;}
     }
     return {ok:!!ok,reason,actual,step:index,check:key};
   }
