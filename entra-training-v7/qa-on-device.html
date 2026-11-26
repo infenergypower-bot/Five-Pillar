@@ -4,7 +4,7 @@
 <div id="root"></div><div id="modal"></div>
 <script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script>
 <script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-content-expanded.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script><script src="./v6-tutor.js" defer></script>
-<script src="./granular-blueprint-data.js" defer></script><script src="./granular-skills-ui.js" defer></script><script src="./integrated-case-labs.js" defer></script><script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script>
+<script src="./granular-blueprint-data.js" defer></script><script src="./granular-skills-ui.js" defer></script><script src="./integrated-case-labs.js" defer></script><script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script><script src="./ca-masterclass-data.js" defer></script><script src="./ca-masterclass-ui.js" defer></script>
 <script>
 window.addEventListener('DOMContentLoaded',function(){
   let originalDb,originalSave,oldHash;
@@ -56,6 +56,17 @@ window.addEventListener('DOMContentLoaded',function(){
      return s.submitted&&s.result?.pct===100;
    });
    test('Assessment history is recorded locally',()=>db.v7.advancedHistory?.length>=1);
+   test('Conditional Access Masterclass includes ten chapters',()=>V7_CA_LESSONS.length===10);
+   test('Visual masterclass chapter opens',()=>{go('v7/ca/mental');return document.getElementById('root').textContent.includes('How a sign-in decision')});
+   test('Tappable visual decision nodes work',()=>{action('v7-ca-node',{dataset:{index:'2'}});return db.v7.ca.node===2;});
+   test('Policy evaluator renders test choices',()=>{go('v7/ca-simulator');return !!document.getElementById('v7-ca-evaluate')});
+   test('Report-only CA never enforces in the simplified training evaluator',()=>{
+     db.policies.push({id:'QA-RO',name:'QA Report Only',group:'All users',app:'Finance Reports',control:'Require MFA',state:'Report-only'});
+     go('v7/ca-simulator');
+     const form=document.querySelector('#v7-ca-evaluate');form.querySelector('[name=app]').value='Finance Reports';form.querySelector('[name=mfa]').value='no';
+     form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+     return !!db.v7.ca.last?.reported.some(x=>x.includes('QA Report Only'))&&!db.v7.ca.last?.enforced.some(x=>x.includes('QA Report Only'));
+   });
    test('Readiness gate refuses false complete status',()=>{go('v7/readiness');return document.getElementById('root').textContent.includes('Not certification-ready')});
   }catch(e){tests.push({name:'Unexpected setup or execution error',ok:false,error:String(e)})}
   finally{
