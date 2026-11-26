@@ -52,6 +52,13 @@
     if(u.validate==="registration")return db.regs.length>0;
     if(u.validate==="governance")return db.packages.length>0&&db.reviews.length>0&&db.pim.length>0;
     if(u.validate==="risk")return db.risks.some(x=>x.status&&x.status!=="Open")||!!db.caseSolved;
+    if(u.validate==="unit")return db.units.length>0;
+    if(u.validate==="hybrid")return !!db.hybridFixed;
+    if(u.validate==="gsa")return db.gsa.length>0;
+    if(u.validate==="oauth")return !!db.oauthDenied;
+    if(u.validate==="package")return db.packages.length>0;
+    if(u.validate==="pim")return db.pim.length>0;
+    if(u.validate==="diagnostics")return !!db.diagnostics||!!db.queryFailed;
     return false;
   }
   function coverageView(){
