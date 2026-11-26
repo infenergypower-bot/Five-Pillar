@@ -1,0 +1,84 @@
+Objective ID,Domain,Group,Official skill text,Linked legacy lesson,Verified deep instruction,Verified hands-on lab,Verified assessment,Current status
+INF-001,infrastructure,Add devices to Microsoft Entra ID,"Choose an appropriate device join type, including considerations such as device registration and Microsoft Entra join",3,No,No,No,Needs development
+INF-002,infrastructure,Add devices to Microsoft Entra ID,Join devices to Microsoft Entra ID,3,No,No,No,Needs development
+INF-003,infrastructure,Add devices to Microsoft Entra ID,Register devices to Microsoft Entra ID,3,No,No,No,Needs development
+INF-004,infrastructure,Add devices to Microsoft Entra ID,"Plan and implement groups for devices in Microsoft Entra ID, including dynamic group membership rules",3,No,No,No,Needs development
+INF-005,infrastructure,Enroll devices to Microsoft Intune,Configure enrollment settings in Microsoft Intune,6,No,No,No,Needs development
+INF-006,infrastructure,Enroll devices to Microsoft Intune,Configure automatic enrollment for Windows,6,No,No,No,Needs development
+INF-007,infrastructure,Enroll devices to Microsoft Intune,"Configure personal enrollment for macOS, iOS, iPadOS",29,No,No,No,Needs development
+INF-008,infrastructure,Enroll devices to Microsoft Intune,"Configure enrollment profiles for Android devices, including fully managed, dedicated, corporate-owned devices with a work profile, enrollment restrictions and troubleshooting enrollment failures",30,No,No,No,Needs development
+INF-009,infrastructure,Enroll devices to Microsoft Intune,Configure corporate enrollment for macOS and iOS devices by integrating Intune with Apple Business Manager,29,No,No,No,Needs development
+INF-010,infrastructure,Enroll devices to Microsoft Intune,Configure enrollment for Android devices by integrating Intune with Samsung Knox Mobile Enrollment or Google zero-touch enrollment,30,No,No,No,Needs development
+INF-011,infrastructure,Implement identity and compliance,"Manage built-in and custom roles for Intune and Windows 365, including role assignments",32,No,No,No,Needs development
+INF-012,infrastructure,Implement identity and compliance,Configure scope tags and scoped administration for multi-admin environments,27,No,No,No,Needs development
+INF-013,infrastructure,Implement identity and compliance,Implement and manage multi-admin approval,27,No,No,No,Needs development
+INF-014,infrastructure,Implement identity and compliance,Implement compliance policies for all supported device platforms by using Intune,11,No,No,No,Needs development
+INF-015,infrastructure,Implement identity and compliance,Implement Microsoft Entra Conditional Access policies that require a compliance status,12,No,No,No,Needs development
+INF-016,infrastructure,Implement identity and compliance,Configure Windows Hello for Business by using Intune,28,No,No,No,Needs development
+INF-017,infrastructure,Implement identity and compliance,Implement and manage Windows Local Administrator Password Solution (Windows LAPS) by using Microsoft Intune and Microsoft Entra ID,28,No,No,No,Needs development
+INF-018,infrastructure,Implement identity and compliance,Manage the membership of local groups on Windows devices by using Intune,28,No,No,No,Needs development
+MAN-019,management,Deploy and upgrade Windows clients by using cloud-based tools,Choose between Windows Autopilot deployment profiles and device preparation policies,7,No,No,No,Needs development
+MAN-020,management,Deploy and upgrade Windows clients by using cloud-based tools,"Choose between Windows Autopilot deployment modes, including user-driven, pre-provisioning, and self-deploying",7,No,No,No,Needs development
+MAN-021,management,Deploy and upgrade Windows clients by using cloud-based tools,Apply a device name template by using Windows Autopilot,7,No,No,No,Needs development
+MAN-022,management,Deploy and upgrade Windows clients by using cloud-based tools,Implement Windows client deployment by using Windows Autopilot,7,No,No,No,Needs development
+MAN-023,management,Deploy and upgrade Windows clients by using cloud-based tools,Create an Enrollment Status Page (ESP),7,No,No,No,Needs development
+MAN-024,management,Deploy and upgrade Windows clients by using cloud-based tools,Plan and implement device upgrades for Windows 11 by using Intune,7,No,No,No,Needs development
+MAN-025,management,Deploy and upgrade Windows clients by using cloud-based tools,"Provision and configure Windows 365 Cloud PCs by using Intune, including provisioning policies, network connections, and image management",32,No,No,No,Needs development
+MAN-026,management,Deploy and upgrade Windows clients by using cloud-based tools,Implement Windows Backup by using Intune,32,No,No,No,Needs development
+MAN-027,management,Plan and implement device configuration profiles,"Create device configuration profiles for Windows devices, including importing ADMX files and using Group Policy analytics",31,No,No,No,Needs development
+MAN-028,management,Plan and implement device configuration profiles,Create device configuration profiles for Android devices,30,No,No,No,Needs development
+MAN-029,management,Plan and implement device configuration profiles,Create device configuration profiles for iOS/iPadOS devices,29,No,No,No,Needs development
+MAN-030,management,Plan and implement device configuration profiles,Create device configuration profiles for macOS devices,29,No,No,No,Needs development
+MAN-031,management,Plan and implement device configuration profiles,"Create device configuration profiles for specialty devices, including Microsoft Teams Rooms, HoloLens 2, and Zebra",31,No,No,No,Needs development
+MAN-032,management,Plan and implement device configuration profiles,Target a profile by using assignment filters and enrollment time grouping,31,No,No,No,Needs development
+MAN-033,management,Implement Intune Suite add-on capabilities,"Configure Endpoint Privilege Management including configuring elevation policies, monitoring elevated actions, and adjusting EPM settings",33,No,No,No,Needs development
+MAN-034,management,Implement Intune Suite add-on capabilities,Manage applications by using the Enterprise App Catalog,34,No,No,No,Needs development
+MAN-035,management,Implement Intune Suite add-on capabilities,Configure Microsoft Intune Remote Help,33,No,No,No,Needs development
+MAN-036,management,Implement Intune Suite add-on capabilities,"Plan and implement Microsoft Cloud PKI, including setting up cloud-based PKI, automating certificate issuance, and monitoring certificate health",34,No,No,No,Needs development
+MAN-037,management,Implement Intune Suite add-on capabilities,"Implement Microsoft Tunnel for Mobile Application Management, including configuring the Microsoft Tunnel VPN Gateway, extending support to MAM devices, and monitoring tunnel connections",34,No,No,No,Needs development
+MAN-038,management,Implement Intune Suite add-on capabilities,"Implement Microsoft Intune Advanced Analytics, including anomaly detection, proactive insights, and risk-based policy recommendations",35,No,No,No,Needs development
+MAN-039,management,Perform remote actions on devices,"Sync, restart, retire, or wipe devices",19,No,No,No,Needs development
+MAN-040,management,Perform remote actions on devices,Perform bulk remote actions,19,No,No,No,Needs development
+MAN-041,management,Perform remote actions on devices,Update Microsoft Defender Antivirus security intelligence,36,No,No,No,Needs development
+MAN-042,management,Perform remote actions on devices,Rotate BitLocker recovery keys,19,No,No,No,Needs development
+MAN-043,management,Perform remote actions on devices,Rotate local administrator passwords,19,No,No,No,Needs development
+MAN-044,management,Perform remote actions on devices,Run a device query by using KQL,35,No,No,No,Needs development
+MAN-045,management,Perform remote actions on devices,"Collect device diagnostics and logs by using Microsoft Intune, including using the Troubleshooting blade for user-based diagnostics",19,No,No,No,Needs development
+SEC-046,security,Configure endpoint security,Create antivirus policies by using Microsoft Intune,17,No,No,No,Needs development
+SEC-047,security,Configure endpoint security,"Create and manage disk encryption policies by using Microsoft Intune, including managing BitLocker recovery keys, configuring user self-service recovery, and monitoring encryption compliance status",41,No,No,No,Needs development
+SEC-048,security,Configure endpoint security,Create firewall policies by using Microsoft Intune,17,No,No,No,Needs development
+SEC-049,security,Configure endpoint security,"Configure Attack surface reduction policies by using Microsoft Intune, including applying Zero Trust principles for endpoint protection",17,No,No,No,Needs development
+SEC-050,security,Configure endpoint security,Plan and implement security baselines by using Microsoft Intune,17,No,No,No,Needs development
+SEC-051,security,Configure endpoint security,"Integrate Intune with Microsoft Defender for Endpoint, including configuring Endpoint Detection and Response (EDR) policies, investigating endpoint threats, and triaging incidents",36,No,No,No,Needs development
+SEC-052,security,Configure endpoint security,Onboard devices into Microsoft Defender for Endpoint,36,No,No,No,Needs development
+SEC-053,security,Configure endpoint security,Configure App Control for Business policies by using Microsoft Intune,36,No,No,No,Needs development
+SEC-054,security,Manage device updates,Plan for device updates by using Intune,18,No,No,No,Needs development
+SEC-055,security,Manage device updates,"Create and manage update rings, feature updates, and quality updates for Windows devices by using Intune",18,No,No,No,Needs development
+SEC-056,security,Manage device updates,Implement Windows Autopatch and configure Hotpatch policies,37,No,No,No,Needs development
+SEC-057,security,Manage device updates,Create and manage update policies for iOS/iPadOS and macOS devices by using the Settings Catalog in Microsoft Intune,29,No,No,No,Needs development
+SEC-058,security,Manage device updates,Manage Android updates by using configuration profiles or firmware-over-the-air (FOTA) deployments,30,No,No,No,Needs development
+SEC-059,security,Manage device updates,Configure Windows client Delivery Optimization by using Intune,37,No,No,No,Needs development
+SEC-060,security,Manage device updates,Monitor device updates by using Intune,41,No,No,No,Needs development
+APP-061,applications,Deploy and update apps,Prepare applications for deployment by using Intune,13,No,No,No,Needs development
+APP-062,applications,Deploy and update apps,"Deploy apps by using Intune, including Win32 apps, line-of-business (LOB) apps, and Microsoft Store apps",13,No,No,No,Needs development
+APP-063,applications,Deploy and update apps,Configure Quiet Time policies for Android and iOS apps,38,No,No,No,Needs development
+APP-064,applications,Deploy and update apps,Deploy Microsoft 365 Apps by using Intune,13,No,No,No,Needs development
+APP-065,applications,Deploy and update apps,Configure policies for Microsoft 365 apps by using Microsoft Intune or the Microsoft 365 Apps admin center,38,No,No,No,Needs development
+APP-066,applications,Deploy and update apps,"Deploy Microsoft 365 Apps as part of a Windows Autopilot deployment, including using the Office Deployment Tool (ODT) or Microsoft Intune",7,No,No,No,Needs development
+APP-067,applications,Deploy and update apps,Manage Microsoft 365 Apps by using the Microsoft 365 Apps admin center,38,No,No,No,Needs development
+APP-068,applications,Deploy and update apps,"Deploy apps from platform-specific app stores by using Intune, including Apple Business Manager and Managed Google Play",29,No,No,No,Needs development
+APP-069,applications,Deploy and update apps,Monitor app deployment status and troubleshoot installation failures by using Microsoft Intune,41,No,No,No,Needs development
+APP-070,applications,Plan and implement app protection and app configuration policies,Plan and implement app protection policies for managed and unmanaged (BYOD) devices by using Microsoft Intune,15,No,No,No,Needs development
+APP-071,applications,Plan and implement app protection and app configuration policies,Implement Microsoft Entra Conditional Access policies for app protection policies,12,No,No,No,Needs development
+APP-072,applications,Plan and implement app protection and app configuration policies,Plan and implement app configuration policies for managed apps and managed devices,15,No,No,No,Needs development
+OPE-073,operations,Automate management tasks,Automate Intune management tasks by using PowerShell and Microsoft Graph,40,No,No,No,Needs development
+OPE-074,operations,Automate management tasks,Investigate threats identified by Security Copilot agents in Intune,39,No,No,No,Needs development
+OPE-075,operations,Automate management tasks,Analyze device performance by using Security Copilot agents in Intune,39,No,No,No,Needs development
+OPE-076,operations,Automate management tasks,Review and respond to Security Copilot agent recommendations to make management decisions,39,No,No,No,Needs development
+OPE-077,operations,Automate management tasks,Extend device compliance by using PowerShell,40,No,No,No,Needs development
+OPE-078,operations,Monitor and optimize health,"Implement reporting and data visibility in Microsoft Intune, including customizing reports and filters, using workbooks and dashboards, and exporting reporting data",20,No,No,No,Needs development
+OPE-079,operations,Monitor and optimize health,"Monitor endpoint performance by using Endpoint Analytics, including Remediations, device health scores, and app startup performance",41,No,No,No,Needs development
+OPE-080,operations,Monitor and optimize health,"Configure and manage remediation scripts, including detecting and fixing common device issues, and scheduling remediation runs",20,No,No,No,Needs development
+OPE-081,operations,Monitor and optimize health,"Analyze endpoint reliability and user experience scores, including startup performance, restart frequency, and application reliability metrics",20,No,No,No,Needs development
+OPE-082,operations,Monitor and optimize health,"Monitor tenant health and Intune service communications, including reviewing service health dashboards, message center notifications, and establishing operational baselines",41,No,No,No,Needs development
+OPE-083,operations,Monitor and optimize health,"Configure alerts and notifications for policy and compliance changes, including setting up alert rules for compliance drift, enrollment failures, and configuration conflicts",41,No,No,No,Needs development
