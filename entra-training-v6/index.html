@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover"/><meta name="theme-color" content="#202020"/><title>Identity Architect Academy V6 — Certification Training</title>
+<link rel="stylesheet" href="./styles.css?v=5.1"/>
+<style>
+#boot-notice{margin:22px auto;max-width:850px;background:white;border:1px solid #ddd;padding:28px;font-family:system-ui, -apple-system,sans-serif;border-radius:8px;line-height:1.6}
+#boot-notice h1{font-size:27px;margin-bottom:10px}#boot-notice p{color:#4b5563}
+#boot-notice a{display:inline-block;margin:6px 10px 6px 0;text-decoration:underline}#boot-error{display:none;color:#a11f2b;background:#fff2f3;padding:14px;overflow-wrap:anywhere;font-family:ui-monospace,monospace}
+</style></head>
+<body><div id="root"><main id="boot-notice" role="status"><h1>Identity Architect Academy V6</h1><p id="boot-message">Loading guided lessons and the practice console…</p><p>If this screen remains, the simulator could not start in this browser. You can still read every lesson below.</p><p><a href="./reader.html">Open the complete visual course reader</a> <a href="./health">Check site connection</a></p><pre id="boot-error"></pre></main></div>
+<script>
+(function(){
+  var errors=[];
+  function displayProblem(message){
+    errors.push(String(message));
+    var msg=document.getElementById('boot-message'),box=document.getElementById('boot-error');
+    if(msg)msg.textContent='The interactive application could not start. Details:';
+    if(box){box.style.display='block';box.textContent=errors.slice(-2).join(' | ')}
+  }
+  window.__entraReportBootError=displayProblem;
+  window.addEventListener('error',function(e){displayProblem('JavaScript error: '+(e.message||'unknown')+(e.filename?' in '+e.filename.split('/').pop():'')+(e.lineno?':'+e.lineno:''))});
+  window.addEventListener('unhandledrejection',function(e){displayProblem('Startup promise rejected: '+String(e.reason||'unknown'))});
+  window.addEventListener('DOMContentLoaded',function(){
+    try {
+      if(typeof render!=='function')throw Error('Application script unavailable; please reload the page');
+      if(!location.hash)location.hash='#/portal/overview';
+      render();
+      window.__entraBootCompleted=true;
+    }catch(e){ displayProblem('Startup: '+(e&&e.message?e.message:String(e))); }
+  });
+})();
+</script>
+<script src="./data.js?v=5.1" defer></script>
+<script src="./core.js?v=5.1" defer></script>
+<script src="./portal.js?v=5.1" defer></script>
+<script src="./exam.js?v=5.1" defer></script>
+<script src="./blueprint-data.js?v=6" defer></script>
+<script src="./v6-content.js?v=6" defer></script>
+<script src="./v6-upgrade.js?v=6" defer></script>
+</body></html>
