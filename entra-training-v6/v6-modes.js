@@ -13,6 +13,14 @@
   if(unit.id==="apps")return db.regs.length>0;
   if(unit.id==="governance")return db.packages.length>0&&db.reviews.length>0&&db.pim.length>0;
   if(unit.id==="monitoring")return db.risks.some(x=>x.status&&x.status!=="Open")||!!db.caseSolved;
+  if(unit.id==="tenant")return db.units.length>0;
+  if(unit.id==="hybrid")return !!db.hybridFixed;
+  if(unit.id==="gsa")return db.gsa.length>0;
+  if(unit.id==="cloudapps")return !!db.oauthDenied;
+  if(unit.id==="entitlements")return db.packages.length>0;
+  if(unit.id==="pim")return db.pim.length>0;
+  if(unit.id==="scim")return db.regs.length>0;
+  if(unit.id==="kql")return !!db.diagnostics||!!db.queryFailed;
   return false;
  }
  function snapshot(unit){
@@ -24,6 +32,14 @@
   if(unit.id==="apps")return JSON.stringify(db.regs);
   if(unit.id==="governance")return JSON.stringify([db.packages,db.reviews,db.pim]);
   if(unit.id==="monitoring")return JSON.stringify([db.risks,db.caseSolved]);
+  if(unit.id==="tenant")return JSON.stringify(db.units);
+  if(unit.id==="hybrid")return JSON.stringify(db.hybridFixed);
+  if(unit.id==="gsa")return JSON.stringify(db.gsa);
+  if(unit.id==="cloudapps")return JSON.stringify(db.oauthDenied);
+  if(unit.id==="entitlements")return JSON.stringify(db.packages);
+  if(unit.id==="pim")return JSON.stringify(db.pim);
+  if(unit.id==="scim")return JSON.stringify(db.regs);
+  if(unit.id==="kql")return JSON.stringify([db.diagnostics,db.queryFailed]);
   return "";
  }
  function modeTabs(unit){
