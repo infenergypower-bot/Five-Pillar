@@ -184,6 +184,18 @@ window.addEventListener('DOMContentLoaded',function(){
     action("v11-grade",{dataset:{id:"pim-groups"}});
     return original.v11.attempts["pim-groups"].passed===false;
   });
+  run("Four-part teach-back checks reject shallow answers",()=>{
+    go("v11/clinic/cae");const f=document.querySelector("#v11-teachback");if(!f)return false;
+    for(const field of ["configured","reason","verification","rollback"])f.querySelector('[name="'+field+'"]').value="too short";
+    f.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    return !original.v11.teachback["cae"];
+  });
+  run("Four-part teach-back stores substantial learning explanation",()=>{
+    go("v11/clinic/cae");const f=document.querySelector("#v11-teachback");if(!f)return false;
+    for(const field of ["configured","reason","verification","rollback"])f.querySelector('[name="'+field+'"]').value="This is a fictional teaching answer explaining "+field+" with a safe validation plan.";
+    f.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    return !!original.v11.teachback["cae"]?.verification&&document.getElementById("root").textContent.includes("Explanation drafted");
+  });
   run("Advanced progress screen separates reasoning from simulated work",()=>{
     go("v11/progress");return document.getElementById("root").textContent.includes("Correct knowledge checks")&&document.getElementById("root").textContent.includes("Independent fictional-state checks");
   });
