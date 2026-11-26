@@ -12,19 +12,20 @@ Production service: Railway project "Entra Practice Console", existing function 
 ## Delivered and tested
 - Existing fictional Entra administration simulation retained without changing unrelated company applications or main branch.
 - 2026 official exam group inventory: **SC-300: 16 groups / 98 enumerated subskills; SC-900: 14 / 58; SC-100: 14 / 81**. These are *inventory counts*, not verified coverage. Sources: official Microsoft Learn study guides.
-- **Eight additional SC-300 deep learning units** using diagrams, concepts, guided navigation, checklists, troubleshooting, and new knowledge checks.
-- **Eight state-based simulated configuration checks**, validating fictional tenant state rather than merely counting clicks.
+- **Sixteen additional SC-300 deep learning units** using diagrams, concepts, guided navigation, checklists, troubleshooting, and new knowledge checks.
+- **Sixteen state-based simulated configuration checks**, validating fictional tenant state rather than merely counting clicks.
 - Every new deep lesson now exposes **Guided, Practice, and Exam challenge modes**. Practice provides optional hints; Exam hides hints and requires a relevant fictional configuration change after the attempt starts.
-- **18 additional original case-based SC-300 questions**, with randomized answer order and detailed explanations.
-- Existing 40 lessons, 31 original guided missions, and 129 questions retained (new case bank brings question inventory to 147; depth varies).
+- **36 additional original case-based SC-300 questions**, with randomized answer order and detailed explanations.
+- Existing 40 lessons, 31 original guided missions, and 129 questions retained (new case bank brings question inventory to 165; depth varies).
 - V6 sidebar navigation, progress and readiness dashboard, objective matrix with CSV export, independent scenario practice, and real-tenant lab companion.
 - Eight real-lab worksheets covering tenant safety, users/groups, CA report-only, passwordless recovery, applications, B2B governance, logging/KQL and architecture capstone, with a local checklist export.
 - Existing V5 localStorage key `entra_practice_console_v4` preserved. V6 progress is stored under `db.v6` within the same saved object.
 
 ## Verification evidence
 - Browser walkthrough of V6 preview: 13 interactions passed (academy, next step, blueprint filters, exam answer saving, simulated Users, readiness).
-- Automated in-browser test suite: **79 passed / 0 failed** (including all 34 portal routes, 8 new lesson routes, case assessment and guided/practice/exam challenge checks). Test page: https://entra-console-site-production.up.railway.app/test.html
+- Automated in-browser regression suite: **95 passed / 0 failed** on unique expanded suite (including 34 portal routes, 16 guided lesson routes, case assessment, state-based checks and guided/practice/exam challenges). Test page: https://entra-console-site-production.up.railway.app/qa-expanded.html
 - Production browser walkthrough: **6 checks passed**, covering V6 homepage, guided Conditional Access lesson, practice-console link, readiness verdict, and eight-lab companion.
+- In-console visual instructor QA: step 1/4 to 2/4 progression, why explanations, practice screen integration, return navigation, and no visible JavaScript errors all passed.
 - Railway function deployment status: SUCCESS. Existing service reused; no new paid subscription, monitoring schedule, or background job activated.
 - iPadOS Safari physical-device test: **NOT VERIFIED**. Browser automation did not emulate an actual iPad.
 
@@ -41,7 +42,7 @@ Production service: Railway project "Entra Practice Console", existing function 
 
 ## Core limitations
 - Simulated records are fictional and persisted locally per browser; there is no Microsoft tenant connection.
-- V6 lesson walkthroughs use explanatory diagrams and guided steps. They do not replace all real screen-level demonstrations or training videos.
+- V6 lesson walkthroughs use explanatory diagrams, in-console instructor callouts, and guided steps. They do not replace all real screen-level demonstrations or training videos.
 - Coverage linking is advisory. The objective matrix correctly labels groups as *Not validated* until sufficient evidence exists.
 - Student exam readiness and curriculum completeness are separate questions.
 - Developer sandbox entitlement is not universal. CA generally requires P1; risk-based protections and PIM may require P2/additional licensing. Azure/Log Analytics resources may incur costs. Do not activate subscriptions without approval.
