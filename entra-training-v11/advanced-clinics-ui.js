@@ -93,7 +93,9 @@
  }
  function chapter(c){
   S.current=c.id;const v=getView(c.id),i=Math.max(0,Math.min(v.stage||0,4)),step=Math.max(0,Math.min(v.step||0,3)),z=c.guided[step],q=S.quiz[c.id],a=S.attempts[c.id];
+  const official=V7_SKILLS.find(x=>x.exam==="SC-300"&&x.skill===c.skill);
   return `<div class="page clinic-root">${css}<button class="btn xs" data-route="v11/clinics">← All advanced clinics</button>${banner(c)}
+   ${official?`<div class="panel" style="margin-top:12px"><div class="eyebrow">Exact current Microsoft SC-300 measured skill</div><p>${esc(official.skill)}</p><button class="btn xs" data-route="v7/skill/${official.id}">Open official objective and evidence record →</button><span class="clinic-flag">Coverage still unverified</span></div>`:""}
    <div class="clinic-sequence" style="margin:15px 0">${["WATCH","UNDERSTAND","FOLLOW","PRACTICE","TROUBLESHOOT","MASTER"].map((x,k)=>`<span class="${k===0?"active":""}">${k+1}. ${x}</span>`).join("")}</div>
    <div class="panel"><div class="eyebrow">WATCH · Interactive administrative architecture</div><h3>Tap each stage to explore how it works</h3>
    <div class="clinic-flow">${c.visual.map((n,k)=>`<button class="${k===i?"active":""}" data-action="v11-node" data-id="${c.id}" data-index="${k}"><b>${k+1}.</b> ${esc(n[0])}</button>`).join("")}</div>${stage(c,i)}
@@ -155,6 +157,16 @@
    $("root").innerHTML=shell(content,r);document.title="Identity Architect · SC-300 Skill Clinics";lastRenderedHash=location.hash;window.scrollTo(0,0);return;
   }
   oldRender();attachCoach();
+  if(r.startsWith("v7/skill/")){
+   const skill=V7_SKILLS.find(x=>x.id===r.slice("v7/skill/".length));
+   const clinic=skill?clinics.find(x=>x.skill===skill.skill):null;
+   const host=document.querySelector("#root .page");
+   if(host&&clinic&&!document.getElementById("v11-exact-skill")){
+    const block='<div id="v11-exact-skill" class="panel" style="margin-top:15px;border-left:3px solid #2383ad"><div class="eyebrow">Advanced visual clinic for this exact measured objective</div><h3>'+esc(clinic.topic)+'</h3><p class="small">Includes a five-stage diagram, a four-action guided procedure, a troubleshooting scenario and practice. It does not mark this objective completely verified.</p><button class="btn primary" data-route="v11/clinic/'+clinic.id+'">Start advanced skill clinic →</button></div>';
+    const caution=host.querySelector(".caution");
+    if(caution)caution.insertAdjacentHTML("afterend",block);else host.insertAdjacentHTML("afterbegin",block);
+   }
+  }
   if(r==="v8/academy"){
    const hero=document.querySelector(".v8-hero");
    if(hero&&!hero.querySelector('[data-route="v11/clinics"]'))hero.insertAdjacentHTML("beforeend",'<div style="margin-top:13px"><button class="btn primary" data-route="v11/clinics">Continue to advanced hands-on skill clinics →</button></div>');
