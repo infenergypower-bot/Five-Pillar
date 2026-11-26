@@ -2,6 +2,7 @@
 (function installV8LearningStudio(){
  if(!Array.isArray(V8_LESSONS)||V8_LESSONS.length!==14)throw Error("V8 lessons failed initialization");
  db.v8=db.v8||{current:"",screen:{},passed:{},simulation:{},notes:{},attempt:{},records:[],choiceOrder:{},coach:null,filter:"All",focus:0};
+ db.v8.quizHistory=Array.isArray(db.v8.quizHistory)?db.v8.quizHistory:[];
  const oldRender=render,oldShell=shell,oldAction=action,esc=v=>safe(String(v??""));
  const terms={
  "Tenant":"The Microsoft Entra directory boundary that owns identities, policies and local applications.",
@@ -129,10 +130,10 @@
   <p class="muted maincopy">Four domains. Fourteen detailed instructional units. This new learning path is deliberately separate from a mere topic checklist: each lesson explains the system, displays an interactive flow, sends you into the practice console with an instructor, challenges you to troubleshoot, and checks your reasoning and fictional configuration.</p>
   <div class="v8-hero"><h3>WATCH → UNDERSTAND → FOLLOW → PRACTICE → TROUBLESHOOT → MASTER</h3><p>Use Guided mode first. Then repeat the workflow in Independent Exam mode. Passing a simulated state check is evidence of practice, not verified production competence or Microsoft certification readiness.</p>
     <button class="btn primary" data-route="${db.v8.current?"v8/learn/"+db.v8.current:"v8/learn/"+V8_LESSONS[0].id}">${db.v8.current?"Continue last lesson":"Start lesson 1"} →</button></div>
-  <div class="grid3" style="margin-top:18px"><div class="panel"><div class="statnum">${known}/14</div><div class="statlabel">Knowledge questions passed</div></div><div class="panel"><div class="statnum">${indep}/13</div><div class="statlabel">Independent simulator checks</div></div><div class="panel"><div class="statnum">98</div><div class="statlabel">SC-300 official subskills — all still require full external verification</div></div></div>
+  <div class="grid3" style="margin-top:18px"><div class="panel"><div class="statnum">${known}/14</div><div class="statlabel">Knowledge checks correct</div></div><div class="panel"><div class="statnum">${indep}/13</div><div class="statlabel">Independent simulator checks</div></div><div class="panel"><div class="statnum">98</div><div class="statlabel">SC-300 official subskills — all still require full external verification</div></div></div>
   <div class="pillrow" style="margin:18px 0">${["All",...lessonsByDomain].map(x=>`<button class="btn ${track===x?"primary":""}" data-action="v8-filter" data-domain="${esc(x)}">${esc(x)}</button>`).join("")}</div>
   <div class="v8-grid">${lst.map((l,i)=>`<div class="panel"><div class="eyebrow">${esc(l.domain)} · ${l.minutes} min</div><h3>${esc(l.title)}</h3><p class="small muted">${esc(l.caseStudy)}</p><p class="small muted"><b>You'll be able to:</b> ${esc(l.objective)}</p>
-   <div class="flex wrap"><span class="v8-status ${db.v8.passed[l.id]?"complete":""}">${db.v8.passed[l.id]?"✓ Concept understood":"Knowledge pending"}</span><span class="v8-status ${db.v8.simulation[l.id]?.independent?"complete":""}">${l.lab==="design"?"Design-only: real-tenant verification needed":db.v8.simulation[l.id]?.independent?"✓ Independent fictional lab":"Independent practice pending"}</span></div>
+   <div class="flex wrap"><span class="v8-status ${db.v8.passed[l.id]?"complete":""}">${db.v8.passed[l.id]?"✓ Knowledge check correct":"Knowledge pending"}</span><span class="v8-status ${db.v8.simulation[l.id]?.independent?"complete":""}">${l.lab==="design"?"Design-only: real-tenant verification needed":db.v8.simulation[l.id]?.independent?"✓ Independent fictional lab":"Independent practice pending"}</span></div>
    <button class="btn primary" data-route="v8/learn/${l.id}" style="margin-top:14px">Learn this skill →</button></div>`).join("")}</div>
    <div class="caution" style="margin-top:18px"><b>Curriculum status: incomplete.</b><p>There are 98 official SC-300 measured subskills; these fourteen broad guided modules cannot replace every individual subskill or all licensed real-world labs. See the full official skill tracker for outstanding details.</p><button class="btn" data-route="v7/skills">Open measured-skill coverage</button></div>${footer()}</div>`);
  }
@@ -201,14 +202,19 @@
  }
  function overview(){
   const known=V8_LESSONS.filter(l=>db.v8.passed[l.id]).length,guided=V8_LESSONS.filter(l=>db.v8.simulation[l.id]?.guided).length,solo=V8_LESSONS.filter(l=>db.v8.simulation[l.id]?.independent).length;
+  const misses=V8_LESSONS.map(l=>({l,count:db.v8.quizHistory.filter(q=>q.id===l.id&&!q.correct).length})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
   return frame(`<div class="page">${styles}<div class="eyebrow">PERSONAL LEARNING RECORD · SC-300 TRAINING</div><h1>Understanding and fictional practice are different achievements</h1>
    <div class="grid3" style="margin:16px 0"><div class="panel"><div class="statnum">${known}/14</div><div class="statlabel">Knowledge questions correct</div></div><div class="panel"><div class="statnum">${guided}/13</div><div class="statlabel">Guided simulator passes</div></div><div class="panel"><div class="statnum">${solo}/13</div><div class="statlabel">Independent simulator passes</div></div></div>
    <div class="caution"><b>Not an official readiness calculation.</b><p>The 98 current SC-300 measured subskills require substantive mapping and real-world verification beyond these fourteen practice modules. Passing a fictional exercise alone does not demonstrate a secure production deployment.</p></div>
    <div class="panel" style="margin-top:16px"><h3>Resume and protect your work</h3><p>Your learning record lives in this browser. Export a backup before changing devices or browser storage. The import function restores only V8 learning records, not Microsoft accounts or the old simulator dataset.</p>
    <div class="flex wrap"><button class="btn primary" data-route="${db.v8.current?"v8/learn/"+db.v8.current:"v8/academy"}">Resume learning →</button>
     <button class="btn" data-action="v8-export">Export V8 learning backup ↓</button><a class="btn" href="./qa-learning.html">Run Safari/on-device functional tests →</a><label class="btn" for="v8-import">Import V8 backup</label><input id="v8-import" type="file" accept=".json,application/json" style="display:none"/></div></div>
+   <div class="panel" style="margin-top:16px"><h3>Personalized review: skills missed in practice</h3>
+   <p class="small muted">Incorrect answers are recorded locally and help prioritize remediation. A later correct answer does not erase an earlier error; review the reasoning and repeat the independent configuration task.</p>
+   ${misses.length?misses.slice(0,7).map(x=>`<div class="flex between wrap" style="padding:11px 0;border-bottom:1px solid #dbe5ee"><span><b>${esc(x.l.title)}</b><span class="v8-status"> ${x.count} incorrect attempt(s)</span></span><button class="btn xs" data-route="v8/learn/${x.l.id}">Revisit this lesson →</button></div>`).join(""):"<p>No incorrect responses recorded in this learning module yet.</p>"}
+   </div>
    <div class="panel" style="margin-top:16px"><h3>Where you need more practice</h3>
-   ${V8_LESSONS.map(l=>`<div class="flex wrap between" style="border-bottom:1px solid #dae5ed;padding:12px 0"><div><b>${esc(l.title)}</b><p class="small muted">${db.v8.passed[l.id]?"✓ Concept check passed":"Concept check pending"} · ${db.v8.simulation[l.id]?.independent?"✓ Fictional independent check passed":"Independent lab pending"}</p></div><button class="btn xs" data-route="v8/learn/${l.id}">Study →</button></div>`).join("")}
+   ${V8_LESSONS.map(l=>`<div class="flex wrap between" style="border-bottom:1px solid #dae5ed;padding:12px 0"><div><b>${esc(l.title)}</b><p class="small muted">${db.v8.passed[l.id]?"✓ Knowledge check passed":"Concept check pending"} · ${db.v8.simulation[l.id]?.independent?"✓ Fictional independent check passed":"Independent lab pending"}</p></div><button class="btn xs" data-route="v8/learn/${l.id}">Study →</button></div>`).join("")}
     </div>${footer()}</div>`);
  }
  function coachMarkup(){
@@ -276,6 +282,7 @@
    e.preventDefault();const l=get(form.dataset.id);if(!l)return;
    const v=new FormData(form).get("v8choice");if(v===null)return;
    const correct=Number(v)===l.answer;if(correct)db.v8.passed[l.id]=true;
+   db.v8.quizHistory.push({id:l.id,correct,date:new Date().toISOString()});db.v8.quizHistory=db.v8.quizHistory.slice(-500);
    const p=progress(l.id);p.stage="master";db.v8.screen[l.id]=p;save();
    const status=document.getElementById("v8-quiz-feedback");if(status)status.textContent=(correct?"✓ Correct. ":"Not yet. ")+l.feedback+" Correct answer: "+l.choices[l.answer]+".";
    toast(correct?"Concept understood":"Review why the other answers fail",correct?"good":"bad");
@@ -293,7 +300,7 @@
     const obj=JSON.parse(String(reader.result||""));
     if(obj.schema!=="identity-architect-v8-learning"||obj.version!==1||!obj.data||!obj.data.passed||!obj.data.notes||!obj.data.screen)throw Error("Invalid V8 learning backup schema");
     const d=obj.data;
-    db.v8={current:String(d.current||""),screen:d.screen||{},passed:d.passed||{},simulation:d.simulation||{},notes:d.notes||{},attempt:{},records:Array.isArray(d.records)?d.records:[],choiceOrder:{},coach:null,filter:"All",focus:0};
+    db.v8={current:String(d.current||""),screen:d.screen||{},passed:d.passed||{},simulation:d.simulation||{},notes:d.notes||{},attempt:{},records:Array.isArray(d.records)?d.records:[],quizHistory:Array.isArray(d.quizHistory)?d.quizHistory.slice(-500):[],choiceOrder:{},coach:null,filter:"All",focus:0};
     save();toast("V8 learning backup imported","good");go("v8/progress");
    }catch(err){toast("Cannot import this backup: "+String(err.message||err),"bad");}
   };
