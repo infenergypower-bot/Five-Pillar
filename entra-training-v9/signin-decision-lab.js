@@ -38,9 +38,9 @@
   // The actual Entra application service has a separate assignment-required property.
   const assignmentRequired=["Finance Reports","Vendor Portal"].includes(o.app);
   const assigned=app?app.assignees.some(id=>id===user.id||groups.some(g=>g.id===id)):false;
-  const accessOk=!!app&&(!assignmentRequired||assigned);
+  const accessOk=app?(!assignmentRequired||assigned):o.app==="Microsoft 365";
   trace.push({stage:"4. App authorization",state:accessOk?"evaluated":"problem",
-   headline:!app?"Application absent":assignmentRequired?(assigned?"User/group entitlement found":"Required assignment missing"):"App assignment not modeled as mandatory",
+   headline:!app&&o.app!=="Microsoft 365"?"Application absent":o.app==="Microsoft 365"?"Built-in cloud resource; app assignment not modeled":assignmentRequired?(assigned?"User/group entitlement found":"Required assignment missing"):"App assignment not modeled as mandatory",
    detail:"A successful authentication does not grant every app permission. This training exercise treats Finance Reports and Vendor Portal as assignment-required. Real apps have a configurable assignment-required setting and may perform their own in-app authorization.",route:"portal/apps"});
   trace.push({stage:"5. Session and audit",state:"evaluated",
    headline:user.revoked?"Existing refresh sessions marked revoked":"No previous session revocation marked",
@@ -70,7 +70,7 @@
   const appList=[...new Set([...db.apps.map(x=>x.name),"Finance Reports","Vendor Portal","Microsoft 365"])].map(x=>`<option value="${esc(x)}" ${inputs.app===x?"selected":""}>${esc(x)}</option>`).join("");
   const known=`<div class="grid3">
    ${demoCard("Why does an employee get Access not assigned?","Select an app and see whether group or direct assignment exists.","assignment")}
-   ${demoCard("What happens if MFA is not satisfied?","Compare a matching enforced MFA grant with an unsatisfied sign-in.","mfa")}
+   ${demoCard("What happens if MFA is not satisfied?","Compare MFA results after configuring a matching enforced policy; without a matching policy, no challenge is expected.","mfa")}
    ${demoCard("Report-only cannot enforce","Inspect how a report-only policy is recorded but does not block by itself.","report")}
   </div>`;
   return `<div class="page"><div class="eyebrow">LEARNING LAB · CONNECTED FICTIONAL ENTRA TENANT</div><h1>Why did this sign-in succeed or fail?</h1>
