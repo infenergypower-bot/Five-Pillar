@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entra V6 - Automated QA</title><link rel="stylesheet" href="./styles.css"><style>body{background:#eef4fa}main{max-width:940px;margin:30px auto;padding:22px;background:white;border:1px solid #d9e4f2;border-radius:12px}.pass{color:#137346}.fail{color:#ad2b36}#root{position:absolute;left:-10000px;width:1200px;visibility:hidden}.testrow{padding:8px 3px;border-bottom:1px solid #e5edf6;font-size:13px}#results{max-height:60vh;overflow:auto}code{background:#eff3f9;padding:2px 5px}</style></head><body><main><h1>Identity Architect V6 — Browser QA</h1><p>Runs checks in a temporary copy of the fictional tenant state. Your existing local progress storage is not modified.</p><h2 id="summary">Running checks…</h2><div id="results" role="status" aria-live="polite"></div><p><a href="./">Return to academy</a></p></main><div id="root" aria-hidden="true"></div>
-<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script><script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-upgrade.js" defer></script>
+<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script><script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script>
 <script>
 window.addEventListener('DOMContentLoaded',function(){
  const entries=[],originalDb=JSON.parse(JSON.stringify(db)),originalSave=save,originalRoute=location.hash;
@@ -33,6 +33,11 @@ window.addEventListener('DOMContentLoaded',function(){
  test("V6 choice order preserved per question",()=>{const a=db.v6.active,id=a.ids[a.at],order=a.orders[id];return order.length===4&&new Set(order).size===4});
  test("V6 answers saved",()=>{const c=document.querySelector('input[name="v6case"]');c.checked=true;action("v6-case-save",{});return Object.keys(db.v6.active.answer).length===1});
  test("V6 case advances",()=>{action("v6-case-next",{});return db.v6.active.at===1});
+ test("Three-mode launch buttons appear",()=>{go("v6/academy");return !!document.querySelector('[data-mode="practice"]')&&!!document.querySelector('[data-mode="exam"]')});
+ test("Practice mode includes optional hints",()=>{action("v6-start-challenge",{dataset:{id:"external",mode:"practice"}});return has("Reveal optional practice hints")});
+ test("Exam mode conceals hints",()=>{action("v6-start-challenge",{dataset:{id:"external",mode:"exam"}});return has("Exam mode")&&!has("Reveal optional practice hints")});
+ test("Exam challenge rejects no state change",()=>{action("v6-evaluate-challenge",{dataset:{id:"external"}});return db.v6.activeChallenge.passed===false});
+ test("Exam challenge verifies post-start change",()=>{action("v6-start-challenge",{dataset:{id:"external",mode:"exam"}});db.users.push({id:"uqa-guest",name:"QA Guest",type:"Guest",email:"qa-guest@partner.example",role:"User",licenses:[]});action("v6-evaluate-challenge",{dataset:{id:"external"}});return db.v6.activeChallenge.passed===true});
  test("Readiness dashboard renders",()=>{go("v6/readiness");return has("NOT YET EXAM-READY")});
  db=originalDb;save=originalSave;history.replaceState(null,"",location.pathname+location.search+(originalRoute||""));
  const passed=entries.filter(x=>x.ok).length,failed=entries.filter(x=>!x.ok).length;
