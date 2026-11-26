@@ -29,6 +29,14 @@ window.addEventListener('DOMContentLoaded',function(){
   run("Interactive diagram advances",()=>{action('v8-node-next',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].node===1});
   run("Diagram can be replayed",()=>{action('v8-node-replay',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].node===0});
   run("Guided console step advances",()=>{action('v8-step-next',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].step===1});
+  run("A wrong knowledge answer creates a remediation record",()=>{
+    const lesson=V8_LESSONS.find(x=>x.id==="group-app-access");go("v8/learn/group-app-access");
+    const form=document.querySelector("#v8-quiz");if(!form)return false;
+    const wrong=lesson.choices.findIndex((_,i)=>i!==lesson.answer);
+    form.querySelector('input[value="'+wrong+'"]').checked=true;
+    form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    return db.v8.quizHistory.some(x=>x.id===lesson.id&&x.correct===false);
+  });
   run("Knowledge check accepts the correct reasoning",()=>{
     const lesson=V8_LESSONS.find(x=>x.id==='group-app-access');go('v8/learn/group-app-access');
     const form=document.querySelector('#v8-quiz');if(!form)return false;
@@ -107,6 +115,9 @@ window.addEventListener('DOMContentLoaded',function(){
     return r.kind==="granted"&&r.revoked===true;
   });
   run("Decision consequences update the fictional sign-in log",()=>db.logs.some(x=>x.source==="V9 simulation"&&x.user==="v9qa@training.test"));
+  run("Learning dashboard recommends missed topics",()=>{
+    go("v8/progress");return document.getElementById("root").textContent.includes("Personalized review: skills missed")&&document.getElementById("root").textContent.includes("incorrect attempt");
+  });
   run("All official subskills remain conservatively marked unverified",()=>V7_SKILLS.length===237&&V7_SKILLS.every(x=>x.status==='Not verified'));
  }catch(err){out.push({name:'Unexpected test startup failure',ok:false,reason:String(err?.message||err)});}
  finally{
