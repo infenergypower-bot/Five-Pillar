@@ -100,6 +100,7 @@
     ["Exam performance","Repeated independent fresh practice and official Microsoft AI Skills Navigator assessment with mistake review.",false],
     ["Device quality","Physical iPadOS Safari, desktop, accessible keyboard/touch, storage and failure-path verification.",false]
    ].map(a=>`<div class="flex wrap" style="border-bottom:1px solid #ddd;padding:14px 0"><span class="pill warning">Not verified</span><div style="flex:1"><b>${escape(a[0])}</b><p class="small muted">${escape(a[1])}</p></div></div>`).join("")}</div>
+  <div class="panel" style="margin-top:18px"><h3>Check this device</h3><p class="small muted">Run the isolated browser self-test on your actual iPad before relying on saved progress. It uses fictional, temporary data.</p><a class="btn primary" href="./qa-on-device.html">Run Safari and browser self-test →</a></div>
   <div class="caution"><b>Do not purchase an exam based solely on this application's readiness score.</b><p class="small">The official Microsoft study guide, authorized lab competence, and Microsoft’s current practice assessment remain the final external checks.</p></div>${footer()}</div>`;
  }
  render=function(){
