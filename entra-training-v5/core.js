@@ -49,7 +49,16 @@ function action(a,el){if(a==='atlas-topic'){db.atlasTopic=el.dataset.id;db.atlas
 document.addEventListener('click',e=>{let x=e.target.closest('[data-route],[data-action],[data-lab]');if(!x)return;e.preventDefault();if(x.dataset.route){go(x.dataset.route);document.getElementById('side')?.classList.remove('open');return}if(x.dataset.lab){selectLab(x.dataset.lab);return}if(x.dataset.action)action(x.dataset.action,x)});
 document.addEventListener('submit',e=>{let f=e.target;if(f.matches('#entity-form,#whatif-form,#blueprint-form,#duo-form,#nist-form')){e.preventDefault();if(f.id==='entity-form')handleForm(f);else submitSpecial(f)}else if(f.matches('#exam-setup')){e.preventDefault();examSetupSubmit(f)}});
 document.addEventListener('input',e=>{if(e.target.id==='portal-search'){const term=e.target.value.trim().toLowerCase();document.querySelectorAll('.portalnav button[data-page]').forEach(b=>{b.hidden=!b.textContent.toLowerCase().includes(term)})}});
-document.addEventListener('change',e=>{if(e.target.id==='importfile'&&e.target.files[0]){e.target.files[0].text().then(t=>{try{let d=JSON.parse(t);if(d.app!=='Identity Architect Lab Studio'||!Array.isArray(d.data?.users))throw Error('Wrong backup format');db={...initialDb(),...d.data};save();toast('Progress restored','good');render()}catch(err){toast('Invalid backup file: '+err.message,'bad')}})}});
+document.addEventListener('change',e=>{if(e.target.id==='importfile'&&e.target.files[0]){e.target.files[0].text().then(t=>{try{let d=JSON.parse(t);if(d.app!=='Identity Architect Lab Studio'||!Array.isArray(d.data?.users))throw Error('Wrong backup format');const next={...initialDb(),...d.data};
+ for(const key of ['v6','v7','v8','v9','v10','v11','v12'])if(!(key in d.data)&&key in db)next[key]=db[key];
+ if(db.v11&&next.v11&&next.v11!==db.v11){
+   const originalV11=db.v11,restore=next.v11;
+   for(const k of Object.keys(originalV11))delete originalV11[k];
+   Object.assign(originalV11,restore);next.v11=originalV11;
+ }
+ for(const key of Object.keys(db))delete db[key];
+ Object.assign(db,next);
+ save();toast('Progress restored without resetting the learning engine','good');render()}catch(err){toast('Invalid backup file: '+err.message,'bad')}})}});
 document.addEventListener('click',e=>{if(e.target.id==='menuToggle'){document.getElementById('side')?.classList.toggle('open');document.getElementById('overlay')?.classList.toggle('show')}else if(e.target.id==='overlay'){document.getElementById('side')?.classList.remove('open');e.target.classList.remove('show')}});
 window.addEventListener('hashchange',()=>{if(location.hash!==lastRenderedHash)render()});
 window.addEventListener('keydown',e=>{if(e.key==='Escape')$('modal').innerHTML=''});
