@@ -6,7 +6,7 @@
 <script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-content-expanded.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script><script src="./v6-tutor.js" defer></script>
 <script src="./granular-blueprint-data.js" defer></script><script src="./granular-skills-ui.js" defer></script><script src="./integrated-case-labs.js" defer></script>
 <script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script><script src="./ca-masterclass-data.js" defer></script><script src="./ca-masterclass-ui.js" defer></script>
-<script src="./deep-learning-data.js" defer></script><script src="./learning-studio.js" defer></script>
+<script src="./deep-learning-data.js" defer></script><script src="./learning-studio.js" defer></script><script src="./signin-decision-lab.js" defer></script>
 <script>
 window.addEventListener('DOMContentLoaded',function(){
  const out=[],storedHash=location.hash;let original,originalSave;
@@ -75,6 +75,38 @@ window.addEventListener('DOMContentLoaded',function(){
   run("Progress dashboard shows separate knowledge and simulation results",()=>{
     go('v8/progress');return document.getElementById('root').textContent.includes('Independent simulator passes');
   });
+  run("Connected sign-in lab loads",()=>{go("v9/signin");return !!document.querySelector("#v9-evaluate")});
+  run("Sign-in authorization denies unassigned user",()=>{
+    db.policies=[{id:"qaLegacy",name:"Block legacy",group:"All users",app:"All cloud apps",control:"Block legacy clients (concept)",state:"On"}];
+    db.users.push({id:"v9qa",name:"V9 Isolated Learner",email:"v9qa@training.test",type:"Member",role:"User",licenses:[],revoked:false,tap:false});
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"yes",device:"yes",client:"modern"});
+    return r.kind==="deny-app";
+  });
+  run("Group and application assignment change access outcome",()=>{
+    db.groups.push({id:"v9g",name:"V9 Authorized",members:["v9qa"]});db.apps.find(x=>x.name==="Finance Reports").assignees.push("v9g");
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"yes",device:"yes",client:"modern"});
+    return r.kind==="granted";
+  });
+  run("Report-only MFA shows impact without enforcement",()=>{
+    db.policies.push({id:"qaReport",name:"V9 Report Only MFA",group:"V9 Authorized",app:"Finance Reports",control:"Require MFA",state:"Report-only"});
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"no",device:"yes",client:"modern"});
+    return r.kind==="granted"&&r.reported.some(x=>x.name==="V9 Report Only MFA");
+  });
+  run("Enforced MFA causes authentication challenge",()=>{
+    db.policies.push({id:"qaOn",name:"V9 Enforce MFA",group:"V9 Authorized",app:"Finance Reports",control:"Require MFA",state:"On"});
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"no",device:"yes",client:"modern"});
+    return r.kind==="challenge"&&r.enforced.some(x=>x.name==="V9 Enforce MFA");
+  });
+  run("Satisfying MFA allows assigned user through",()=>{
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"yes",device:"yes",client:"modern"});
+    return r.kind==="granted";
+  });
+  run("Revoked sessions do not automatically block a fresh sign-in",()=>{
+    db.users.find(x=>x.id==="v9qa").revoked=true;
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"yes",device:"yes",client:"modern"});
+    return r.kind==="granted"&&r.revoked===true;
+  });
+  run("Decision consequences update the fictional sign-in log",()=>db.logs.some(x=>x.source==="V9 simulation"&&x.user==="v9qa@training.test"));
   run("All official subskills remain conservatively marked unverified",()=>V7_SKILLS.length===237&&V7_SKILLS.every(x=>x.status==='Not verified'));
  }catch(err){out.push({name:'Unexpected test startup failure',ok:false,reason:String(err?.message||err)});}
  finally{
