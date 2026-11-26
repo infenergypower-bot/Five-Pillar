@@ -115,7 +115,7 @@ function portalAction(act,el){let id=el?.dataset?.id;switch(act){
  case 'fix-storage':db.cloudRemediated=true;record('Cloud finding: public storage disabled');save();toast('Storage exposure reduced','good');render();return;
  case 'fix-owner':db.cloudLeast=true;record('Cloud finding: workload owner grant removed');save();toast('Workload privilege reduced','good');render();return;
  case 'reset-practice':if(confirm('Reset the fictional tenant resources? Your completed lessons, assessments, study notes and learning history will remain. Current connected-mission attempts will end and must be restarted.')){
-   const savedKeys=['completed','labDone','answers','examHistory','notes','lessonReveal','lessonChecks','portfolio','v6','v7','v8','v9','v10','v11','v12'];
+   const savedKeys=['completed','labDone','answers','examHistory','notes','lessonReveal','lessonChecks','portfolio','v6','v7','v8','v9','v10','v11','v12','v14'];
    const keep={};for(const key of savedKeys)if(Object.prototype.hasOwnProperty.call(db,key))keep[key]=db[key];
    if(keep.v12){keep.v12.active={};keep.v12.last=null;}
    if(keep.v11)keep.v11.coach=null;
