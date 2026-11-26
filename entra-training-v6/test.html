@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entra V6 - Automated QA</title><link rel="stylesheet" href="./styles.css"><style>body{background:#eef4fa}main{max-width:940px;margin:30px auto;padding:22px;background:white;border:1px solid #d9e4f2;border-radius:12px}.pass{color:#137346}.fail{color:#ad2b36}#root{position:absolute;left:-10000px;width:1200px;visibility:hidden}.testrow{padding:8px 3px;border-bottom:1px solid #e5edf6;font-size:13px}#results{max-height:60vh;overflow:auto}code{background:#eff3f9;padding:2px 5px}</style></head><body><main><h1>Identity Architect V6 — Browser QA</h1><p>Runs checks in a temporary copy of the fictional tenant state. Your existing local progress storage is not modified.</p><h2 id="summary">Running checks…</h2><div id="results" role="status" aria-live="polite"></div><p><a href="./">Return to academy</a></p></main><div id="root" aria-hidden="true"></div>
-<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script><script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script>
+<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script><script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-content-expanded.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script>
 <script>
 window.addEventListener('DOMContentLoaded',function(){
  const entries=[],originalDb=JSON.parse(JSON.stringify(db)),originalSave=save,originalRoute=location.hash;
@@ -9,8 +9,8 @@ window.addEventListener('DOMContentLoaded',function(){
  test("V6 skill group inventory available",()=>V6_BLUEPRINT.length===44);
  test("SC-300 detailed group count",()=>V6_BLUEPRINT.filter(x=>x.exam==="SC-300").length===16);
  test("Current study releases recorded",()=>V6_BLUEPRINT.every(x=>/^2026-10/.test(x.release)));
- test("V6 learning units loaded",()=>V6_UNITS.length===8);
- test("V6 original case questions loaded",()=>V6_CASES.length>=18);
+ test("V6 learning units loaded",()=>V6_UNITS.length===16);
+ test("V6 original case questions loaded",()=>V6_CASES.length>=36);
  test("V5 original lessons preserved",()=>LESSONS.length>=35);
  test("V5 guided missions preserved",()=>LABS.length>=25);
  test("V6 root shell integrates training nav",()=>{go("v6/academy");return has("Deep learning academy")&&has("Learn it. Configure it. Prove it.")});
