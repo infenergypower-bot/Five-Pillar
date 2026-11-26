@@ -80,6 +80,7 @@
   function all(m,a){return m.steps.map((_,i)=>stepResult(m,a,i));}
   const shuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
   function start(m,mode){
+    mode=["guided","practice","exam"].includes(mode)?mode:"guided";
     const code=(Math.random().toString(36).slice(2,7)+Date.now().toString(36).slice(-2)).toUpperCase();
     state().active[m.id]={code,mode,step:0,checked:{},started:Date.now(),submitted:false,questions:{},orders:Object.fromEntries(m.questions.map((q,i)=>[i,shuffle(q.options.map((_,j)=>j))])),hiddenHint:{},done:false};
     if(db.v8)db.v8.coach=null;
@@ -146,7 +147,7 @@
     <div class="grid3" style="margin:16px 0"><div class="panel"><div class="statnum">4</div><div class="statlabel">Connected business missions</div></div><div class="panel"><div class="statnum">25</div><div class="statlabel">Actual state-checked admin steps</div></div><div class="panel"><div class="statnum">${mastered}/4</div><div class="statlabel">Independent simulated missions plus reasoning</div></div></div>
     <div class="grid2">${V12_MISSIONS.map(m=>{const a=get(m.id),results=a?all(m,a):[],n=results.filter(x=>x.ok).length;return `<div class="panel"><div class="eyebrow">${esc(m.domain)} · ${m.minutes} min</div><h3>${esc(m.title)}</h3><p>${esc(m.scenario)}</p><p class="small muted"><b>Why:</b> ${esc(m.why)}</p>
      <p class="small"><b>Current saved configuration:</b> ${n}/${m.steps.length} required conditions met${a?" for attempt "+esc(a.code):""}</p>
-     <div class="flex wrap"><button class="btn primary" data-action="v12-start" data-id="${m.id}" data-mode="guided">Learn with coach →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="exam">Try independently →</button>${a?`<button class="btn" data-route="v12/mission/${m.id}">Resume attempt →</button>`:""}</div>
+     <div class="flex wrap"><button class="btn primary" data-action="v12-start" data-id="${m.id}" data-mode="guided">Learn with coach →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="practice">Practice with hints →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="exam">Try independently →</button>${a?`<button class="btn" data-route="v12/mission/${m.id}">Resume attempt →</button>`:""}</div>
     </div>`}).join("")}</div>
     <div class="panel" style="margin-top:17px"><h3>What an independent pass means here</h3><p>The required fictional records and links existed at submission, and you answered the corresponding reasoning questions. This is a controlled local simulation, not an official exam score or real enterprise tenant validation.</p>
     <button class="btn" data-route="v12/results">Review saved mission results →</button><button class="btn" data-action="v12-export">Export this mission learning record ↓</button><a class="btn" href="./qa-connected.html">Run free browser and iPad workflow checks →</a></div>${footer()}</div>`;
@@ -154,11 +155,13 @@
   function stepContent(m,a){
     const i=a.step,s=m.steps[i],status=stepResult(m,a,i),names=labNames(m,a);
     const content=replace(s.do,m,a),where=s.where,passed=status.ok;
-    return `<div class="v12-task"><div class="eyebrow">STEP ${i+1} / ${m.steps.length} · ${a.mode==="guided"?"GUIDED PRACTICE":"INDEPENDENT CONFIGURATION"}</div>
-     <h2>${esc(s.title)}</h2>${a.mode==="guided"?`<p><b>Do this:</b> ${esc(content)}</p><div class="v12-why"><b>Why this matters</b><p>${esc(s.why)}</p></div>`:`<p>Use the exact attempt-specific resource names above to satisfy the business requirement. No step-by-step answers are shown until the final attempt is submitted.</p>`}
+    return `<div class="v12-task"><div class="eyebrow">STEP ${i+1} / ${m.steps.length} · ${a.mode==="guided"?"GUIDED INSTRUCTION":a.mode==="practice"?"PRACTICE — OPTIONAL HINTS":"INDEPENDENT ASSESSMENT"}</div>
+     <h2>${esc(s.title)}</h2>${a.mode==="guided"?`<p><b>Do this:</b> ${esc(content)}</p><div class="v12-why"><b>Why this matters</b><p>${esc(s.why)}</p></div>`:a.mode==="practice"?`<p>Complete this stage using the business requirement and named training records. You can request an optional clue, but the coach will not complete any setting for you.</p>
+      <button class="btn" data-action="v12-hint" data-id="${m.id}" data-index="${i}">${a.hiddenHint?.[i]?"Hide optional hint":"Show a hint for this step"}</button>
+      ${a.hiddenHint?.[i]?`<div class="v12-why"><b>Practice hint</b><p>${esc(content)}</p><p><b>Why:</b> ${esc(s.why)}</p></div>`:""}`: `<p>Use the business requirement and your own knowledge. The required procedure stays hidden until submission.</p>`}
      <div class="flex wrap"><button class="btn primary" data-route="${esc(where)}" data-v12-open="${m.id}">Open the matching Entra-style practice screen →</button><button class="btn" data-action="v12-check" data-id="${m.id}" data-index="${i}">Check saved configuration</button></div>
      ${a.checked[i]?`<div class="${a.checked[i].ok?"v12-evidence":"v12-errors"}"><b>${a.checked[i].ok?"✓ Requirement currently satisfied":"Not satisfied yet"}</b>
-       ${a.mode==="guided"||a.submitted?`<p>${esc(status.reason)}</p><p class="small">Observed: ${esc(status.actual)}</p>`:`<p>Review the fictional resource and its relationships, then try again.</p>`}</div>`:""}
+       ${a.mode==="guided"||a.mode==="practice"&&a.hiddenHint?.[i]||a.submitted?`<p>${esc(status.reason)}</p><p class="small">Observed: ${esc(status.actual)}</p>`:`<p>Review the fictional resource and its relationships, then try again.</p>`}</div>`:""}
      <div class="flex between wrap" style="margin-top:17px"><button class="btn" data-action="v12-previous" data-id="${m.id}" ${i===0?"disabled":""}>← Previous step</button>
        ${i<m.steps.length-1?`<button class="btn primary" data-action="v12-next" data-id="${m.id}">Next configuration step →</button>`:`<button class="btn primary" data-action="v12-submit" data-id="${m.id}">Submit full mission configuration →</button>`}</div>
     </div>`;
@@ -176,9 +179,9 @@
     <p>The source and security enforcement remain simulated. Review a real test tenant and Microsoft Learn to validate professional competence.</p></div></div>`;
   }
   function mission(m){
-    const a=get(m.id);if(!a)return `<div class="page v12-main">${css}<button class="btn xs" data-route="v12/missions">← All missions</button><h1>${esc(m.title)}</h1><p>${esc(m.scenario)}</p><button class="btn primary" data-action="v12-start" data-id="${m.id}" data-mode="guided">Start guided learning →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="exam">Start independent attempt →</button></div>`;
+    const a=get(m.id);if(!a)return `<div class="page v12-main">${css}<button class="btn xs" data-route="v12/missions">← All missions</button><h1>${esc(m.title)}</h1><p>${esc(m.scenario)}</p><button class="btn primary" data-action="v12-start" data-id="${m.id}" data-mode="guided">Start guided learning →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="practice">Start Practice mode (optional hints) →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="exam">Start independent attempt →</button></div>`;
     const completed=all(m,a),n=completed.filter(x=>x.ok).length,mode=a.mode;
-    return `<div class="page v12-main">${css}<button class="btn xs" data-route="v12/missions">← All missions</button><div class="eyebrow" style="margin-top:16px">${esc(m.domain)} · ${mode==="guided"?"GUIDED":"INDEPENDENT"} · ATTEMPT ${esc(a.code)}</div><h1>${esc(m.title)}</h1>
+    return `<div class="page v12-main">${css}<button class="btn xs" data-route="v12/missions">← All missions</button><div class="eyebrow" style="margin-top:16px">${esc(m.domain)} · ${mode==="guided"?"GUIDED":mode==="practice"?"PRACTICE":"INDEPENDENT"} · ATTEMPT ${esc(a.code)}</div><h1>${esc(m.title)}</h1>
       <div class="v12-banner"><h3>Business requirement</h3><p>${esc(m.scenario)}</p><p class="small"><b>Why this configuration exists:</b> ${esc(m.why)}</p></div>
       ${namesBox(m,a)}
       <div class="panel" style="margin:14px 0"><div class="flex between wrap"><b>${n} of ${m.steps.length} fictional requirements currently satisfied</b><span class="pill">${esc(mode.toUpperCase())}</span></div>
@@ -187,8 +190,8 @@
       ${a.submitted?`<div class="${a.passed?"v12-evidence":"v12-errors"}"><h3>${a.passed?"Configuration check passed":"Configuration check needs more work"}</h3><p>${n}/${m.steps.length} of the expected fictional state conditions are currently met.</p>
        ${a.results.map((r,i)=>`<details style="margin:7px 0"><summary>${r.ok?"✓":"✕"} Step ${i+1}: ${esc(m.steps[i].title)}</summary><p>${esc(r.reason)}</p><p>Observed: ${esc(r.actual)}</p></details>`).join("")}
        ${!a.passed?`<button class="btn" data-action="v12-reopen" data-id="${m.id}">Continue correcting the configuration →</button>`:""}</div>${quizView(m,a)}`:
-        `<div class="v12-layout"><div>${stepContent(m,a)}</div><aside class="v12-side"><div class="v12-coach"><b>${mode==="guided"?"Your instructor":"Independent assessment"}</b>
-          <p>${mode==="guided"?"I will show the target screen, the exact action and why the setting matters. You must perform it. Use Check configuration before moving on.":"Use the business requirement, your knowledge and the fictional console. I will not reveal the expected configuration until you submit."}</p>
+        `<div class="v12-layout"><div>${stepContent(m,a)}</div><aside class="v12-side"><div class="v12-coach"><b>${mode==="guided"?"Your instructor":mode==="practice"?"Independent practice with optional hints":"Independent exam assessment"}</b>
+          <p>${mode==="guided"?"I will show the target screen, the exact action and why the setting matters. You must perform it. Use Check configuration before moving on.":mode==="practice"?"Practice using the business requirement. Reveal a hint only when needed. Your fictional configuration is checked just like the other modes.":"Use the business requirement, your knowledge and the fictional console. I will not reveal the expected configuration until you submit."}</p>
           <p class="small">The available controls are a simplified educational replica; real tenant validations and licenses vary.</p>
           <button class="btn" data-route="v9/signin">Explore sign-in decision consequences →</button></div></aside></div>`}
       <div class="panel" style="margin-top:16px"><h3>Document what you learned</h3><form id="v12-notes" data-id="${m.id}">
@@ -245,7 +248,8 @@
   };
   action=(name,el)=>{
     const m=find(el?.dataset?.id);
-    if(name==="v12-start"&&m){start(m,el.dataset.mode==="exam"?"exam":"guided");return;}
+    if(name==="v12-start"&&m){const mode=el.dataset.mode;start(m,mode==="exam"?"exam":mode==="practice"?"practice":"guided");return;}
+    if(name==="v12-hint"&&m){const a=get(m.id),i=Number(el.dataset.index);if(a?.mode==="practice"&&!a.submitted&&i>=0&&i<m.steps.length){a.hiddenHint=a.hiddenHint||{};a.hiddenHint[i]=!a.hiddenHint[i];save();render();}return;}
     if(name==="v12-check"&&m){check(m,Number(el.dataset.index));return;}
     if(name==="v12-next"&&m){next(m,1);return;}
     if(name==="v12-previous"&&m){next(m,-1);return;}
