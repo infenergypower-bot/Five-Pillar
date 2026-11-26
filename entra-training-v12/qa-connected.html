@@ -1,0 +1,156 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connected Skills · On-device workflow QA</title><link rel="stylesheet" href="./styles.css"/>
+<style>body{background:#edf3f9;color:#182e42;font:15px system-ui,-apple-system,sans-serif}.qa{max-width:840px;margin:22px auto;padding:24px;background:#fff;border-radius:15px;border:1px solid #cbd9ea}.qa-result{padding:9px 0;border-bottom:1px solid #dbe6ef}.qa-pass{color:#12653a}.qa-fail{color:#a12232}#root{position:absolute;left:-100000px;top:0;width:1200px;visibility:hidden}#modal{display:none}</style></head>
+<body><main class="qa"><h1>SC-300 Connected Mission — Functional Browser Test</h1><p>Uses an isolated, temporary copy of the fictional tenant. It does not sign into Microsoft services, spend browser-testing credits or intentionally save changes to your own progress.</p><p>It tests actual form submissions for users, groups, memberships, app assignments and licensing, then tests Conditional Access, workload, and contractor checks against fictional records.</p><h2 id="summary">Running the learning workflow checks…</h2><div id="results" aria-live="polite"></div><p><a href="./#/v12/missions">Return to Connected Missions</a></p><small>A successful run on this device only verifies these specific automated browser interactions. Full Safari accessibility and Microsoft production parity require additional testing.</small></main>
+<div id="root" aria-hidden="true"></div><div id="modal"></div>
+<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script>
+<script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-content-expanded.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script><script src="./v6-tutor.js" defer></script>
+<script src="./granular-blueprint-data.js" defer></script><script src="./granular-skills-ui.js" defer></script><script src="./integrated-case-labs.js" defer></script>
+<script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script><script src="./ca-masterclass-data.js" defer></script><script src="./ca-masterclass-ui.js" defer></script>
+<script src="./deep-learning-data.js" defer></script><script src="./learning-studio.js" defer></script><script src="./signin-decision-lab.js" defer></script><script src="./objective-learning-bridge.js" defer></script>
+<script src="./advanced-clinics-a.js" defer></script><script src="./advanced-clinics-b.js" defer></script><script src="./advanced-checkpoints.js" defer></script><script src="./advanced-clinics-ui.js" defer></script>
+<script src="./missions-data.js" defer></script><script src="./missions-ui.js" defer></script>
+<script>
+window.addEventListener("DOMContentLoaded",function(){
+ const result=[],originalHash=location.hash;let originalDb,originalSave;
+ const test=(name,fn)=>{try{if(fn()!==true)throw Error("Expected result was not observed");result.push({name,ok:true});}catch(error){result.push({name,ok:false,error:String(error?.message||error)});}};
+ function openForm(route,actionName,vals){
+   go(route);const btn=document.querySelector('[data-action="'+actionName+'"]');
+   if(!btn)throw Error("Button missing: "+actionName);
+   btn.click();const f=document.querySelector("#entity-form");
+   if(!f)throw Error("Creation dialog missing for "+actionName);
+   for(const [name,value] of Object.entries(vals)){
+     const field=f.querySelector('[name="'+name+'"]');
+     if(!field)throw Error("Form field missing: "+name);
+     field.value=value;
+   }
+   f.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+   if(document.querySelector("#entity-form"))throw Error("Form did not save: "+actionName);
+ }
+ try{
+   originalDb=db;originalSave=save;db=JSON.parse(JSON.stringify(originalDb));save=function(){};
+   test("Four connected missions are loaded",()=>V12_MISSIONS.length===4);
+   test("Exactly twenty-five administrative checks are defined",()=>V12_MISSIONS.reduce((n,x)=>n+x.steps.length,0)===25);
+   test("All missions have two reasoning cases",()=>V12_MISSIONS.every(x=>x.questions.length===2&&x.steps.every(s=>!!s.why&&!!s.where)));
+   test("Mission homepage loads",()=>{go("v12/missions");return !!document.querySelector('[data-action="v12-start"]')});
+   test("Guided attempt creates unique required names",()=>{
+      action("v12-start",{dataset:{id:"joiner",mode:"guided"}});
+      const a=__V12_TESTS.getAttempt("joiner");
+      return a?.code?.length>=5&&document.getElementById("root").textContent.includes("Lab Analyst "+a.code);
+   });
+   const a=__V12_TESTS.getAttempt("joiner"),code=a?.code;
+   test("Unchanged directory cannot pass an admin step",()=>__V12_TESTS.stepResult(__V12_TESTS.getMission("joiner"),a,0).ok===false);
+   test("Real create-user modal saves training member",()=>{
+      openForm("portal/users","new-user",{name:"Lab Analyst "+code,email:"lab-"+code+"@contoso-training.test"});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("joiner"),a,0).ok===true;
+   });
+   test("Real create-group modal saves dedicated group",()=>{
+      openForm("portal/groups","new-group",{name:"Lab Finance "+code});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("joiner"),a,1).ok===true;
+   });
+   test("Real group membership form grants only intended user",()=>{
+      const u=db.users.find(x=>x.name==="Lab Analyst "+code),g=db.groups.find(x=>x.name==="Lab Finance "+code);
+      openForm("portal/groups","group-add-member",{group:g.id,user:u.id});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("joiner"),a,2).ok===true;
+   });
+   test("Real enterprise application assignment form links group",()=>{
+      const g=db.groups.find(x=>x.name==="Lab Finance "+code),app=db.apps.find(x=>x.name==="Finance Reports");
+      openForm("portal/apps","assign-app",{app:app.id,principal:g.id});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("joiner"),a,3).ok===true;
+   });
+   test("Real license form assigns license without directory admin",()=>{
+      const u=db.users.find(x=>x.name==="Lab Analyst "+code);
+      openForm("portal/users","user-license",{user:u.id,license:"Microsoft Entra ID P2"});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("joiner"),a,4).ok===true;
+   });
+   test("Least-privileged employee configuration passes final evaluator",()=>{
+      const m=__V12_TESTS.getMission("joiner");return __V12_TESTS.all(m,a).every(x=>x.ok);
+   });
+   test("Guided mission submission scores actual connected state",()=>{
+      action("v12-submit",{dataset:{id:"joiner"}});
+      return __V12_TESTS.getAttempt("joiner").passed===true;
+   });
+   test("Learning reasoning answers can be checked independently",()=>{
+      go("v12/mission/joiner");
+      for(let i=0;i<2;i++){
+        const f=document.querySelector('#v12-quiz[data-index="'+i+'"]');
+        if(!f)return false;
+        f.querySelector('input[value="0"]').checked=true;f.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+      }
+      return __V12_TESTS.getAttempt("joiner").knowledge===true;
+   });
+   test("Fresh independent attempt does not inherit the first attempt's pass",()=>{
+      action("v12-start",{dataset:{id:"joiner",mode:"exam"}});
+      const again=__V12_TESTS.getAttempt("joiner");
+      return again.code!==code&&__V12_TESTS.all(__V12_TESTS.getMission("joiner"),again).every(x=>!x.ok);
+   });
+   test("Report-only Conditional Access does not pass as On",()=>{
+      action("v12-start",{dataset:{id:"pilot",mode:"exam"}});
+      const p=__V12_TESTS.getAttempt("pilot"),v=__V12_TESTS.labels(__V12_TESTS.getMission("pilot"),p),uid="qa-pilot",gid="qa-pilot-group";
+      db.users.push({id:uid,name:v.USER,email:"qa-"+p.code+"@test.example",type:"Member",role:"User",licenses:[]});
+      db.groups.push({id:gid,name:v.GROUP,members:[uid]});
+      db.policies.push({id:"qa-policy",name:v.POLICY,group:v.GROUP,app:"Finance Reports",control:"Require MFA",state:"On"});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("pilot"),p,3).ok===false;
+   });
+   test("Report-only CA becomes valid when correctly scoped",()=>{
+      db.policies.find(x=>x.id==="qa-policy").state="Report-only";
+      const p=__V12_TESTS.getAttempt("pilot");
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("pilot"),p,3).ok===true;
+   });
+   test("What If requires the pilot principal and targeted app",()=>{
+      const p=__V12_TESTS.getAttempt("pilot"),v=__V12_TESTS.labels(__V12_TESTS.getMission("pilot"),p);
+      db.whatif={user:v.USER,app:"Vendor Portal",result:"No enforced grant"};
+      const before=__V12_TESTS.stepResult(__V12_TESTS.getMission("pilot"),p,4).ok;
+      db.whatif.app="Finance Reports";
+      return !before&&__V12_TESTS.stepResult(__V12_TESTS.getMission("pilot"),p,4).ok;
+   });
+   test("Managed identity Owner permission fails least privilege",()=>{
+      action("v12-start",{dataset:{id:"workload",mode:"exam"}});
+      const p=__V12_TESTS.getAttempt("workload"),v=__V12_TESTS.labels(__V12_TESTS.getMission("workload"),p);
+      db.managed.push({id:"qa-man",name:v.IDENTITY,grant:"Owner at Subscription"});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("workload"),p,1).ok===false;
+   });
+   test("Exact resource-scoped secret permission passes workload check",()=>{
+      const p=__V12_TESTS.getAttempt("workload");db.managed.find(x=>x.id==="qa-man").grant="Secrets User on PayrollVault";
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("workload"),p,1).ok===true;
+   });
+   test("Broad app-only Graph permission fails narrow delegated grant",()=>{
+      const p=__V12_TESTS.getAttempt("workload"),v=__V12_TESTS.labels(__V12_TESTS.getMission("workload"),p);
+      db.regs.push({id:"qa-reg",name:v.REG,permissions:["Application Directory.Read.All"],consented:true});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("workload"),p,3).ok===false;
+   });
+   test("Exactly delegated Graph User.Read clears scope check",()=>{
+      const p=__V12_TESTS.getAttempt("workload");
+      db.regs.find(x=>x.id==="qa-reg").permissions=["Delegated User.Read"];
+      return __V12_TESTS.all(__V12_TESTS.getMission("workload"),p).every(x=>x.ok);
+   });
+   test("Guest access is denied if Finance Reports group is included",()=>{
+      action("v12-start",{dataset:{id:"contractor",mode:"exam"}});
+      const p=__V12_TESTS.getAttempt("contractor"),v=__V12_TESTS.labels(__V12_TESTS.getMission("contractor"),p),uid="qa-guest",gid="qa-c-group";
+      db.users.push({id:uid,name:v.GUEST,email:"qa-"+p.code+"@partner.example",type:"Guest",role:"",licenses:[]});
+      db.groups.push({id:gid,name:v.GROUP,members:[uid]});
+      db.apps.push({id:"qa-vendor",name:"Vendor Portal",sso:"SAML",assignees:[gid]});
+      db.packages.push({name:v.PACKAGE,approval:"Required",expiry:30});
+      db.reviews.push({target:v.GROUP,reviewer:"Security Team"});
+      db.apps.find(x=>x.name==="Finance Reports").assignees.push(gid);
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("contractor"),p,6).ok===false;
+   });
+   test("Removing forbidden Finance Reports entitlement passes contractor separation",()=>{
+      const p=__V12_TESTS.getAttempt("contractor"),v=__V12_TESTS.labels(__V12_TESTS.getMission("contractor"),p),g=db.groups.find(x=>x.name===v.GROUP),fin=db.apps.find(x=>x.name==="Finance Reports");
+      fin.assignees=fin.assignees.filter(x=>x!==g.id);
+      return __V12_TESTS.all(__V12_TESTS.getMission("contractor"),p).every(x=>x.ok);
+   });
+   test("No mission check changes the fictional tenant as a side effect",()=>{
+      const before=JSON.stringify({users:db.users,groups:db.groups,apps:db.apps,policies:db.policies,regs:db.regs,managed:db.managed,packages:db.packages,reviews:db.reviews,whatif:db.whatif});
+      const m=__V12_TESTS.getMission("contractor"),a=__V12_TESTS.getAttempt("contractor");__V12_TESTS.all(m,a);
+      const after=JSON.stringify({users:db.users,groups:db.groups,apps:db.apps,policies:db.policies,regs:db.regs,managed:db.managed,packages:db.packages,reviews:db.reviews,whatif:db.whatif});
+      return before===after;
+   });
+ }catch(err){result.push({name:"Unexpected startup or test failure",ok:false,error:String(err?.message||err)});}
+ finally{if(originalDb){db=originalDb;save=originalSave;}history.replaceState(null,"",location.pathname+location.search+originalHash);}
+ const passed=result.filter(x=>x.ok).length,failed=result.length-passed;
+ document.getElementById("summary").textContent=passed+" passed / "+failed+" failed / "+result.length+" checks";
+ document.getElementById("summary").className=failed?"qa-fail":"qa-pass";
+ document.getElementById("results").innerHTML=result.map(x=>'<div class="qa-result '+(x.ok?"qa-pass":"qa-fail")+'">'+(x.ok?"✓ ":"✕ ")+x.name+(x.error?" · "+x.error.replace(/</g,"&lt;"):"")+"</div>").join("");
+ window.__V12_BROWSER_QA={passed,failed,results:result};
+});
+</script></body></html>
