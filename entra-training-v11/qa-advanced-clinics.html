@@ -6,7 +6,7 @@
 <script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-content-expanded.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script><script src="./v6-tutor.js" defer></script>
 <script src="./granular-blueprint-data.js" defer></script><script src="./granular-skills-ui.js" defer></script><script src="./integrated-case-labs.js" defer></script>
 <script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script><script src="./ca-masterclass-data.js" defer></script><script src="./ca-masterclass-ui.js" defer></script>
-<script src="./deep-learning-data.js" defer></script><script src="./learning-studio.js" defer></script><script src="./advanced-clinics-a.js" defer></script><script src="./advanced-clinics-b.js" defer></script><script src="./advanced-clinics-ui.js" defer></script><script src="./signin-decision-lab.js" defer></script>
+<script src="./deep-learning-data.js" defer></script><script src="./learning-studio.js" defer></script><script src="./advanced-clinics-a.js" defer></script><script src="./advanced-clinics-b.js" defer></script><script src="./advanced-checkpoints.js" defer></script><script src="./advanced-clinics-ui.js" defer></script><script src="./signin-decision-lab.js" defer></script>
 <script>
 window.addEventListener('DOMContentLoaded',function(){
  const out=[],storedHash=location.hash;let original,originalSave,originalV11;
@@ -145,7 +145,15 @@ window.addEventListener('DOMContentLoaded',function(){
     go("v11/clinic/cae");
     const f=document.querySelector("#v11-quiz");f.querySelector('input[value="0"]').checked=true;
     f.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
-    return original.v11.quiz["cae"].correct===true&&!original.v11.practice["cae"]?.independent;
+    return original.v11.quiz["cae"].first===true&&original.v11.quiz["cae"].correct===false&&!original.v11.practice["cae"]?.independent;
+  });
+  run("Seventeen additional reasoning checkpoints exist",()=>V11_CHECKPOINTS.length===17&&new Set(V11_CHECKPOINTS.map(x=>x.id)).size===17);
+  run("Second independent reasoning problem unlocks knowledge completion",()=>{
+    go("v11/clinic/cae");const f=document.querySelector("#v11-checkpoint");if(!f)return false;
+    const q=V11_CHECKPOINTS.find(x=>x.id==="cae");
+    f.querySelector('input[value="'+q.answer+'"]').checked=true;
+    f.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    return original.v11.quiz["cae"].second===true&&original.v11.quiz["cae"].correct===true;
   });
   run("Design-only skill cannot pass a simulator state check",()=>{
     action("v11-start",{dataset:{id:"domain-dns",mode:"exam"}});
