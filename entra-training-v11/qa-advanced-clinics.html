@@ -1,0 +1,194 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SC-300 Learning Studio — Browser QA</title><link rel="stylesheet" href="./styles.css"/>
+<style>body{background:#f0f4f9;font-family:system-ui,sans-serif}.qa{max-width:870px;margin:25px auto;background:white;padding:26px;border:1px solid #d1e0ed;border-radius:14px}.qrow{padding:10px;border-bottom:1px solid #e8ecf2}.pass{color:#167245}.fail{color:#ae2030}#root{position:absolute;left:-10000px;top:0;width:1200px;visibility:hidden}#modal{display:none}</style></head>
+<body><main class="qa"><h1>SC-300 Advanced Skill Clinics — On-device QA</h1><p>This page checks existing learning controls and the seventeen advanced clinics in your actual browser, including Safari on iPad. It uses a temporary fictional tenant, and restores your training record after the tests. It does not connect to a live Microsoft Entra tenant or charge another service.</p><h2 id="summary">Preparing checks…</h2><div id="results" role="status" aria-live="polite"></div><p><a href="./#/v8/academy">Return to the learning academy</a></p><small>Note: passing these checks is not proof of exam readiness. A physical iPad validation requires you to open this page on your own device.</small></main>
+<div id="root" aria-hidden="true"></div><div id="modal"></div>
+<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script>
+<script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-content-expanded.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script><script src="./v6-tutor.js" defer></script>
+<script src="./granular-blueprint-data.js" defer></script><script src="./granular-skills-ui.js" defer></script><script src="./integrated-case-labs.js" defer></script>
+<script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script><script src="./ca-masterclass-data.js" defer></script><script src="./ca-masterclass-ui.js" defer></script>
+<script src="./deep-learning-data.js" defer></script><script src="./learning-studio.js" defer></script><script src="./advanced-clinics-a.js" defer></script><script src="./advanced-clinics-b.js" defer></script><script src="./advanced-clinics-ui.js" defer></script><script src="./signin-decision-lab.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded',function(){
+ const out=[],storedHash=location.hash;let original,originalSave,originalV11;
+ const run=(name,fn)=>{try{const ok=fn();if(!ok)throw Error('Expected result was not observed');out.push({name,ok:true});}catch(err){out.push({name,ok:false,reason:String(err?.message||err)});}};
+ try{
+  original=db;originalSave=save;originalV11=JSON.parse(JSON.stringify(db.v11||{}));db=JSON.parse(JSON.stringify(db));save=function(){};
+  run("14 authored instructional units are loaded",()=>V8_LESSONS.length===14);
+  run("Four SC-300 learning domains are present",()=>new Set(V8_LESSONS.map(x=>x.domain)).size===4);
+  run("Every lesson has a visual explanation and hands-on steps",()=>V8_LESSONS.every(x=>x.visual.length===5&&x.steps.length>=4&&x.beginner.length>200&&x.technical.length>400));
+  run("Learning homepage opens without an error",()=>{go('v8/academy');return document.getElementById('root').textContent.includes('Learn by seeing, doing, and understanding why')});
+  for(const unit of V8_LESSONS){
+    run("Lesson route loads: "+unit.id,()=>{go("v8/learn/"+unit.id);return document.getElementById("root").textContent.includes(unit.title)&&!!document.querySelector("#v8-quiz");});
+    run("Guided step can advance: "+unit.id,()=>{
+      db.v8.screen[unit.id]={node:0,step:0,stage:"follow"};action("v8-step-next",{dataset:{id:unit.id}});
+      return db.v8.screen[unit.id].step===1;
+    });
+  }
+  run("Course navigation opens a detailed lesson",()=>{go('v8/learn/group-app-access');return document.getElementById('root').textContent.includes('Groups, assignments, and effective application access')});
+  run("Vocabulary tap-to-expand controls are present",()=>document.querySelectorAll('.v8-term').length>=4);
+  run("Interactive diagram advances",()=>{action('v8-node-next',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].node===1});
+  run("Diagram can be replayed",()=>{action('v8-node-replay',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].node===0});
+  run("Guided console step advances",()=>{action('v8-step-next',{dataset:{id:'group-app-access'}});return db.v8.screen['group-app-access'].step===1});
+  run("A wrong knowledge answer creates a remediation record",()=>{
+    const lesson=V8_LESSONS.find(x=>x.id==="group-app-access");go("v8/learn/group-app-access");
+    const form=document.querySelector("#v8-quiz");if(!form)return false;
+    const wrong=lesson.choices.findIndex((_,i)=>i!==lesson.answer);
+    form.querySelector('input[value="'+wrong+'"]').checked=true;
+    form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    return db.v8.quizHistory.some(x=>x.id===lesson.id&&x.correct===false);
+  });
+  run("Knowledge check accepts the correct reasoning",()=>{
+    const lesson=V8_LESSONS.find(x=>x.id==='group-app-access');go('v8/learn/group-app-access');
+    const form=document.querySelector('#v8-quiz');if(!form)return false;
+    const choice=form.querySelector('input[value="'+lesson.answer+'"]');choice.checked=true;form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+    return db.v8.passed['group-app-access']===true;
+  });
+  run("Guided practice creates a unique fictional attempt",()=>{
+    action('v8-start',{dataset:{id:'group-app-access',mode:'guided'}});
+    return !!db.v8.attempt['group-app-access']?.code&&db.v8.attempt['group-app-access'].mode==='guided';
+  });
+  run("Unchanged tenant data cannot pass a lab",()=>{
+    action('v8-grade',{dataset:{id:'group-app-access'}});
+    return db.v8.attempt['group-app-access'].result?.valid===false;
+  });
+  run("New guided practice can validate connected records",()=>{
+    action('v8-start',{dataset:{id:'group-app-access',mode:'guided'}});
+    const code=db.v8.attempt['group-app-access'].code,uid='qa_'+code,gid='qa_group_'+code;
+    db.users.push({id:uid,name:'V8 Analyst '+code,email:'qa-'+code+'@training.test',type:'Member',role:'User',licenses:[],revoked:false,tap:false});
+    db.groups.push({id:gid,name:'V8 Finance '+code,members:[uid]});
+    const app=db.apps.find(x=>x.name==='Finance Reports');
+    app.assignees.push(gid);
+    action('v8-grade',{dataset:{id:'group-app-access'}});
+    return db.v8.attempt['group-app-access'].result?.valid===true&&db.v8.simulation['group-app-access']?.guided===true;
+  });
+  run("Independent Exam mode hides the guided instructor",()=>{
+    action('v8-start',{dataset:{id:'group-app-access',mode:'exam'}});
+    const btn=document.querySelector('button[data-v8-start="group-app-access"]');
+    if(!btn)return false;btn.click();
+    return db.v8.coach===null&&db.v8.attempt['group-app-access'].mode==='exam';
+  });
+  run("Independent exam still requires newly changed simulated state",()=>{
+    const code=db.v8.attempt['group-app-access'].code,uid='qa_i'+code,gid='qa_g'+code;
+    db.users.push({id:uid,name:'V8 Analyst '+code,email:'qa-'+code+'@training.test',type:'Member',role:'User',licenses:[],revoked:false,tap:false});
+    db.groups.push({id:gid,name:'V8 Finance '+code,members:[uid]});db.apps.find(x=>x.name==='Finance Reports').assignees.push(gid);
+    action('v8-grade',{dataset:{id:'group-app-access'}});
+    return db.v8.simulation['group-app-access']?.independent===true;
+  });
+  run("Evidence notes can be saved",()=>{
+    go('v8/learn/group-app-access');const form=document.querySelector('#v8-note');if(!form)return false;
+    form.querySelector('textarea').value='QA fictional evidence: access checked';
+    form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+    return db.v8.notes['group-app-access']==='QA fictional evidence: access checked';
+  });
+  run("Progress dashboard shows separate knowledge and simulation results",()=>{
+    go('v8/progress');return document.getElementById('root').textContent.includes('Independent simulator passes');
+  });
+  run("Connected sign-in lab loads",()=>{go("v9/signin");return !!document.querySelector("#v9-evaluate")});
+  run("Sign-in authorization denies unassigned user",()=>{
+    db.policies=[{id:"qaLegacy",name:"Block legacy",group:"All users",app:"All cloud apps",control:"Block legacy clients (concept)",state:"On"}];
+    db.users.push({id:"v9qa",name:"V9 Isolated Learner",email:"v9qa@training.test",type:"Member",role:"User",licenses:[],revoked:false,tap:false});
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"yes",device:"yes",client:"modern"});
+    return r.kind==="deny-app";
+  });
+  run("Group and application assignment change access outcome",()=>{
+    db.groups.push({id:"v9g",name:"V9 Authorized",members:["v9qa"]});db.apps.find(x=>x.name==="Finance Reports").assignees.push("v9g");
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"yes",device:"yes",client:"modern"});
+    return r.kind==="granted";
+  });
+  run("Report-only MFA shows impact without enforcement",()=>{
+    db.policies.push({id:"qaReport",name:"V9 Report Only MFA",group:"V9 Authorized",app:"Finance Reports",control:"Require MFA",state:"Report-only"});
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"no",device:"yes",client:"modern"});
+    return r.kind==="granted"&&r.reported.some(x=>x.name==="V9 Report Only MFA");
+  });
+  run("Enforced MFA causes authentication challenge",()=>{
+    db.policies.push({id:"qaOn",name:"V9 Enforce MFA",group:"V9 Authorized",app:"Finance Reports",control:"Require MFA",state:"On"});
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"no",device:"yes",client:"modern"});
+    return r.kind==="challenge"&&r.enforced.some(x=>x.name==="V9 Enforce MFA");
+  });
+  run("Satisfying MFA allows assigned user through",()=>{
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"yes",device:"yes",client:"modern"});
+    return r.kind==="granted";
+  });
+  run("Revoked sessions do not automatically block a fresh sign-in",()=>{
+    db.users.find(x=>x.id==="v9qa").revoked=true;
+    const r=window.__identityV9Evaluate({user:"v9qa",app:"Finance Reports",mfa:"yes",device:"yes",client:"modern"});
+    return r.kind==="granted"&&r.revoked===true;
+  });
+  run("Decision consequences update the fictional sign-in log",()=>db.logs.some(x=>x.source==="V9 simulation"&&x.user==="v9qa@training.test"));
+  run("Learning dashboard recommends missed topics",()=>{
+    go("v8/progress");return document.getElementById("root").textContent.includes("Personalized review: skills missed")&&document.getElementById("root").textContent.includes("incorrect attempt");
+  });
+  run("17 original advanced skill clinics are present",()=>V11_CLINICS_A.length+V11_CLINICS_B.length===17);
+  run("All advanced clinics have unique IDs, visuals and guided workflows",()=>{
+    const c=[...V11_CLINICS_A,...V11_CLINICS_B];return new Set(c.map(x=>x.id)).size===17&&c.every(x=>x.visual.length===5&&x.guided.length===4&&x.options.length===4&&x.tech.length>150);
+  });
+  run("Advanced clinic index opens",()=>{go("v11/clinics");return document.getElementById("root").textContent.includes("Learn the skills that simple quizzes leave out")});
+  for(const c of [...V11_CLINICS_A,...V11_CLINICS_B]){
+    run("Advanced lesson loads: "+c.id,()=>{go("v11/clinic/"+c.id);return document.getElementById("root").textContent.includes(c.topic)&&!!document.querySelector("#v11-quiz");});
+    run("Visual flow can advance: "+c.id,()=>{action("v11-node-next",{dataset:{id:c.id}});return !!document.querySelector(".clinic-flow button.active");});
+  }
+  run("Advanced diagram can replay",()=>{
+    action("v11-node-next",{dataset:{id:"cae"}});action("v11-node-replay",{dataset:{id:"cae"}});
+    return !!document.querySelector(".clinic-flow button.active");
+  });
+  run("Advanced clinic question answer positions are randomized and stored",()=>{
+    go("v11/clinic/cae");return document.querySelectorAll("#v11-quiz input[type=radio]").length===4;
+  });
+  run("A wrong answer triggers immediate root-cause feedback",()=>{
+    const c=[...V11_CLINICS_A,...V11_CLINICS_B].find(x=>x.id==="cae");
+    go("v11/clinic/cae");
+    const f=document.querySelector("#v11-quiz");f.querySelector('input[value="1"]').checked=true;
+    f.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    return document.getElementById("root").textContent.includes("Not quite")&&!!original.v11.quiz["cae"];
+  });
+  run("Correct answer records knowledge only, not tenant mastery",()=>{
+    go("v11/clinic/cae");
+    const f=document.querySelector("#v11-quiz");f.querySelector('input[value="0"]').checked=true;
+    f.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    return original.v11.quiz["cae"].correct===true&&!original.v11.practice["cae"]?.independent;
+  });
+  run("Design-only skill cannot pass a simulator state check",()=>{
+    action("v11-start",{dataset:{id:"domain-dns",mode:"exam"}});
+    action("v11-grade",{dataset:{id:"domain-dns"}});
+    return original.v11.attempts["domain-dns"].passed===false;
+  });
+  run("Independent practice hides the suggested resolution before grading",()=>{
+    action("v11-start",{dataset:{id:"cross-tenant",mode:"exam"}});
+    return document.getElementById("root").textContent.includes("Independent mode: the complete procedure and suggested resolution are hidden");
+  });
+  run("Guided practice shows the four administrative steps",()=>{
+    action("v11-start",{dataset:{id:"custom-attributes",mode:"guided"}});
+    return document.getElementById("root").textContent.includes("Guided instructor checklist");
+  });
+  run("Unchanged simulated directory cannot pass attribute practice",()=>{
+    action("v11-grade",{dataset:{id:"custom-attributes"}});
+    return original.v11.attempts["custom-attributes"].passed===false;
+  });
+  run("Relevant fictional change can pass a limited guided attribute exercise",()=>{
+    action("v11-start",{dataset:{id:"custom-attributes",mode:"guided"}});
+    db.attributes["qa-classification"]="Restricted";
+    action("v11-grade",{dataset:{id:"custom-attributes"}});
+    return original.v11.attempts["custom-attributes"].passed===true;
+  });
+  run("PIM for Groups is not mislabeled complete using role activation",()=>{
+    action("v11-start",{dataset:{id:"pim-groups",mode:"exam"}});
+    db.pim.push({user:"QA user",role:"Groups Administrator",active:true});
+    action("v11-grade",{dataset:{id:"pim-groups"}});
+    return original.v11.attempts["pim-groups"].passed===false;
+  });
+  run("Advanced progress screen separates reasoning from simulated work",()=>{
+    go("v11/progress");return document.getElementById("root").textContent.includes("Correct knowledge checks")&&document.getElementById("root").textContent.includes("Independent fictional-state checks");
+  });
+  run("All official subskills remain conservatively marked unverified",()=>V7_SKILLS.length===237&&V7_SKILLS.every(x=>x.status==='Not verified'));
+ }catch(err){out.push({name:'Unexpected test startup failure',ok:false,reason:String(err?.message||err)});}
+ finally{
+  if(original){db=original;save=originalSave;if(originalV11){const record=original.v11;for(const k of Object.keys(record))delete record[k];Object.assign(record,originalV11);}}
+  history.replaceState(null,'',location.pathname+location.search+storedHash);
+ }
+ const passed=out.filter(x=>x.ok).length,failed=out.length-passed;
+ document.getElementById('summary').textContent=passed+' passed · '+failed+' failed · '+out.length+' tests';
+ document.getElementById('summary').className=failed?'fail':'pass';
+ document.getElementById('results').innerHTML=out.map(x=>'<div class="qrow '+(x.ok?'pass':'fail')+'">'+(x.ok?'✓ ':'✕ ')+x.name+(x.reason?': '+x.reason.replace(/</g,'&lt;'):'')+'</div>').join('');
+ window.__v11TestReport={passed,failed,tests:out};
+});
+</script></body></html>
