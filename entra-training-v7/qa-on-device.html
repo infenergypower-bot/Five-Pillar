@@ -1,0 +1,71 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Identity Academy V7 — iPad and browser self-check</title>
+<style>body{font:16px system-ui,-apple-system,sans-serif;background:#f3f6fb;color:#18283d;margin:0;padding:20px}main{max-width:850px;margin:0 auto;background:white;border-radius:16px;padding:25px;border:1px solid #d7e2f0}.ok{color:#137249}.err{color:#a3293b}.check{padding:9px 0;border-bottom:1px solid #e8eef5}small{color:#586987}#root,#modal{display:none}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}</style>
+</head><body><main><h1>Identity Architect Academy · On-device functional self-test</h1><p>This test works without a paid external browser service. It uses an isolated in-memory copy of the fictional tenant; it will not alter your saved training progress or Microsoft accounts. It does not prove live tenant parity or exam readiness.</p><h2 id="summary">Loading tests…</h2><div id="results" aria-live="polite"></div><p><a href="/">Return to Academy</a></p><small>For a failed test, provide the test name and error shown here. Physical iPad Safari validation requires actually opening this page on the device.</small></main>
+<div id="root"></div><div id="modal"></div>
+<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script>
+<script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-content-expanded.js" defer></script><script src="./v6-upgrade.js" defer></script><script src="./v6-modes.js" defer></script><script src="./v6-tutor.js" defer></script>
+<script src="./granular-blueprint-data.js" defer></script><script src="./granular-skills-ui.js" defer></script><script src="./integrated-case-labs.js" defer></script><script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded',function(){
+  let originalDb,originalSave,oldHash;
+  const tests=[];
+  const test=(name,run)=>{try{const pass=run();if(!pass)throw Error('Condition not met');tests.push({name,ok:true})}catch(err){tests.push({name,ok:false,error:String(err&&err.message||err)})}};
+  try{
+   originalDb=db;originalSave=save;oldHash=location.hash;save=function(){};
+   db=JSON.parse(JSON.stringify(originalDb));
+   test('Official exam inventory has 237 measured skills',()=>V7_SKILLS.length===237);
+   test('SC-300 has 98 measured skills',()=>V7_SKILLS.filter(x=>x.exam==='SC-300').length===98);
+   test('SC-900 has 58 measured skills',()=>V7_SKILLS.filter(x=>x.exam==='SC-900').length===58);
+   test('SC-100 has 81 measured skills',()=>V7_SKILLS.filter(x=>x.exam==='SC-100').length===81);
+   test('All objective statuses remain unverified',()=>V7_SKILLS.every(x=>x.status==='Not verified'));
+   test('All 28 extra questions are original records',()=>V7_ADVANCED_QUESTIONS.length===28&&new Set(V7_ADVANCED_QUESTIONS.map(x=>x.id)).size===28);
+   test('Four exam question types are included',()=>['single','multi','matching','sequence'].every(x=>V7_ADVANCED_QUESTIONS.some(q=>q.type===x)));
+   test('Skill list UI opens',()=>{go('v7/skills');return document.getElementById('root').textContent.includes('Every measured skill')});
+   test('SC-900 exam filter works',()=>{action('v7-track',{dataset:{track:'SC-900'}});return db.v7.track==='SC-900'});
+   test('SC-100 exam filter works',()=>{action('v7-track',{dataset:{track:'SC-100'}});return db.v7.track==='SC-100'});
+   test('Measured skill record opens',()=>{go('v7/skill/SC-300-001');return !!document.querySelector('#v7-proof')});
+   test('Evidence notes can be saved in-memory',()=>{
+     let form=document.querySelector('#v7-proof');let note=form.querySelector('textarea[name=notes]');note.value='Fictional test evidence only';
+     form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+     return db.v7.proof['SC-300-001']?.notes==='Fictional test evidence only';
+   });
+   test('Integrated case lab list opens',()=>{go('v7/integrated');return document.getElementById('root').textContent.includes('Practice an entire business security workflow')});
+   test('Guided finance case creates attempt with unique code',()=>{
+     action('v7-case-start',{dataset:{id:'finance',mode:'guided'}});
+     return db.v7.activeCase?.id==='finance'&&!!db.v7.activeCase.code;
+   });
+   test('Finance case rejects no configuration changes',()=>{
+     action('v7-case-grade',{dataset:{id:'finance'}});
+     return db.v7.activeCase?.passed===false;
+   });
+   test('Independent vendor case hides checklist before submission',()=>{
+     action('v7-case-start',{dataset:{id:'vendor',mode:'exam'}});
+     return db.v7.activeCase?.mode==='exam'&&document.getElementById('root').textContent.includes('Exam mode: configuration checklist');
+   });
+   test('Mixed-format exam setup opens',()=>{go('v7/advanced-exam');return !!document.getElementById('v7-advanced-setup')});
+   test('Advanced exam creates a randomized SC-300 session',()=>{
+     const f=document.getElementById('v7-advanced-setup');
+     f.querySelector('[name=track]').value='SC-300';f.querySelector('[name=count]').value='8';f.querySelector('[name=minutes]').value='0';
+     f.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+     return db.v7.advancedExam?.ids.length===8;
+   });
+   test('Exam validates correct answers across all formats',()=>{
+     let s=db.v7.advancedExam;
+     s.ids.forEach(id=>{const q=V7_ADVANCED_QUESTIONS.find(x=>x.id===id);s.answers[id]=q.type==='single'?q.correct:q.type==='multi'?[...q.correct]:q.type==='matching'?Object.fromEntries(q.pairs.map((_,i)=>[i,i])):q.steps.map((_,i)=>i)});
+     s.minutes=1;s.started=Date.now()-70000;render();
+     return s.submitted&&s.result?.pct===100;
+   });
+   test('Assessment history is recorded locally',()=>db.v7.advancedHistory?.length>=1);
+   test('Readiness gate refuses false complete status',()=>{go('v7/readiness');return document.getElementById('root').textContent.includes('Not certification-ready')});
+  }catch(e){tests.push({name:'Unexpected setup or execution error',ok:false,error:String(e)})}
+  finally{
+    if(originalDb){db=originalDb;save=originalSave;}
+    if(typeof oldHash==='string')history.replaceState(null,'',location.pathname+location.search+oldHash);
+  }
+  const passed=tests.filter(x=>x.ok).length,failed=tests.length-passed;
+  document.getElementById('summary').textContent=passed+' passed / '+failed+' failed / '+tests.length+' total';
+  document.getElementById('summary').className=failed?'err':'ok';
+  document.getElementById('results').innerHTML=tests.map(x=>'<div class="check '+(x.ok?'ok':'err')+'">'+(x.ok?'✓ ':'✕ ')+x.name+(x.error?' — '+x.error.replace(/</g,'&lt;'):'')+'</div>').join('');
+  window.__IDENTITY_V7_TESTS={passed,failed,tests};
+});
+</script></body></html>
