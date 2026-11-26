@@ -265,6 +265,7 @@
  document.addEventListener("click",e=>{
   const btn=e.target.closest("[data-v8-start]");if(!btn)return;
   const id=btn.dataset.v8Start;if(!get(id))return;
+  const task=db.v8.attempt[id];if(task?.mode==="exam"&&!task.finished){db.v8.coach=null;save();return;}
   db.v8.coach={id,step:progress(id).step||0};
   if(db.v6?.activeTutor)db.v6.activeTutor=null;
   save();
