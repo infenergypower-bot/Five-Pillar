@@ -22,7 +22,7 @@
   window.addEventListener('DOMContentLoaded',function(){
     try {
       if(typeof render!=='function')throw Error('Application script unavailable; please reload the page');
-      if(!location.hash)location.hash='#/portal/overview';
+      if(!location.hash)location.hash='#/v8/academy';
       render();
       window.__entraBootCompleted=true;
     }catch(e){ displayProblem('Startup: '+(e&&e.message?e.message:String(e))); }
