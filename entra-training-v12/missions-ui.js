@@ -78,6 +78,8 @@
     return {ok:!!ok,reason,actual,step:index,check:key};
   }
   function all(m,a){return m.steps.map((_,i)=>stepResult(m,a,i));}
+  function stillValid(m,a){return !!a?.submitted&&all(m,a).every(x=>x.ok);}
+
   const shuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
   function start(m,mode){
     mode=["guided","practice","exam"].includes(mode)?mode:"guided";
@@ -150,8 +152,8 @@
   </style>`;
   const head=()=>`<div class="v12-banner"><div class="eyebrow">SC-300 CONNECTED SKILL PRACTICE · REAL FICTIONAL CONFIGURATION</div><h1>Practice the whole workflow, not just one setting</h1><p>Create users, groups, application access, policies and governance resources using the SAME practice directory. The instructor tells you why each action matters, while the checks inspect what was actually saved.</p><div class="v12-why"><b>Not Microsoft cloud:</b> no real credentials or subscriptions are used. Every result is limited to the fictional model; success does not certify a production configuration.</div></div>`;
   function hub(){
-    const passed=V12_MISSIONS.filter(m=>get(m.id)?.submitted&&get(m.id)?.passed).length;
-    const mastered=V12_MISSIONS.filter(m=>get(m.id)?.mode==="exam"&&get(m.id)?.passed&&get(m.id)?.knowledge).length;
+    const passed=V12_MISSIONS.filter(m=>stillValid(m,get(m.id))).length;
+    const mastered=V12_MISSIONS.filter(m=>get(m.id)?.mode==="exam"&&stillValid(m,get(m.id))&&get(m.id)?.knowledge).length;
     return `<div class="page v12-main">${css}${head()}
     <div class="grid3" style="margin:16px 0"><div class="panel"><div class="statnum">4</div><div class="statlabel">Connected business missions</div></div><div class="panel"><div class="statnum">25</div><div class="statlabel">Actual state-checked admin steps</div></div><div class="panel"><div class="statnum">${mastered}/4</div><div class="statlabel">Independent simulated missions plus reasoning</div></div></div>
     <div class="grid2">${V12_MISSIONS.map(m=>{const a=get(m.id),results=a?all(m,a):[],n=results.filter(x=>x.ok).length;return `<div class="panel"><div class="eyebrow">${esc(m.domain)} · ${m.minutes} min</div><h3>${esc(m.title)}</h3><p>${esc(m.scenario)}</p><p class="small muted"><b>Why:</b> ${esc(m.why)}</p>
@@ -188,7 +190,7 @@
     </div>`;
   }
   function quizView(m,a){
-    const allOk=a.results?.every(x=>x.ok),questions=m.questions;
+    const allOk=stillValid(m,a),questions=m.questions;
     return `<div class="panel" style="margin-top:17px"><div class="eyebrow">TROUBLESHOOT AND MASTER · TWO SEPARATE QUESTIONS</div><h3>Show you understand the cause, not only the clicks</h3><p>Answer both cases. A correct configuration and correct reasoning are recorded separately.</p>
     ${questions.map((q,idx)=>{const k=a.questions[idx],order=a.orders?.[idx]||[...q.options.map((_,i)=>i)];
       return `<div style="padding:13px 0;border-bottom:1px solid #d6e1ec"><p><b>${idx+1}. ${esc(q.q)}</b></p><form id="v12-quiz" data-id="${m.id}" data-index="${idx}">
@@ -201,16 +203,16 @@
   }
   function mission(m){
     const a=get(m.id);if(!a)return `<div class="page v12-main">${css}<button class="btn xs" data-route="v12/missions">← All missions</button><h1>${esc(m.title)}</h1><p>${esc(m.scenario)}</p><button class="btn primary" data-action="v12-start" data-id="${m.id}" data-mode="guided">Start guided learning →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="practice">Start Practice mode (optional hints) →</button><button class="btn" data-action="v12-start" data-id="${m.id}" data-mode="exam">Start independent attempt →</button></div>`;
-    const completed=all(m,a),n=completed.filter(x=>x.ok).length,mode=a.mode;
+    const completed=all(m,a),n=completed.filter(x=>x.ok).length,mode=a.mode,currentPass=stillValid(m,a);
     return `<div class="page v12-main">${css}<button class="btn xs" data-route="v12/missions">← All missions</button><div class="eyebrow" style="margin-top:16px">${esc(m.domain)} · ${mode==="guided"?"GUIDED":mode==="practice"?"PRACTICE":"INDEPENDENT"} · ATTEMPT ${esc(a.code)}</div><h1>${esc(m.title)}</h1>
       <div class="v12-banner"><h3>Business requirement</h3><p>${esc(m.scenario)}</p><p class="small"><b>Why this configuration exists:</b> ${esc(m.why)}</p></div>
       ${namesBox(m,a)}
       <div class="panel" style="margin:14px 0"><div class="flex between wrap"><b>${n} of ${m.steps.length} fictional requirements currently satisfied</b><span class="pill">${esc(mode.toUpperCase())}</span></div>
       <div class="v12-steps" aria-label="Administrative mission steps">${m.steps.map((s,i)=>`<button data-action="v12-goto" data-id="${m.id}" data-index="${i}" class="${completed[i].ok?"complete":""} ${a.step===i?"current":""}" aria-label="Step ${i+1}: ${esc(s.title)}, ${completed[i].ok?"satisfied":"pending"}">${completed[i].ok?"✓":i+1}</button>`).join("")}</div>
       <p class="small muted">Green means the current fictional tenant meets the modeled requirement, regardless of whether this button was previously clicked. The actual state is rechecked after every configuration change.</p></div>
-      ${a.submitted?`<div class="${a.passed?"v12-evidence":"v12-errors"}"><h3>${a.passed?"Configuration check passed":"Configuration check needs more work"}</h3><p>${n}/${m.steps.length} of the expected fictional state conditions are currently met.</p>
-       ${a.results.map((r,i)=>`<details style="margin:7px 0"><summary>${r.ok?"✓":"✕"} Step ${i+1}: ${esc(m.steps[i].title)}</summary><p>${esc(r.reason)}</p><p>Observed: ${esc(r.actual)}</p>${m.steps[i].path?`<p><b>Expected:</b> ${esc(m.steps[i].expected)}</p><p><b>Common mistake:</b> ${esc(m.steps[i].pitfall)}</p><p><b>Recovery:</b> ${esc(m.steps[i].recovery)}</p>`:""}</details>`).join("")}
-       ${!a.passed?`<button class="btn" data-action="v12-reopen" data-id="${m.id}">Continue correcting the configuration →</button>`:""}</div>${quizView(m,a)}`:
+      ${a.submitted?`<div class="${currentPass?"v12-evidence":"v12-errors"}"><h3>${currentPass?"Configuration currently meets the limited requirements":"Current configuration no longer meets every requirement"}</h3><p class="small">Original submission: ${a.passed?"passed":"incomplete"}; current state: ${currentPass?"all modeled checks still satisfied":"one or more checks need repair"}.</p><p>${n}/${m.steps.length} of the expected fictional state conditions are currently met.</p>
+       ${completed.map((r,i)=>`<details style="margin:7px 0"><summary>${r.ok?"✓":"✕"} Step ${i+1}: ${esc(m.steps[i].title)}</summary><p>${esc(r.reason)}</p><p>Observed: ${esc(r.actual)}</p><p>At submission: ${a.results?.[i]?.ok?"met":"not met"}; now: ${r.ok?"met":"not met"}.</p>${m.steps[i].path?`<p><b>Expected:</b> ${esc(m.steps[i].expected)}</p><p><b>Common mistake:</b> ${esc(m.steps[i].pitfall)}</p><p><b>Recovery:</b> ${esc(m.steps[i].recovery)}</p>`:""}</details>`).join("")}
+       ${!currentPass?`<button class="btn" data-action="v12-reopen" data-id="${m.id}">Continue correcting the configuration →</button>`:""}</div>${quizView(m,a)}`:
         `<div class="v12-layout"><div>${stepContent(m,a)}</div><aside class="v12-side"><div class="v12-coach"><b>${mode==="guided"?"Your instructor":mode==="practice"?"Independent practice with optional hints":"Independent exam assessment"}</b>
           <p>${mode==="guided"?"I will show the target screen, the exact action and why the setting matters. You must perform it. Use Check configuration before moving on.":mode==="practice"?"Practice using the business requirement. Reveal a hint only when needed. Your fictional configuration is checked just like the other modes.":"Use the business requirement, your knowledge and the fictional console. I will not reveal the expected configuration until you submit."}</p>
           <p class="small">The available controls are a simplified educational replica; real tenant validations and licenses vary.</p>
@@ -305,5 +307,5 @@
       event.preventDefault();state().notes[form.dataset.id]=String(new FormData(form).get("notes")||"").slice(0,5000);save();toast("Training evidence saved locally","good");
     }
   });
-  window.__V12_TESTS={getMission:find,getAttempt:get,stepResult,all,labels:labNames};
+  window.__V12_TESTS={getMission:find,getAttempt:get,stepResult,all,stillValid,labels:labNames};
 })();
