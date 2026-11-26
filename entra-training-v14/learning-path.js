@@ -53,16 +53,19 @@
   const total=modules.reduce((acc,m)=>acc+stats(m).studied,0),advanced=modules.reduce((acc,m)=>acc+stats(m).checked,0);
   const ids=modules.filter(m=>!stats(m).independent),next=ids[0]||modules[0],task=nextStep(next);
   const recentWrong=(db.v8?.quizHistory||[]).filter(x=>x.correct===false).slice(-3).map(x=>V8_LESSONS.find(y=>y.id===x.id)?.title).filter(Boolean);
+  const recentRoute=/^(v8\/learn\/|v11\/clinic\/|v12\/mission\/)/.test(db.v14.lastPage||"")?db.v14.lastPage:null;
+  const resume=recentRoute||(db.v12?.last&&db.v12.active?.[db.v12.last]?"v12/mission/"+db.v12.last:
+    db.v11?.current?"v11/clinic/"+db.v11.current:db.v8?.current?"v8/learn/"+db.v8.current:null);
   return `<div class="page v14-root">${css}${header()}
    <div class="grid3" style="margin:17px 0"><div class="panel"><div class="statnum">${total}/14</div><div class="statlabel">Foundational knowledge checks completed</div></div>
    <div class="panel"><div class="statnum">${advanced}/17</div><div class="statlabel">Advanced two-question checks passed</div></div>
    <div class="panel"><div class="statnum">${modules.filter(m=>stats(m).independent).length}/4</div><div class="statlabel">Independent fictional mission results</div></div></div>
    <div class="panel" style="margin-top:14px"><div class="eyebrow">RECOMMENDED NEXT STEP · SC-300</div><h3>${esc(next.name)}</h3><p>${esc(task.why)}</p>
-    <div class="flex wrap"><button class="btn primary" data-route="${task.route}">Continue learning →</button><button class="btn" data-route="v12/missions">Hands-on missions</button><button class="btn" data-route="v11/clinics">Advanced clinics</button></div></div>
+    <div class="flex wrap"><button class="btn primary" data-route="${task.route}">Follow the recommended next step →</button>${resume?`<button class="btn" data-route="${resume}">Resume the lesson or mission I last opened →</button>`:""}<button class="btn" data-route="v12/missions">Hands-on missions</button><button class="btn" data-route="v11/clinics">Advanced clinics</button></div></div>
    <h2 style="margin-top:22px">Four connected identity engineering domains</h2><div class="v14-topic-list">${modules.map(domainCard).join("")}</div>
    ${recentWrong.length?`<div class="panel" style="margin-top:17px"><h3>Review concepts previously missed</h3><p class="small muted">${recentWrong.map(esc).join(" · ")}</p><button class="btn" data-route="v8/progress">Open my error-based learning record →</button></div>`:""}
    <div class="v14-warning" style="margin-top:17px"><b>Measured objective coverage remains unverified.</b><p>This dashboard reports only learning activity and fictional state validation. The academy cannot call any SC-300, SC-900 or SC-100 domain fully exam-ready until the full official blueprint, independent practice and browser testing gates are met.</p></div>
-   <div class="flex wrap" style="margin-top:16px"><button class="btn" data-route="v7/skills">237 official objective records →</button><a class="btn" href="./real-labs.html">Real Microsoft practice tenant companion ↗</a><a class="btn" href="./qa-connected.html">Run functional browser self-tests ↗</a></div>
+   <div class="flex wrap" style="margin-top:16px"><button class="btn primary" data-action="export-progress">Back up my full learning and fictional tenant data ↓</button><button class="btn" data-route="notes">Import a full backup / view all study notes →</button><button class="btn" data-route="v7/skills">237 official objective records →</button><a class="btn" href="./real-labs.html">Real Microsoft practice tenant companion ↗</a><a class="btn" href="./qa-connected.html">Run functional browser self-tests ↗</a></div>
    ${footer()}</div>`;
  }
  function topicList(ids,course){
@@ -98,6 +101,9 @@
  shell=(content,where)=>oldShell(content,where).replace('<div class="sidefoot">',navigation+'<div class="sidefoot">');
  render=()=>{
   const r=current();
+  if(/^(v8\/learn\/|v11\/clinic\/|v12\/mission\/)/.test(r)){
+   db.v14.lastPage=r;db.v14.lastSeen=Date.now();save();
+  }
   if(r==="v14/path"||r.startsWith("v14/domain/")){
    const m=get(r.split("/").at(-1));
    $("root").innerHTML=shell(r==="v14/path"?home():m?domain(m):"<div class='page'><h1>Learning path not found</h1><button class='btn' data-route='v14/path'>Return to learning home</button></div>",r);
