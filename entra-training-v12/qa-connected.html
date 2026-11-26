@@ -8,7 +8,7 @@
 <script src="./advanced-exam-data.js" defer></script><script src="./advanced-exam-ui.js" defer></script><script src="./ca-masterclass-data.js" defer></script><script src="./ca-masterclass-ui.js" defer></script>
 <script src="./deep-learning-data.js" defer></script><script src="./learning-studio.js" defer></script><script src="./signin-decision-lab.js" defer></script><script src="./objective-learning-bridge.js" defer></script>
 <script src="./advanced-clinics-a.js" defer></script><script src="./advanced-clinics-b.js" defer></script><script src="./advanced-checkpoints.js" defer></script><script src="./advanced-clinics-ui.js" defer></script>
-<script src="./missions-data.js" defer></script><script src="./missions-ui.js" defer></script>
+<script src="./missions-data.js" defer></script><script src="./step-guidance.js" defer></script><script src="./missions-ui.js" defer></script><script src="./learning-path.js" defer></script>
 <script>
 window.addEventListener("DOMContentLoaded",function(){
  const result=[],originalHash=location.hash;let originalDb,originalSave;
@@ -138,6 +138,51 @@ window.addEventListener("DOMContentLoaded",function(){
       const p=__V12_TESTS.getAttempt("contractor"),v=__V12_TESTS.labels(__V12_TESTS.getMission("contractor"),p),g=db.groups.find(x=>x.name===v.GROUP),fin=db.apps.find(x=>x.name==="Finance Reports");
       fin.assignees=fin.assignees.filter(x=>x!==g.id);
       return __V12_TESTS.all(__V12_TESTS.getMission("contractor"),p).every(x=>x.ok);
+   });
+   test("All 25 guided steps include navigation, observation, expected result, error and recovery",()=>
+     V12_MISSIONS.every(m=>m.steps.every(x=>x.path?.length>35&&x.observe?.length>75&&x.expected?.length>65&&x.pitfall?.length>65&&x.recovery?.length>65)));
+   test("Guided mission shows annotated learning panel",()=>{
+      action("v12-start",{dataset:{id:"joiner",mode:"guided"}});
+      return document.getElementById("root").textContent.includes("WATCH · What you are working with");
+   });
+   test("Practice mode hides solution until user asks",()=>{
+      action("v12-start",{dataset:{id:"joiner",mode:"practice"}});
+      const t=document.getElementById("root").textContent;
+      return t.includes("Show a hint for this step")&&!t.includes("WATCH · What you are working with");
+   });
+   test("Practice hint reveals observation and expected result",()=>{
+      action("v12-hint",{dataset:{id:"joiner",index:"0"}});
+      return document.getElementById("root").textContent.includes("WATCH · What you are working with")&&__V12_TESTS.getAttempt("joiner").hiddenHint[0]===true;
+   });
+   test("Independent Exam mode suppresses guided instructions",()=>{
+      action("v12-start",{dataset:{id:"joiner",mode:"exam"}});
+      const t=document.getElementById("root").textContent;
+      return t.includes("INDEPENDENT ASSESSMENT")&&!t.includes("Show a hint for this step")&&!t.includes("WATCH · What you are working with");
+   });
+   test("Extra employee in dedicated group fails the onboarding condition",()=>{
+      const a=__V12_TESTS.getAttempt("joiner"),v=__V12_TESTS.labels(__V12_TESTS.getMission("joiner"),a),uid="qa-other";
+      db.users.push({id:uid,name:"Unauthorized Extra",email:"extra@training.test",type:"Member",role:"User",licenses:[]});
+      db.groups.push({id:"qa-g-"+a.code,name:v.GROUP,members:[uid]});
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("joiner"),a,2).ok===false;
+   });
+   test("Guest inherits denied Finance access through any other group",()=>{
+      const a=__V12_TESTS.getAttempt("contractor"),v=__V12_TESTS.labels(__V12_TESTS.getMission("contractor"),a);
+      const guest=db.users.find(x=>x.name===v.GUEST);if(!guest)return false;
+      db.groups.push({id:"qa-other-finance",name:"Legacy Finance Group",members:[guest.id]});
+      db.apps.find(x=>x.name==="Finance Reports").assignees.push("qa-other-finance");
+      return __V12_TESTS.stepResult(__V12_TESTS.getMission("contractor"),a,6).ok===false;
+   });
+   test("One SC-300 learning path links foundations, clinics and missions",()=>{
+      go("v14/path");return document.getElementById("root").textContent.includes("See it. Understand it. Do it.")
+       &&window.__V14_MODULES.length===4;
+   });
+   test("All fourteen foundational topics and seventeen clinics have a route",()=>{
+      const x=window.__V14_MODULES;
+      return x.reduce((n,m)=>n+m.lessons.length,0)===14&&x.reduce((n,m)=>n+m.clinics.length,0)===17;
+   });
+   test("Interactive security flow map responds to learner navigation",()=>{
+      go("v14/domain/identities");action("v14-node-next",{dataset:{id:"identities"}});
+      return db.v14.node.identities===1&&document.getElementById("root").textContent.includes("Membership groups related identities");
    });
    test("No mission check changes the fictional tenant as a side effect",()=>{
       const before=JSON.stringify({users:db.users,groups:db.groups,apps:db.apps,policies:db.policies,regs:db.regs,managed:db.managed,packages:db.packages,reviews:db.reviews,whatif:db.whatif});
