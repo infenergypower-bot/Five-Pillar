@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entra V6 - Automated QA</title><link rel="stylesheet" href="./styles.css"><style>body{background:#eef4fa}main{max-width:940px;margin:30px auto;padding:22px;background:white;border:1px solid #d9e4f2;border-radius:12px}.pass{color:#137346}.fail{color:#ad2b36}#root{position:absolute;left:-10000px;width:1200px;visibility:hidden}.testrow{padding:8px 3px;border-bottom:1px solid #e5edf6;font-size:13px}#results{max-height:60vh;overflow:auto}code{background:#eff3f9;padding:2px 5px}</style></head><body><main><h1>Identity Architect V6 — Browser QA</h1><p>Runs checks in a temporary copy of the fictional tenant state. Your existing local progress storage is not modified.</p><h2 id="summary">Running checks…</h2><div id="results" role="status" aria-live="polite"></div><p><a href="./">Return to academy</a></p></main><div id="root" aria-hidden="true"></div>
+<script src="./data.js" defer></script><script src="./core.js" defer></script><script src="./portal.js" defer></script><script src="./exam.js" defer></script><script src="./blueprint-data.js" defer></script><script src="./v6-content.js" defer></script><script src="./v6-upgrade.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded',function(){
+ const entries=[],originalDb=JSON.parse(JSON.stringify(db)),originalSave=save,originalRoute=location.hash;
+ save=function(){};db=JSON.parse(JSON.stringify(originalDb));
+ function test(name,cb){try{const res=cb();if(res===false)throw Error("assertion returned false");entries.push({name,ok:true})}catch(e){entries.push({name,ok:false,why:String(e&&e.message||e)})}}
+ function has(s){return document.getElementById("root").textContent.includes(s)}
+ test("V6 skill group inventory available",()=>V6_BLUEPRINT.length===44);
+ test("SC-300 detailed group count",()=>V6_BLUEPRINT.filter(x=>x.exam==="SC-300").length===16);
+ test("Current study releases recorded",()=>V6_BLUEPRINT.every(x=>/^2026-10/.test(x.release)));
+ test("V6 learning units loaded",()=>V6_UNITS.length===8);
+ test("V6 original case questions loaded",()=>V6_CASES.length>=18);
+ test("V5 original lessons preserved",()=>LESSONS.length>=35);
+ test("V5 guided missions preserved",()=>LABS.length>=25);
+ test("V6 root shell integrates training nav",()=>{go("v6/academy");return has("Deep learning academy")&&has("Learn it. Configure it. Prove it.")});
+ for(const exam of ["SC-300","SC-900","SC-100"]){test(exam+" objective filter",()=>{db.v6.blueprintTrack=exam;go("v6/blueprint");return has(exam+"")&&document.querySelectorAll(".matrixrow,.ptable tbody tr").length>=1});}
+ test("Blueprint export control visible",()=>{go("v6/blueprint");return !!document.querySelector('[data-action="v6-export-blueprint"]')});
+ for(const u of V6_UNITS){
+ test("Lesson page: "+u.id,()=>{go("v6/lesson/"+u.id);return has(u.title)&&document.getElementById("v6-unit-quiz")&&has("Guided walkthrough")});
+ test("Guided step progression: "+u.id,()=>{db.v6.steps[u.id]=0;action("v6-next",{dataset:{id:u.id}});return db.v6.steps[u.id]===1});
+ }
+ const names=PORTAL_ITEMS.map(x=>x[0]);
+ for(const p of names){test("Portal route: "+p,()=>{go("portal/"+p);return !!document.getElementById("portalContent")&&has("Practice tenant")});}
+ test("User detail route",()=>{go("portal/user/u1");return has("Priya Shah")});
+ test("Group detail route",()=>{go("portal/group/gr0");return has("All Staff")});
+ test("Policy detail route",()=>{go("portal/policy/p0");return has("Block legacy authentication")});
+ test("Conditional Access validation rejects unchanged tenant",()=>{const u=V6_UNITS.find(x=>x.id==="conditional");return !db.v6.labs[u.id]&&!db.policies.some(x=>x.name==="Finance MFA Pilot")});
+ test("Simulated assignment is state-verified",()=>{db.users.push({id:"u999",name:"QA trainee",type:"Member",email:"qa-training@contoso-training.test",role:"User",licenses:[]});db.groups.push({id:"g999",name:"Finance Pilot",members:["u999"]});go("v6/lesson/identity");action("v6-check-lab",{dataset:{id:"identity"}});return db.v6.labs.identity===true});
+ test("Conditional Access report-only state verification",()=>{db.policies.push({id:"p999",name:"Finance MFA Pilot",group:"Finance Pilot",app:"Finance Reports",control:"Require MFA",state:"Report-only"});go("v6/lesson/conditional");action("v6-check-lab",{dataset:{id:"conditional"}});return db.v6.labs.conditional===true});
+ test("Knowledge check validates correct answer",()=>{const u=V6_UNITS.find(x=>x.id==="identity");go("v6/lesson/identity");const form=document.querySelector("#v6-unit-quiz");const radio=form.querySelector('input[value="'+u.quiz.answer+'"]');radio.checked=true;form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));return db.v6.quiz.identity===true});
+ test("V6 case practice starts",()=>{action("v6-start-cases",{dataset:{id:"exam"}});return db.v6.active.ids.length===V6_CASES.length&&!db.v6.active.submitted});
+ test("V6 choice order preserved per question",()=>{const a=db.v6.active,id=a.ids[a.at],order=a.orders[id];return order.length===4&&new Set(order).size===4});
+ test("V6 answers saved",()=>{const c=document.querySelector('input[name="v6case"]');c.checked=true;action("v6-case-save",{});return Object.keys(db.v6.active.answer).length===1});
+ test("V6 case advances",()=>{action("v6-case-next",{});return db.v6.active.at===1});
+ test("Readiness dashboard renders",()=>{go("v6/readiness");return has("NOT YET EXAM-READY")});
+ db=originalDb;save=originalSave;history.replaceState(null,"",location.pathname+location.search+(originalRoute||""));
+ const passed=entries.filter(x=>x.ok).length,failed=entries.filter(x=>!x.ok).length;
+ document.getElementById("summary").textContent=passed+" passed / "+failed+" failed / "+entries.length+" total";
+ document.getElementById("summary").className=failed?"fail":"pass";
+ document.getElementById("results").innerHTML=entries.map(x=>'<div class="testrow '+(x.ok?"pass":"fail")+'">'+(x.ok?"✓ ":"✕ ")+x.name+(x.why?" — "+x.why.replace(/</g,"&lt;"):"")+'</div>').join("");
+ window.__V6_QA_REPORT={passed,failed,total:entries.length,failures:entries.filter(x=>!x.ok)};
+});
+</script></body></html>
