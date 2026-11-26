@@ -20,6 +20,18 @@
  .clinic-flow button{background:var(--surface,#fff);border:1px solid #c4d7e2;border-radius:12px;padding:12px 7px;min-height:84px;color:inherit;cursor:pointer;font-size:13px;line-height:1.35}
  .clinic-flow button.active{background:#dcf2fb;color:#0e425d;outline:2px solid #267fa6}
  .clinic-visual{border-left:4px solid #287fa9;padding:16px;background:#eef8fc;color:#183f59;border-radius:8px;min-height:110px}
+ .clinic-console{border:1px solid #bed5e5;border-radius:13px;overflow:hidden;display:grid;grid-template-columns:195px minmax(0,1fr);background:#fff;color:#23384e;margin:16px 0}
+ .clinic-console-nav{background:#eaf1f7;border-right:1px solid #c2d7e5;padding:15px 12px}
+ .clinic-console-nav .clinic-navtitle{font-weight:800;color:#173b57;display:block;margin:0 0 12px;font-size:13px}
+ .clinic-console-nav button{display:block;width:100%;font-size:12px;color:#244966;border:0;border-radius:7px;background:transparent;text-align:left;padding:12px 9px;cursor:pointer}
+ .clinic-console-nav button.active,.clinic-console-nav button:hover{background:#d6e8f4;font-weight:700}
+ .clinic-console-body{padding:17px;min-width:0}
+ .clinic-console-body .clinic-crumb{font-size:11px;color:#647a90;overflow-wrap:anywhere;margin:0 0 12px}
+ .clinic-console-settings{display:grid;gap:6px}
+ .clinic-console-settings button{border:1px solid #d9e4ee;background:#f8fbff;color:#1f3d56;text-align:left;padding:12px;border-radius:8px;cursor:pointer;display:flex;gap:11px;align-items:center}
+ .clinic-console-settings button.selected{border:2px solid #187ca8;background:#e5f5fe;font-weight:700}
+ .clinic-console-settings span{display:inline-grid;place-items:center;width:26px;height:26px;min-width:26px;border-radius:7px;background:#e0ecf5;font-weight:700}
+ @media(max-width:760px){.clinic-console{grid-template-columns:1fr}.clinic-console-nav{border-right:0;border-bottom:1px solid #c2d7e5}.clinic-console-nav button{display:inline-block;width:auto;margin-right:4px}}
  .clinic-sequence{display:flex;flex-wrap:wrap;gap:7px}.clinic-sequence span{font-size:12px;padding:6px 10px;border-radius:99px;background:var(--surface,#fff);border:1px solid #c6d9e6}
  .clinic-sequence span.active{background:#225a8c;color:white}
  .clinic-coach{border:2px solid #267ba6;border-radius:14px;background:#eaf5fc;color:#13344f;padding:18px;margin:0 0 17px}
@@ -93,7 +105,22 @@
  }
  function stage(c,i){
   const n=c.visual[i];
-  return `<div class="clinic-visual" role="status"><h3>${esc(n[0])}</h3><p>${esc(n[1])}</p><p class="small" style="margin-top:14px">Stage ${i+1} of ${c.visual.length}. Select any stage to review that decision.</p></div>`;
+  return `<div class="clinic-console" role="region" aria-label="Annotated fictional administration screen">
+    <aside class="clinic-console-nav"><span class="clinic-navtitle">Identity practice console</span>
+      <button data-route="portal/overview">⌂ Overview</button>
+      <button data-route="portal/users">♙ Users and groups</button>
+      <button data-route="portal/policies">▦ Conditional Access</button>
+      <button data-route="portal/apps">◇ Enterprise applications</button>
+      <button class="active" data-route="${esc(c.route)}">◉ Related training screen</button>
+      <button data-route="portal/logs">▤ Sign-in &amp; audit logs</button>
+    </aside>
+    <div class="clinic-console-body"><p class="clinic-crumb">TRAINING SCREEN TOUR · ${esc(c.path)}</p>
+      <h3>${esc(c.topic)}</h3><p class="small muted">Illustrative layout, not a screenshot of Microsoft's service. Tap a setting below to see its function and why it matters.</p>
+      <div class="clinic-console-settings">${c.visual.map((p,k)=>`<button class="${k===i?"selected":""}" data-action="v11-node" data-id="${c.id}" data-index="${k}"><span>${k+1}</span><b>${esc(p[0])}</b></button>`).join("")}</div>
+      <div class="clinic-visual" role="status" style="margin-top:12px"><h3>${esc(n[0])}</h3><p>${esc(n[1])}</p>
+        <p class="small" style="margin-top:10px"><b>Why this setting matters:</b> ${esc(c.why)}</p></div>
+      <button class="btn primary" data-route="${esc(c.route)}" data-v11-open="${c.id}" style="margin-top:12px">Open the actual fictional admin controls →</button>
+    </div></div>`;
  }
  function chapter(c){
   S.current=c.id;const v=getView(c.id),i=Math.max(0,Math.min(v.stage||0,4)),step=Math.max(0,Math.min(v.step||0,3)),z=c.guided[step],q=S.quiz[c.id],a=S.attempts[c.id];
