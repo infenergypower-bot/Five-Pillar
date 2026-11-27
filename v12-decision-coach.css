@@ -1,0 +1,39 @@
+/* v12 Decision Coach: additive styles for existing four-stage practice wizards. */
+#recordform .dc-open{display:inline-flex;align-items:center;gap:4px;justify-content:flex-start;width:max-content;max-width:100%;background:transparent;border:0;color:#0b609e;font-size:12px;font-weight:750;line-height:1.35;padding:5px 2px;text-align:left;text-decoration:underline;text-underline-offset:3px;border-radius:4px}
+#recordform .dc-open:hover,#recordform .dc-open:focus-visible{color:#063e75;background:#e9f4ff}
+#recordform .dc-explain,#recordform .dc-decision{margin:20px 0 8px;padding:19px;border:1px solid #b5d3e6;background:#f5faff;border-radius:12px;box-shadow:0 5px 16px #1b48600d;grid-column:1/-1;min-width:0}
+#recordform .dc-heading{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+#recordform .dc-heading>span,#recordform .dc-kicker{font-size:10px;letter-spacing:.12em;color:#146a8f;font-weight:900;text-transform:uppercase}
+#recordform .dc-heading strong{font-size:17px;color:#172f47;line-height:1.4}
+#recordform .dc-selected{padding:12px 15px;background:#e4f4ff;border-left:3px solid #1d79b3;border-radius:7px;margin-bottom:13px}
+#recordform .dc-selected b{font-size:12px;color:#18557f}
+#recordform .dc-selected p{font-size:13px;color:#274d6d;line-height:1.55;margin:4px 0 0}
+#recordform .dc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#recordform .dc-grid article{background:#fff;padding:11px 13px;border:1px solid #d9e5ed;border-radius:8px;min-width:0}
+#recordform .dc-grid small{font-weight:850;font-size:10px;letter-spacing:.045em;color:#12679a}
+#recordform .dc-grid p{font-size:12px;color:#344f63;line-height:1.62;margin:6px 0 0}
+#recordform .dc-decision>p{font-size:13px;color:#416176;line-height:1.6}
+#recordform .dc-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:14px 0}
+#recordform .dc-stats span{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 6px;border-radius:8px;background:#e7f2fb;color:#385d77;font-size:11px}
+#recordform .dc-stats b{font-size:23px;color:#174b76}
+#recordform .dc-muted{color:#5f7484!important;font-size:11px!important}
+#recordform .dc-alerts{display:grid;gap:7px;margin:11px 0}
+#recordform .dc-alerts p{padding:9px 11px;border-radius:6px;border-left:3px solid #e0a646;background:#fff8eb;color:#715017;font-size:12px;margin:0}
+#recordform .dc-alerts p.warn{border-color:#c56155;background:#fef0ee;color:#8b3a33}
+#recordform .dc-alerts p.info{border-color:#4f91d2;background:#edf7ff;color:#2a608a}
+#recordform .dc-good{font-size:12px;color:#146444;background:#ecf9f1;padding:10px;border-radius:6px}
+#recordform .dc-quiz{background:white;border:1px solid #d4e6ed;border-radius:9px;padding:14px;margin-top:18px}
+#recordform .dc-quiz>b{font-size:14px;color:#19435e}
+#recordform .dc-quiz>p{font-size:13px;margin:8px 0}
+#recordform .dc-answers{display:grid;gap:8px}
+#recordform .dc-answers button{background:#fafcff;text-align:left;border:1px solid #c7d8e5;border-radius:7px;padding:11px 13px;color:#2b506e;font-size:12px;line-height:1.5}
+#recordform .dc-answers button:hover{border-color:#2478b0;background:#eaf5fe}
+#recordform .dc-answers button.selected{border:2px solid #16699c;background:#e3f2ff;font-weight:800}
+#recordform .dc-feedback{border-radius:6px;padding:10px!important;font-size:12px!important;line-height:1.5}
+#recordform .dc-feedback.right{background:#e5f7eb;color:#155f37}
+#recordform .dc-feedback.wrong{background:#fff3e8;color:#99500e}
+#recordform .dc-footer{border-top:1px solid #dce7ee;margin-top:15px;padding-top:11px;color:#557083;font-size:11px}
+#recordform .dc-footer a{font-weight:750;color:#075f9b}
+#recordform .dc-open:focus-visible,#recordform .dc-answers button:focus-visible{outline:3px solid #76b5ed;outline-offset:2px}
+@media(max-width:800px){#recordform .dc-grid{grid-template-columns:1fr}#recordform .dc-explain,#recordform .dc-decision{padding:14px}#recordform .dc-stats{gap:5px}#recordform .dc-stats span{font-size:10px}#recordform .dc-stats b{font-size:18px}}
+@media(prefers-reduced-motion:reduce){#recordform .dc-answers button{transition:none}}
