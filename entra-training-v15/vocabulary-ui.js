@@ -107,7 +107,7 @@
     <p><b>What can go wrong:</b> ${esc(a[3])}</p></div>`;
  }
  function termPage(e){
-  memory.last=e.id;
+  if(memory.last!==e.id){memory.last=e.id;save();}
   const nearby=entries.filter(x=>x.category===e.category&&x.id!==e.id).slice(Math.max(0,entries.filter(x=>x.category===e.category).indexOf(e)-2),Math.max(0,entries.filter(x=>x.category===e.category).indexOf(e)-2)+4).slice(0,3);
   const paired=flows.filter(f=>f.terms.includes(e.id));
   const related=Object.entries(preferred).filter(([,ids])=>ids.includes(e.id)).slice(0,4);
@@ -198,7 +198,18 @@
   }
   if(route.startsWith("v8/learn/")){
     const id=route.split("/").at(-1),termList=preferred[id]||[];
-    const host=root.querySelector(".v8-terms")?.closest(".panel");
+    const vocabulary=root.querySelector(".v8-terms");
+    if(vocabulary&&!vocabulary.dataset.v15Upgraded){
+      vocabulary.dataset.v15Upgraded="true";
+      vocabulary.innerHTML=termList.filter(t=>get(t)).map(t=>{
+        const e=get(t);
+        return `<article class="v15-item"><h4>${esc(e.term)}</h4>
+           <p><b>What:</b> ${esc(e.definition)}</p><p><b>What it does:</b> ${esc(e.does)}</p>
+           <p><b>Why:</b> ${esc(e.why)}</p><p><b>Micro detail:</b> ${esc(e.micro)}</p>
+           <button class="btn xs" data-route="${link(e.id)}">Why, when, how & failure modes →</button></article>`;
+      }).join("");
+    }
+    const host=vocabulary?.closest(".panel");
     if(host&&!host.querySelector("[data-v15-lesson]")){
       const el=document.createElement("div");el.dataset.v15Lesson="true";el.className="v15-lesson-block";
       el.innerHTML=`<div class="v15-decision" style="margin-top:16px"><h3>GO DEEPER · Every term from microscopic detail to architecture</h3>
@@ -208,6 +219,9 @@
       host.appendChild(el);
     }
   }
+ }
+ if(document.head&&typeof document.head.insertAdjacentHTML==="function"&&!document.getElementById("v15-global-style")){
+    document.head.insertAdjacentHTML("beforeend",css.replace("<style>",'<style id="v15-global-style">'));
  }
  const navigation='<div class="sectioncap">Terminology · every detail explained</div><button class="navitem" data-route="v15/vocabulary"><span class="navicon">◎</span>Vocabulary Microscope</button><button class="navitem" data-route="v15/systems"><span class="navicon">⤳</span>Visual System Stories</button>';
  shell=(content,where)=>oldShell(content,where).replace('<div class="sidefoot">',navigation+'<div class="sidefoot">');
