@@ -61,7 +61,7 @@
   return `<div class="page v14-root">${css}${header()}
    <section class="panel" style="margin-top:16px;border:2px solid #3c8da5">
     <div class="eyebrow">START BEFORE THE TECHNICAL JARGON</div><h2>Vocabulary Microscope — what, why, when, how, from one field to the whole company</h2>
-    <p>Before you configure users, groups, MFA or Conditional Access, learn exactly what those terms mean. Study 131 multi-layer definitions, open 15 annotated field examples, and follow 12 interactive system stories. Then return to these lessons with tap-to-define words in context.</p>
+    <p>Before you configure users, groups, MFA or Conditional Access, learn exactly what those terms mean. Study 157 multi-layer definitions, open 15 annotated field examples, and follow 13 interactive system stories. Then return to these lessons with tap-to-define words in context.</p>
     <div class="flex wrap"><button class="btn primary" data-route="v15/vocabulary">Explain the vocabulary from zero →</button>
     <button class="btn" data-route="v15/systems">Show how the systems fit together →</button></div></section>
    <div class="grid3" style="margin:17px 0"><div class="panel"><div class="statnum">${total}/14</div><div class="statlabel">Foundational knowledge checks completed</div></div>
