@@ -1,0 +1,52 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vocabulary Microscope · Device QA</title>
+<style>body{font:16px system-ui,-apple-system,sans-serif;background:#edf3f8;color:#18364c;padding:14px}.test{background:#fff;border:1px solid #c4d7e5;border-radius:14px;margin:10px auto;padding:18px;max-width:940px}.pass{color:#196b3b}.fail{color:#a21f35}#root{position:absolute;left:-99999px;width:1100px;top:0;visibility:hidden}#v15-peek{visibility:hidden}</style></head><body>
+<main class="test"><h1>Technical Vocabulary — on-device interaction tests</h1><p>This tests the 131-word microscope, real DOM navigation, touch-compatible buttons and saved view state in an isolated fictional browser copy. It does not change your actual academy study progress or connect to Microsoft.</p>
+<h2 id="summary" aria-live="polite">Running tests…</h2><div id="checks"></div>
+<p><a href="./#/v15/vocabulary">Return to the academy's vocabulary explorer</a></p><p><small>These checks run in the browser you opened this page in. A passing result does not prove every page or real Microsoft operation works.</small></p></main><div id="root" aria-hidden="true"></div>
+<script>
+let V8_LESSONS=[],db={},lastRenderedHash="",render=()=>{},action=()=>{},shell=x=>x;
+const $=id=>document.getElementById(id);
+function current(){return location.hash.replace(/^#\//,"");}
+function safe(x){return String(x??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function footer(){return "";}
+function save(){}
+function toast(){}
+function go(route){location.hash="#/"+route;render();}
+render=function(){if(current().startsWith("v8/learn/")){$("root").innerHTML='<div class="v8-frame"><div class="panel"><p>Conditional Access, MFA, authorization and authentication are four different technical concepts.</p><div class="v8-terms">Legacy short definitions</div></div></div>';}};
+document.addEventListener("click",function(e){const el=e.target.closest("[data-route],[data-action]");if(!el)return;e.preventDefault();if(el.dataset.route)go(el.dataset.route);else action(el.dataset.action,el);});
+</script>
+<script src="./vocab-directory.js" defer></script><script src="./vocab-auth.js" defer></script><script src="./vocab-apps.js" defer></script><script src="./vocab-governance.js" defer></script><script src="./field-anatomy.js" defer></script><script src="./vocabulary-ui.js" defer></script>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+ const tests=[];
+ function test(name,fn){try{if(fn()!==true)throw Error("Expected change not observed");tests.push({name,pass:true});}catch(e){tests.push({name,pass:false,error:String(e.message||e)});}}
+ try{
+ const e=window.__V15_TESTS;
+ test("131 real, separately defined technical concepts loaded",()=>e.entries.length===131);
+ test("Every concept has complete what/why/when/how/micro/macro/troubleshooting",()=>e.entries.every(x=>[x.definition,x.does,x.why,x.when,x.how,x.micro,x.macro,x.failure].every(t=>t.length>=15)));
+ test("Twelve clickable system sequences and fifteen annotated field examples",()=>e.flows.length===12&&e.anatomy.length===15);
+ test("All system steps point to actual vocabulary entries",()=>e.flows.every(f=>f.terms.every(t=>!!e.get(t))));
+ go("v15/vocabulary");
+ test("Full searchable vocabulary homepage renders",()=>$("root").textContent.includes("131 distinct guided terms")&&$("root").querySelectorAll('[data-v15-card]').length===131);
+ const input=$("v15-query");input.value="passkey";input.dispatchEvent(new Event("input",{bubbles:true}));
+ test("Live search filters the visible vocabulary cards",()=>$("root").querySelectorAll('[data-v15-card]').length>0&&$("root").querySelectorAll('[data-v15-card]').length<131);
+ go("v15/term/passkey");
+ test("Deep term page shows distinct what/why/when/how lenses",()=>$("root").textContent.includes("WHY DOES IT EXIST")&&$("root").textContent.includes("WHEN WOULD I USE IT"));
+ test("Passkey shows a field-by-field microscopic example",()=>$("root").textContent.includes("UNDER THE MICROSCOPE")&&!!$("root").querySelector('[data-action="v15-part"]'));
+ const p=$("root").querySelector('[data-action="v15-part"][data-index="1"]');p.click();
+ test("Clicking a microscopic field updates the selected explanation",()=>db.v15.anatomy.passkey===1);
+ go("v15/system/signin");
+ const btn=$("root").querySelector('[data-action="v15-flow-next"]');btn.click();
+ test("System flow next stage changes live browser state",()=>db.v15.flowProgress.signin===1);
+ go("v8/learn/tenant-boundary");
+ test("Legacy one-line glossaries are replaced with detailed term explanations",()=>$("root").textContent.includes("What it does:")&&$("root").textContent.includes("Micro detail:"));
+ const tap=$("root").querySelector('[data-action="v15-peek"]');if(tap)tap.click();
+ test("In-lesson vocabulary taps open accessible explanation dialogs",()=>!!document.querySelector('#v15-peek [role="dialog"]'));
+ test("Study steps and explanations are not auto-counted as a Microsoft exam pass",()=>!$("root").textContent.includes("100% certified"));
+ }catch(e){tests.push({name:"Uncaught script or browser error",pass:false,error:String(e.message||e)});}
+ const n=tests.filter(x=>x.pass).length,failed=tests.length-n;
+ $("summary").className=failed?"fail":"pass";$("summary").textContent=n+" passed / "+failed+" failed / "+tests.length+" checks";
+ $("checks").innerHTML=tests.map(t=>'<div class="'+(t.pass?"pass":"fail")+'" style="padding:7px;border-bottom:1px solid #ddd">'+(t.pass?"✓ ":"✕ ")+t.name+(t.error?": "+safe(t.error):"")+"</div>").join("");
+ window.__V15_BROWSER_QA={passed:n,failed,tests};
+});
+</script></body></html>
