@@ -559,3 +559,39 @@ document.addEventListener('submit',ev=>{if(ev.target.hasAttribute('data-ol-termi
 window.MD102OfficialLabs={groups,exercises,support,commands,allowed,progress,overview,showExercise,showSupport,store};
 store();render();
 })();
+
+
+/* v15.1: Explicit exam cross-reference and existing applied-practice links. */
+(function officialCrosswalk(){
+'use strict';
+const api=window.MD102OfficialLabs,objectives=window.MD102_OBJECTIVES||[],paths=window.MD102_V7_PATHS||[];
+if(!api||!objectives.length)return;
+const map={
+"1.1":["INF-004"],"1.2":["INF-011","INF-012"],"1.3":["INF-001","INF-003","INF-017"],"1.4":["INF-005","INF-006","INF-008","MAN-023"],"1.5":["INF-002","INF-006"],"1.6":["MAN-020","MAN-022"],
+"2.1":["MAN-027"],"2.2":["INF-014","INF-015"],"2.3":["MAN-027"],"2.4":["SEC-054","SEC-055","SEC-060"],"2.5":["OPE-079","OPE-080"],"2.6":["MAN-045","OPE-083"],
+"3.1":["APP-062"],"3.2":["APP-061","APP-062","APP-069"],"3.3":["APP-064","APP-065"],"3.4":["MAN-034"],"3.5":["APP-062"],"3.6":["APP-070","APP-071"],"3.7":["APP-069"],
+"4.1":["SEC-051","SEC-052"],"4.2":["SEC-046","SEC-048","SEC-049","SEC-050"],"4.3":["SEC-047"],"4.4":["MAN-037"],"4.5":["MAN-036"],"4.6":["INF-014","SEC-051"],
+"5.1":["OPE-073"],"5.2":["OPE-080"],"5.3":["INF-011","INF-012"],"5.4":["OPE-082","OPE-083"],"5.5":["OPE-078"],
+"6.1":["MAN-033"],"6.2":["MAN-035"],"6.3":["MAN-038","MAN-044","OPE-081"],"6.4":["MAN-025"],"6.5":[]
+};
+const supplementary={
+0:["INF-015"],1:["INF-011","OPE-082"],2:["INF-011","INF-004"],3:["INF-015","INF-011"],4:["OPE-073"],5:["OPE-073"],6:["OPE-073"],7:["APP-061","APP-062"],8:["SEC-051","SEC-052"],9:["MAN-044"],10:["APP-070"],11:[],12:["MAN-025"]
+};
+const consoles={
+"1.1":["groups","groups"],"1.2":["groups","roles"],"1.3":["identity","enrollment"],"1.4":["autopilot","enrollment"],"1.5":["identity","devices"],"1.6":["autopilot","autopilot"],
+"2.1":["compliance","configuration"],"2.2":["compliance","compliance"],"2.3":["compliance","configuration"],"2.4":["updates","updates"],"2.5":["analytics","reports"],"2.6":["analytics","troubleshoot"],
+"3.1":["apps","apps"],"3.2":["apps","apps"],"3.3":["apps","apps"],"3.4":["apps","suite"],"3.5":["apps","apps"],"3.6":["apps","apps"],"3.7":["apps","apps"],
+"4.1":["security","security"],"4.2":["security","security"],"4.3":["security","security"],"4.4":[null,"suite"],"4.5":[null,"suite"],"4.6":["security","reports"],
+"5.1":["automation","scripts"],"5.2":["automation","scripts"],"5.3":["groups","roles"],"5.4":["analytics","reports"],"5.5":["analytics","reports"],
+"6.1":[null,"suite"],"6.2":[null,"suite"],"6.3":["analytics","reports"],"6.4":[null,"suite"],"6.5":[null,"devices"]
+};
+const H=s=>esc(String(s??''));
+const link=(r,t)=>`<button class="btn small" data-route="${H(r)}">${H(t)}</button>`;
+const official="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/md-102";
+const rows=()=>objectives.map(o=>({o,ex:Object.keys(map).filter(id=>map[id].includes(o.id)),supp:Object.keys(supplementary).filter(i=>supplementary[i].includes(o.id)),deep:paths.filter(p=>p.objectiveIds?.includes(o.id))}));
+function summary(){let r=rows();return {objectives:r.length,linked:r.filter(x=>x.ex.length).length,supplementOnly:r.filter(x=>!x.ex.length&&x.supp.length).length,otherTraining:r.filter(x=>!x.ex.length&&!x.supp.length).length}}
+function matrix(){let s=summary();return `<section class="card"><h1>October 27, 2026 MD-102 objective cross-reference</h1><p>Every existing exam objective is listed, with its original academy lesson, related official-lab companion checkpoint(s), and existing deeper practice where applicable. A link means the topic is reinforced, <b>not</b> fully covered or independently mastered. This is a hand-curated topical cross-reference, not an assertion that the Microsoft lab alone teaches every part of that objective.</p><p><b>${s.objectives}</b> skills · <b>${s.linked}</b> linked to one or more new checkpoints · <b>${s.supplementOnly}</b> linked only to a new supporting study · <b>${s.otherTraining}</b> rely on other academy training and Microsoft Learn.</p><p>${link('official-labs','Back to lab sequence')} ${link('objectives','Existing skill coverage and evidence tracker')} <a href="${official}" target="_blank" rel="noopener noreferrer">Current exam objectives and Microsoft practice assessment ↗</a></p></section>${[...new Set(objectives.map(o=>o.domain))].map(domain=>`<section class="card section"><h2>${H(domain)}</h2>${rows().filter(x=>x.o.domain===domain).map(({o,ex,supp,deep})=>`<div class="concept"><b>${H(o.id)} · ${H(o.title)}</b><p>${link('lesson:'+o.lessonId,'Lesson '+o.lessonId)} ${ex.length?ex.map(id=>link('official-lab:'+id,id+(api.store().done[id]?' ✓':'')+' checkpoint')).join(' '):'<span class="muted">No directly linked new MD-102 lab checkpoint; use the existing training and official guide.</span>'}</p>${supp.length?`<p>${supp.map(i=>link('official-support:'+i,api.support[i][1])).join(' ')}</p>`:''}${deep.length?`<p>${deep.map(p=>link('deep:'+p.id,'Existing applied pathway: '+p.title)).join(' ')}</p>`:''}<p class="small muted">Objective status remains independent of these practice links. A linked checkpoint does not automatically mark an entire objective complete.</p></div>`).join('')}</section>`).join('')}`}
+let previous=render;render=function(){let r=String(state.route||'');if(r==='official-matrix'){$('sidenav').innerHTML=navSidebar();$('bladenav').innerHTML=modernBladeNav();$('coachroot').innerHTML='';$('content').innerHTML=matrix();return}previous();let c=$('content');if(!c)return;if(r==='official-labs'||r==='curriculum'||r==='objectives')c.insertAdjacentHTML('afterbegin',`<section class="card"><h2>Exam-to-practice cross-reference</h2><p>${summary().objectives} current skill statements mapped to their existing lessons and related training. Check which topics are reinforced by Microsoft labs and which need additional practice.</p>${link('official-matrix','Open full objective matrix')}</section>`);if(r.startsWith('official-lab:')){let id=r.slice(13),x=api.exercises.find(z=>z.id===id);if(!x||!api.allowed(id))return;let [deep,console]=consoles[id]||[];c.insertAdjacentHTML('beforeend',`<section class="card section"><h2>Continue in the existing practice environment</h2><p>Use these links to study or perform the actual simulated-console exercises already present in Northstar. The official companion records decision evidence separately; a correct answer does not create real or simulated console records automatically. Some advanced features are conceptual only.</p><p>${deep?link('deep:'+deep,'Existing applied pathway with evidence')+' ':''}${console?link(console,'Open related simulator screen')+' ':''}${link('performance','Independent workplace cases')}</p><p><b>Related October 2026 exam skills:</b> ${map[id]?.length?map[id].map(k=>H(k)).join(', '):'Supplemental scenario outside the direct objective list.'} ${link('official-matrix','See cross-reference')}</p></section>`)}};
+window.MD102OfficialCrosswalk={map,supplementary,consoles,rows,summary};
+render();
+})();
