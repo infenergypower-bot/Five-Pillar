@@ -45,7 +45,7 @@ function evidence(t,p){if(!p.started||!p.baseline)return {pass:false,category:'W
  }
  return {pass:checks.length>0&&checks.every(x=>x.pass),category:t.scope==='design'?'design-only':t.kind,checks,remedy:rec?(t.scope==='design'?'Review prerequisites and actual permissions in an authorized real tenant; this is only simulated design evidence.':`Open a matching enrolled Windows device in ${t.syncGroup}, select Sync device and examine its policy status. Return here to recheck.`):`Open ${t.route}, create the specified record using the four-stage wizard, then come back to this ticket.`};
 }
-function lastIndependent(p){return [...p.attempts].reverse().find(a=>a.mode==='independent'&&a.passed&&a.studied)}
+function lastIndependent(p){const a=[...p.attempts].reverse().find(x=>x.mode==='independent');return a&&a.passed&&a.studied?a:null}
 function status(t){let p=progress(t.id),ev=evidence(t,p),reasoning=!!lastIndependent(p);return {p,ev,reasoning,pass:reasoning&&ev.pass,scope:t.scope==='design'?'Design checkpoint, not device-level proof':'Simulated task evidence'};}
 function stable(s){let x=2166136261;for(let i=0;i<s.length;i++)x=Math.imul(x^s.charCodeAt(i),16777619);return x>>>0}
 function choiceOrder(t,i){return [0,1,2,3].sort((a,b)=>stable(t.id+'-'+i+':'+a)-stable(t.id+'-'+i+':'+b))}
