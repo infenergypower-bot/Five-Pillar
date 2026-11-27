@@ -53,7 +53,7 @@
 
  if(termById.size!==entries.length)throw Error("Duplicate vocabulary term ID");
  const get=id=>termById.get(id);
- const alias={"CA":"conditional-access","PIM":"privileged-identity-management","UPN":"upn","MFA":"mfa","RBAC":"rbac","FIDO2":"fido2","TAP":"temporary-access-pass","OIDC":"openid-connect","SCIM":"scim-provisioning","OAuth":"oauth-2-0","JWT":"jwt","Graph":"microsoft-graph","AAL":"authentication-assurance-level","AU":"administrative-unit"};
+ const alias={"CA":"conditional-access","PIM":"privileged-identity-management","UPN":"upn","MFA":"mfa","RBAC":"rbac","FIDO2":"fido2","TAP":"temporary-access-pass","OIDC":"openid-connect","SCIM":"scim-provisioning","OAuth":"oauth-2-0","JWT":"jwt","Graph":"microsoft-graph","AAL":"authentication-assurance-level","AU":"administrative-unit","SSO":"single-sign-on","IdP":"identity-provider","B2B":"b2b-collaboration","API":"api","DNS":"dns","HTTPS":"https-and-tls"};
  const flows=[
   {id:"web",title:"Start at zero: one button click becomes an authorized API result",category:0,
     goal:"Learn the exact path from a browser through DNS, secure transport, an API request, authentication, authorization and a real server response.",
@@ -73,6 +73,22 @@
   {id:"evidence",title:"What really happened: one failure across multiple logs",category:3,goal:"Separate app sign-in, directory changes, API permissions and security analytics.",terms:["sign-in","audit-log","correlation-id","microsoft-graph","http-403","kql","microsoft-sentinel"],question:"No Sentinel event is found. Does that prove the sign-in never happened?",answer:"No. Verify ingestion, workspace, table, retention, permissions and time window before drawing that conclusion."},
   {id:"architecture",title:"The full organization: people, services, decisions and governance",category:3,goal:"Follow security from small object values to organization-wide identity architecture.",terms:["directory-object","tenant","identity-provider","conditional-access","resource-rbac","identity-governance","zero-trust","audit-evidence"],question:"Can any single policy checkbox deliver Zero Trust for an enterprise?",answer:"No. It requires coordinated authentication, authorization, device/data controls, monitoring, lifecycle and response."}
  ];
+ const atomicConcepts={
+  "tenant-boundary":["computer","software","identifier","attribute"],
+  "user-lifecycle":["attribute","boolean","identifier"],
+  "group-app-access":["identifier","attribute"],
+  "external-b2b":["domain-name","dns","https-and-tls"],
+  "hybrid-sync":["network","server","dns"],
+  "passwordless-recovery":["cryptography","public-key","private-key","digital-signature"],
+  "ca-policy":["boolean","request","response"],
+  "risk-and-logs":["request","response","identifier"],
+  "app-federation":["client","server","browser","http","url","digital-signature"],
+  "app-consent":["api","endpoint","request","response","json"],
+  "managed-workload":["private-key","public-key","https-and-tls"],
+  "governance-package":["identifier","boolean"],
+  "pim-operations":["boolean","identifier"],
+  "scim-monitoring":["json","api","endpoint","attribute"]
+ };
  const preferred={
   "tenant-boundary":["tenant","directory-object","object-id","rbac","administrative-unit","role-assignment","global-administrator","least-privilege"],
   "user-lifecycle":["member-user","upn","license","source-of-authority","soft-delete","session-revocation","joiner","leaver"],
@@ -89,6 +105,7 @@
   "pim-operations":["privileged-identity-management","eligible-role","role-activation","role-assignment","least-privilege"],
   "scim-monitoring":["scim-provisioning","attribute-mapping","audit-log","microsoft-sentinel","kql","deprovisioning"]
  };
+ Object.keys(atomicConcepts).forEach(id=>{preferred[id]=[...atomicConcepts[id],...(preferred[id]||[])];});
  db.v15=db.v15||{reviewed:{},needsReview:{},notes:{},last:null,category:"All",query:"",flowProgress:{}};
  db.v15.anatomy=db.v15.anatomy||{};
  const memory=db.v15;
@@ -212,9 +229,12 @@
   if(route.startsWith("v15/"))return;
   const root=document.querySelector(".v8-frame,.v11-frame,.v12-main,.v14-root,#portalContent");if(!root)return;
   const focus=route.startsWith("v8/learn/")?new Set(preferred[route.split("/").at(-1)]||[]):null;
-  const ordered=entries.filter(x=>!focus||focus.has(x.id)).sort((a,b)=>b.term.length-a.term.length);
-  const byName=new Map(ordered.map(x=>[x.term.toLowerCase(),x]));
-  const re=new RegExp("\\b("+ordered.map(x=>x.term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")\\b","gi");
+  const matched=entries.filter(x=>!focus||focus.has(x.id));
+  const names=[...matched.map(x=>[x.term.toLowerCase(),x]),
+    ...Object.entries(alias).map(([name,id])=>[name.toLowerCase(),get(id)]).filter(x=>x[1]&&(!focus||focus.has(x[1].id)))];
+  const byName=new Map(names);
+  const ordered=[...byName.keys()].sort((a,b)=>b.length-a.length);
+  const re=new RegExp("\\b("+ordered.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")\\b","gi");
   const nodes=[];
   for(const p of root.querySelectorAll("p,li")){
    if(p.closest(".v15"))continue;
