@@ -2,7 +2,7 @@
 (function auditPath(){
 'use strict';
 const m=window.MD102MasteryPath;if(!m)return;
-const VERSION='MASTERY-2026-11-27-R4',H=x=>esc(String(x??'')),B=(r,t)=>`<button class="btn" type="button" data-route="${H(r)}">${H(t)}</button>`;
+const VERSION='MASTERY-2026-11-27-R5',H=x=>esc(String(x??'')),B=(r,t)=>`<button class="btn" type="button" data-route="${H(r)}">${H(t)}</button>`;
 function verify(){
  const links=m.levels.map(l=>m.links(l)),out=[];
  const add=(name,actual,expected,notes='')=>out.push({name,actual,expected,pass:actual===expected,notes});
@@ -49,6 +49,10 @@ function verify(){
  add('Canonical objective missing/extra/duplicate count',oa.missing.length+oa.extra.length+oa.duplicates,0);
  add('Explicit objective prerequisite violations',oa.dependencyFailures.length,0);
  add('Objective gates installed',m.levels.flatMap(l=>m.requirements(l)).filter(r=>r.type==='Objective decisions').length,83);
+ const da=window.MD102DepthR5?.audit();
+ add('Individual technical workbook count',da?.count||0,83);
+ add('Workbook missing/duplicate/invalid entries',(da?da.missing.length+da.extra.length+da.duplicate+da.invalid.length:83),0);
+ add('Objective concept retrieval gates installed',m.levels.flatMap(l=>m.requirements(l)).filter(r=>r.type==='Objective concept retrieval').length,83);
  const seq=map('lessons');
  add('Autopilot follows core application deployment',seq.indexOf(7)>seq.indexOf(38),true);
  add('Final capstone is the final original lesson',seq.at(-1),26);
