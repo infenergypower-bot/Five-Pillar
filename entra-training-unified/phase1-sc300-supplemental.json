@@ -1,0 +1,241 @@
+{
+  "repository": "MicrosoftLearning/SC-300-Identity-and-Access-Administrator",
+  "pin": "53345303d69ef62e2f5707cf2f7bd1b969b29077",
+  "scope": "23 remaining supplemental blobs retrieved and exact Git hash verified on authorized desktop; 2 unique one-page policy PDF texts read; large CSV schema and fields reviewed, no row-level personal-looking data retained; full script inspected without execution; administrative files read and excluded. This is a supplemental file disposition pass, not exhaustive operation-level or legal qualification.",
+  "rows": [
+    {
+      "path": ".github/CONTRIBUTING.md",
+      "blobSha": "35b6033c219c325dc8795deeaba16a2b4fe90258",
+      "verified": true,
+      "decision": "exclude-maintenance",
+      "lab": null,
+      "reason": "Instructor repository contribution guidance, not identity instruction."
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE.md",
+      "blobSha": "4dd6247dace5e3d1d4f9ce30c8f3b986e996abba",
+      "verified": true,
+      "decision": "exclude-maintenance",
+      "lab": null,
+      "reason": "Issue submission form."
+    },
+    {
+      "path": ".github/PULL_REQUEST_TEMPLATE.md",
+      "blobSha": "a593e5653fdb62a3ac00a71f76f081ae6fa80d92",
+      "verified": true,
+      "decision": "exclude-maintenance",
+      "lab": null,
+      "reason": "Pull request form."
+    },
+    {
+      "path": ".github/cloudslice-bug.md",
+      "blobSha": "53ff564c5bf4c5a88d6b8ac574d8cb8d41266dd5",
+      "verified": true,
+      "decision": "exclude-maintenance",
+      "lab": null,
+      "reason": "Lab platform bug report template."
+    },
+    {
+      "path": ".github/lab-bug.md",
+      "blobSha": "4d4dfbfa19e867c076ec742651ce820cb502a2e2",
+      "verified": true,
+      "decision": "exclude-maintenance",
+      "lab": null,
+      "reason": "Lab instructions bug report template."
+    },
+    {
+      "path": ".gitignore",
+      "blobSha": "fa6c8c425a56c4754beaeded3b2204e3d4aa9521",
+      "verified": true,
+      "decision": "exclude-maintenance",
+      "lab": null,
+      "reason": "Git validation report ignore list."
+    },
+    {
+      "path": "Allfiles/Demos/readme.md",
+      "blobSha": "5a3bd9c67962aa6ea5dcd695b250fbd840b12a02",
+      "verified": true,
+      "decision": "exclude-placeholder",
+      "lab": null,
+      "reason": "Empty supplemental demo folder description."
+    },
+    {
+      "path": "Allfiles/Labs/Lab1/SC300BulkUser.csv",
+      "blobSha": "8f1ec84b3cb34c7856d32e396b7bd920a108133f",
+      "verified": true,
+      "decision": "supersede-and-adapt",
+      "lab": 1,
+      "reason": "Old template contains shared plaintext example credentials, incomplete usage locations, and domain placeholders. Teach schema, validation and least privilege using new fictional credential-free preview rows; current live template must be downloaded for real authorized use."
+    },
+    {
+      "path": "Allfiles/Labs/Lab2/SC-300-Lab_ContosoPrivacySample.pdf",
+      "blobSha": "b859df5d4070eb8ece133df45de8b132ca8c2a2b",
+      "verified": true,
+      "decision": "adapt-reference",
+      "lab": 2,
+      "reason": "One-page sample explicitly describes a privacy URL demonstration, not a real policy. Teach notice vs terms, contact, audience and authorization; no sample upload or legal advice."
+    },
+    {
+      "path": "Allfiles/Labs/Lab2/readme.md",
+      "blobSha": "6d82f574e951d047b614bd8098a09148779c6622",
+      "verified": true,
+      "decision": "exclude-placeholder",
+      "lab": null,
+      "reason": "Placeholder only."
+    },
+    {
+      "path": "Allfiles/Labs/Lab23/Contoso_TermsOfUse.pdf",
+      "blobSha": "49cba96fcbf8eafe07d4373aeccc19076ce294cd",
+      "verified": true,
+      "decision": "adapt-reference",
+      "lab": 23,
+      "reason": "One-page demonstration text identifying itself as Lab 26 sample; not a legal agreement. Teach document version, acceptance record, conditional access and reacceptance; never treat classroom sample as production policy."
+    },
+    {
+      "path": "Allfiles/Labs/Lab23/readme.txt",
+      "blobSha": "80a149886b8af703a23d3c11f90820e2566ec785",
+      "verified": true,
+      "decision": "exclude-placeholder",
+      "lab": null,
+      "reason": "Placeholder document."
+    },
+    {
+      "path": "Allfiles/Labs/Lab26/Contoso_TermsOfUse.pdf",
+      "blobSha": "49cba96fcbf8eafe07d4373aeccc19076ce294cd",
+      "verified": true,
+      "decision": "duplicate",
+      "lab": 23,
+      "reason": "Byte-identical to Lab23 PDF; use canonical Lab23 reference. Lab26 PIM is not a terms-of-use upload exercise."
+    },
+    {
+      "path": "Allfiles/Labs/Lab26/readme.txt",
+      "blobSha": "80a149886b8af703a23d3c11f90820e2566ec785",
+      "verified": true,
+      "decision": "duplicate",
+      "lab": null,
+      "reason": "Byte-identical Lab23 placeholder; no teaching content."
+    },
+    {
+      "path": "Allfiles/Labs/Lab7/CreateDemoUsers.csv",
+      "blobSha": "616f493f01ce08823b3f5f990878d8828bdc4d33",
+      "verified": true,
+      "decision": "exclude-data-adapt-schema",
+      "lab": 7,
+      "reason": "Source includes unnecessary personal-looking addresses, telephone numbers, dates of birth and passwords. Do not reproduce rows. Teach minimal synthetic identities, unique UPN, department, OU, source anchor and validation."
+    },
+    {
+      "path": "Allfiles/Labs/Lab7/CreateDemoUsers.ps1",
+      "blobSha": "a372e0b81f5f124bca1fbe857ab2cd320e31e039",
+      "verified": true,
+      "decision": "exclude-unsafe-adapt-concepts",
+      "lab": 7,
+      "reason": "Reject recursive OU deletion, disabling accidental-deletion protection, changing domain password policy, shared password, nonexpiring credentials, IT group nesting in Domain Admins, elevated host access, broad inventory logging and unscoped manager updates. Preserve OU/group/user relationship concepts in a read-only local fixture."
+    },
+    {
+      "path": "Allfiles/Labs/readme.md",
+      "blobSha": "160ccca27cf453e97d113974e487e056f9af68ca",
+      "verified": true,
+      "decision": "exclude-placeholder",
+      "lab": null,
+      "reason": "Folder description."
+    },
+    {
+      "path": "Allfiles/readme.md",
+      "blobSha": "03fab14a488d4054c1615bc4e69e4ec70ae1be37",
+      "verified": true,
+      "decision": "exclude-placeholder",
+      "lab": null,
+      "reason": "Folder description."
+    },
+    {
+      "path": "LICENSE",
+      "blobSha": "9ac2500751749afc23d4ea7f40c798da059afbe7",
+      "verified": true,
+      "decision": "license-reference",
+      "lab": null,
+      "reason": "MIT license, copyright 2019 Sidney Andrews; retain copyright and permission notice if redistributing software or substantial portions. Source links and original teaching adaptations preferred; no assumption of rights to unrelated third-party content."
+    },
+    {
+      "path": "_build.yml",
+      "blobSha": "2d118cd7987177b688c4f65c546c922ffc2c0e59",
+      "verified": true,
+      "decision": "exclude-maintenance",
+      "lab": null,
+      "reason": "Course publishing CI uses obsolete Ubuntu build image; unrelated to identity learning; never run."
+    },
+    {
+      "path": "_config.yml",
+      "blobSha": "91272fc731fe3ac2ae78e84310962bff44717253",
+      "verified": true,
+      "decision": "exclude-maintenance",
+      "lab": null,
+      "reason": "Jekyll course site configuration; no identity instruction."
+    },
+    {
+      "path": "index.md",
+      "blobSha": "50fb34a79673b18d50ea7f04772ce8dc83b7f522",
+      "verified": true,
+      "decision": "reference-index",
+      "lab": null,
+      "reason": "Dynamic index of lab documents, not additional learning content; fixed pinned lab inventory used instead."
+    },
+    {
+      "path": "readme.md",
+      "blobSha": "f07ec1d5c6744ccf64dcac7fe647ffba67fce61f",
+      "verified": true,
+      "decision": "reference-scope",
+      "lab": null,
+      "reason": "Explains that GitHub labs supplement instructor handbook and released course content; cannot claim repository alone is entire SC-300 course."
+    }
+  ],
+  "lessons": [
+    {
+      "lab": 1,
+      "title": "Bulk provisioning — validate before import",
+      "why": "A CSV is input data, not authorization. The portal validates the latest exact template; each row represents a proposed user. Use the actual template for an authorized tenant, unique temporary credentials through a protected process, and account-state review. Never upload shared sample passwords.",
+      "example": "Preview four fictional requests: Ava (ava@lab.example, Sales, US); Bo (bo@lab.example, Finance, US); duplicate AVA@lab.example (Marketing, US); Chen (chen@unverified.example, Support, US). The only approved suffix is lab.example. No password is stored in this planning exercise.",
+      "question": "Which rows are eligible to proceed to authorized creation, and what must happen before assigning licenses?",
+      "answer": "Ava and Bo are valid planning rows, not created users. Reject the duplicate UPN case-insensitively and unverified domain. Obtain individual secure credentials, verify required fields using the current template, confirm usage location and available license seats, validate and inspect per-row results. A failed row does not establish that every other row failed.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/users/users-bulk-add",
+        "https://learn.microsoft.com/en-us/entra/fundamentals/bulk-operations-service-limitations"
+      ]
+    },
+    {
+      "lab": 2,
+      "title": "Privacy notice versus access policy",
+      "why": "A tenant privacy statement tells people how data is handled and a contact identifies a responsible channel. A notice URL does not grant access, enforce MFA, or replace legal-approved disclosure. Do not upload the example PDF as a real notice.",
+      "example": "A guest sees a review-permissions page with no organization privacy URL. The fictional administrator has a reviewed notice and privacy contact.",
+      "question": "Which property change addresses missing notice information, and what evidence confirms success without granting new resource access?",
+      "answer": "An authorized administrator sets the approved privacy statement URL and contact in tenant properties. Verify the URL is reachable and the intended notice is visible in a test guest/user view. Resource access remains controlled by assignments and policy; do not change them to fix the notice.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/fundamentals/properties-area"
+      ]
+    },
+    {
+      "lab": 7,
+      "title": "Hybrid directory seed data — safe provisioning design",
+      "why": "Directory seeding is a change operation. The upstream demo script weakens domain security and performs broad privileged actions; it is excluded. An OU organizes objects and can scope GPO or synchronization; a security group grants access through assignments; neither should be conflated with an admin role. A source anchor identifies a synchronized identity independently of display name and UPN.",
+      "example": "Use three fictional records only: Ava, Sales, OU=Sales; Bo, IT Support, OU=Support; Chen, Finance, OU=Finance. Each has a unique planned sign-in name. Existing domain password policy is unchanged, all privileged group grants are absent, and no real password is collected. Preview intended add operations, existing-object collisions, destination OUs, and group memberships before any approved write.",
+      "question": "A script proposes deleting an existing OU, disabling password complexity, nesting all IT staff in Domain Admins, then creating 1,000 users. Which operations should be approved for this exercise?",
+      "answer": "None of those writes are needed or authorized. Keep the existing OU and policy unchanged; reject the privileged nesting and bulk creation. Teach only bounded synthetic records and explicit nonprivileged membership. An authorized real lab could inspect existing AD objects and password policy read-only, then perform narrowly scoped approved changes with validation, rollback and independent review. Do not run the source script.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/powershell/module/activedirectory/new-aduser?view=windowsserver2025-ps",
+        "https://learn.microsoft.com/en-us/powershell/module/activedirectory/get-addefaultdomainpasswordpolicy?view=windowsserver2022-ps",
+        "https://learn.microsoft.com/en-us/powershell/module/activedirectory/set-addefaultdomainpasswordpolicy?view=windowsserver2025-ps"
+      ]
+    },
+    {
+      "lab": 23,
+      "title": "Terms document lifecycle and acceptance evidence",
+      "why": "Terms of use is an agreement object with a PDF/version and acceptance records; a Conditional Access grant requirement enforces it for an applicable sign-in. The same upstream sample appears twice and is not legally approved production content.",
+      "example": "Fictional version 1 accepted by Ava. An approved version 2 changes the terms and requires reacceptance; Bo has never accepted. A policy targets the pilot group. An active session may not reevaluate immediately.",
+      "question": "What should the administrator verify after version 2 is published, and how does this differ from the tenant privacy notice?",
+      "answer": "Inspect the current document version and require-reaccept setting, scope and applicable licensed Conditional Access policy, then verify a fresh applicable sign-in prompts for the current agreement and the acceptance report records it. A decline prevents satisfying the required grant. Existing sessions and exclusions must be considered. A privacy notice URL alone is not an acceptance grant.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/terms-of-use",
+        "https://learn.microsoft.com/en-us/graph/api/resources/agreement?view=graph-rest-1.0"
+      ]
+    }
+  ]
+}

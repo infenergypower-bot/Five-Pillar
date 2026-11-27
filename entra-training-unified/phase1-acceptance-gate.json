@@ -26,6 +26,11 @@
       "37 of 37; no real commands executed."
     ],
     [
+      "SC-300 supplemental source inventory and dispositions",
+      true,
+      "23/23 remaining files retrieved and reviewed by type; four original learning adaptations; 145/145 pinned repository entries accounted for at source disposition level. Operation-level validation remains open."
+    ],
+    [
       "All repository entries semantically classified with evidence",
       false,
       "Large Learn, Graph and Entra backlogs unresolved."
