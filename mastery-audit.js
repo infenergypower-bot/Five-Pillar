@@ -2,7 +2,7 @@
 (function auditPath(){
 'use strict';
 const m=window.MD102MasteryPath;if(!m)return;
-const VERSION='MASTERY-2026-11-27-R1',H=x=>esc(String(x??'')),B=(r,t)=>`<button class="btn" type="button" data-route="${H(r)}">${H(t)}</button>`;
+const VERSION='MASTERY-2026-11-27-R4',H=x=>esc(String(x??'')),B=(r,t)=>`<button class="btn" type="button" data-route="${H(r)}">${H(t)}</button>`;
 function verify(){
  const links=m.levels.map(l=>m.links(l)),out=[];
  const add=(name,actual,expected,notes='')=>out.push({name,actual,expected,pass:actual===expected,notes});
@@ -44,6 +44,11 @@ function verify(){
  exact('Cookbook lessons',linked('cook'),(window.MD102COOKBOOK?.lessons||[]).map(x=>x.id));
  add('Source-driven asset exercises',links.flatMap(l=>l.assets).length,2);
  add('Immediate and delayed retrieval questions',m.levels.reduce((n,l)=>n+l.questions.length,0),56);
+ const oa=window.MD102ObjectiveOrderR4.audit();
+ add('Canonical objective count',oa.count,83);
+ add('Canonical objective missing/extra/duplicate count',oa.missing.length+oa.extra.length+oa.duplicates,0);
+ add('Explicit objective prerequisite violations',oa.dependencyFailures.length,0);
+ add('Objective gates installed',m.levels.flatMap(l=>m.requirements(l)).filter(r=>r.type==='Objective decisions').length,83);
  const seq=map('lessons');
  add('Autopilot follows core application deployment',seq.indexOf(7)>seq.indexOf(38),true);
  add('Final capstone is the final original lesson',seq.at(-1),26);
