@@ -115,7 +115,7 @@ scripts:["Will the text typed into this Academy's script wizard run on the devic
 };
 function question(entity){return questions[entity]||["Which evidence proves your new record achieved its goal?",["The name appears in a list","An administrator clicked Create","Target eligibility and supported endpoint/user evaluation match the intended outcome"],2,"Policy creation is different from successful effective configuration."];}
 function renderExplain(form,key){
- let entity=form.dataset.entity;const a=info(entity,key),v=fields(form)[key],box=form.querySelector(".dc-explain");
+ let entity=form.dataset.entity;const a=info(entity,key),v=fields(form)[key],input=form.querySelector('[name="'+key+'"]'),stage=input?.closest(".wizardStage"),box=stage?.querySelector(".dc-explain");
  if(!box)return;chosenKey=key;
  box.innerHTML='<div class="dc-heading"><span>EXPLORE THIS FIELD · MICRO → MACRO</span><strong>'+escx(a[0])+'</strong></div>'+
  '<div class="dc-selected"><b>What you selected</b><p>'+escx(valueDescription(entity,key,v))+'</p></div>'+
