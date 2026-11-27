@@ -1,0 +1,137 @@
+/* Primary dependency-ordered curriculum, preserving legacy IDs and saved module state. */
+(function masteryPath(){
+'use strict';
+const data=window.MD102_MASTERY_LEVELS||[],extra=window.MD102_MASTERY_FOUNDATIONS||{},terms=window.MD102_V10_TERMS||[],objects=window.MD102_OBJECTIVES||[];
+if(data.length!==14)return;
+const lessons=ACADEMY.lessons,day=86400000,H=x=>esc(String(x??'')),B=(r,t,primary=false)=>`<button type="button" class="btn ${primary?'primary':''}" data-route="${H(r)}">${H(t)}</button>`;
+const levels=data.map(a=>({id:a[0],title:a[1],lessons:a[2],terms:a[3],modules:a[4],official:a[5],deep:a[6],studio:a[7],tickets:a[8],evidence:a[9],teaching:a[10],questions:a[11]}));
+const by=id=>levels.find(l=>l.id===Number(id)),lessonBy=id=>lessons.find(l=>l.id===id),forLesson=id=>levels.find(l=>l.lessons.includes(Number(id)));
+const S=()=>{state.masteryPath ||= {version:1,concepts:{},checks:{},notes:{},foundations:{},lastLevel:1};let s=state.masteryPath;s.concepts ||= {};s.checks ||= {};s.notes ||= {};s.foundations ||= {};return s};
+const check=id=>S().checks[id]||{},termBy=id=>terms.find(t=>t.id===id),vread=id=>!!state.v10?.read?.includes(id);
+const quizPass=id=>{let l=lessonBy(id);return !!l?.quiz?.length&&l.quiz.every((q,i)=>state.quizAnswers?.[id+'-'+i]===q.correct)};
+const safe=(f,d=false)=>{try{return !!f()}catch(e){return d}};
+const cookbookMap={4:['C13'],5:['C07'],6:['C02'],7:['C03'],8:['C05'],9:['C06','C11'],10:['C04'],11:['C01','C08','C12'],12:['C14'],13:['C09','C10']};
+const stageAssets={6:[['asset-gpo','Interpret the original Group Policy XML','gpo']],11:[['asset-temp','Predict detection, partial repair and re-detection','temp']]};
+const source=window.MD102SupportStudy,official=window.MD102SourceLibrary,comp=window.MD102OfficialLabs,modules=window.MD102ModuleStudy,deep=window.MD102V7,studio=window.MD102V6,tickets=window.MD102V9,gaps=window.MD102GapStudio,ev=window.MD102EvidenceLab,work=window.MD102RepositoryStudio,clinic=window.MD102V8,cook=window.MD102COOKBOOK;
+const exercises=official?.labs?.flatMap(l=>l.exercises)||[];
+function links(l){
+ const ids=new Set(objects.filter(o=>l.lessons.includes(o.lessonId)).map(o=>o.id));
+ const sources=(source?.files||[]).filter(f=>l.lessons.includes(f.lesson)).sort((a,b)=>l.lessons.indexOf(a.lesson)-l.lessons.indexOf(b.lesson)||a.repository.localeCompare(b.repository)||Number(a.kind==='answer-key')-Number(b.kind==='answer-key')||a.path.localeCompare(b.path,undefined,{numeric:true}));
+ const az=sources.filter(f=>f.repository.includes('AZ-040')); // Present labs in syllabus order, regardless of original lesson tag.
+ if(l.id===11&&az.length){let idx=sources.findIndex(f=>f.repository.includes('AZ-040'));let rest=sources.filter(f=>!f.repository.includes('AZ-040'));az.sort((a,b)=>Number(a.kind==='answer-key')-Number(b.kind==='answer-key')||a.path.replace('LAB_AK_','LAB_').localeCompare(b.path.replace('LAB_AK_','LAB_'),undefined,{numeric:true}));rest.splice(idx,0,...az);sources.splice(0,sources.length,...rest)}
+ return {objectives:objects.filter(o=>ids.has(o.id)),sources,modules:l.modules.map(id=>modules?.by(id)).filter(Boolean),exercises:l.official.map(id=>exercises.find(e=>e.id===id)).filter(Boolean),deep:l.deep.map(id=>deep?.paths?.find(x=>x.id===id)).filter(Boolean),studio:l.studio.map(id=>studio?.labs?.find(x=>x.id===id)).filter(Boolean),tickets:l.tickets.map(id=>tickets?.tickets?.find(x=>x.id===id)).filter(Boolean),gaps:(gaps?.data||[]).filter(c=>ids.has(c[0])),evidence:l.evidence.map(id=>ev?.by(id)).filter(Boolean),work:(work?.labs||[]).filter(x=>l.lessons.includes(x.lesson)),clinics:(clinic?.clinics||[]).filter(x=>ids.has(x.id)),cook:(cook?.lessons||[]).filter(x=>(cookbookMap[l.id]||[]).includes(x.id)),assets:stageAssets[l.id]||[]};
+}
+function foundation(l,values){
+ if(l.id===1){let dns=values.dns==='Resolve the service name',tls=values.tls==='Validate the certificate chain',response=dns&&tls&&values.http==='Inspect the HTTP status';return {pass:response,trace:['Device has fictional IP 192.0.2.20 and a reachable gateway.',dns?'DNS returns the fictional service address.':'Name resolution remains unavailable.',tls&&dns?'TLS identity and trust validated.':'Trusted HTTPS session not established.',response?'HTTP response available; inspect service status independently.':'No verified application-layer response.']}}
+ if(l.id===2){let isolated=values.tenant==='Isolated fictional tenant',licensed=values.license==='Eligible existing test entitlement',role=values.role==='Scoped test administrator',safeCost=values.cost==='No new subscription or trial';return {pass:isolated&&licensed&&role&&safeCost,trace:[isolated?'Test tenant boundary established.':'Production boundary selected; not authorized for training.',licensed?'Entitlement requirement modeled as satisfied.':'Required entitlement not established.',role?'Scoped administrative identity selected.':'Unnecessarily broad or inadequate identity selected.',safeCost?'No new service or cost requested.':'Cost boundary not met.']}}
+ return {pass:true,trace:[]};
+}
+const foundationFields={1:[['dns','Network symptom: hostname lookup fails',['Ignore name resolution','Resolve the service name']],['tls','After resolving the name, HTTPS trust fails',['Bypass trust validation','Validate the certificate chain']],['http','Once trust succeeds',['Assume the device is enrolled','Inspect the HTTP status']]],2:[['tenant','Environment',['Production tenant','Isolated fictional tenant']],['license','Entitlement',['Unverified premium trial','Eligible existing test entitlement']],['role','Operator',['Global Administrator for everything','Scoped test administrator']],['cost','Cost boundary',['Activate new services','No new subscription or trial']]]};
+function requirements(l){
+ let x=links(l),s=S(),r=[];
+ const add=(type,label,route,pass)=>r.push({type,label,route,pass:!!pass});
+ for(let id of l.terms)add('Vocabulary',termBy(id)?.name||id,'vocab:'+id,vread(id));
+ (extra[l.id]||[]).forEach((t,i)=>add('Foundations',t[0],'mastery-level:'+l.id,!!s.concepts[l.id+':'+i]));
+ for(let id of l.lessons)add('Lesson retrieval',lessonBy(id)?.title||id,'lesson:'+id,quizPass(id));
+ for(let m of x.modules)add('Module study',m.title,'module-study:'+m.id,safe(()=>{let v=modules.status(m);return v.read&&v.check}));
+ for(let e of x.exercises)add('Official decision checkpoint',e.title,'official-lab:'+e.id,safe(()=>comp.store().done[e.id]&&comp.store().draft?.[e.id]?.result!==false));
+ for(let c of x.gaps)add('Configuration decisions',c[0]+' — '+c[1],'objective-gap:'+c[0],safe(()=>gaps.store().results[c[0]]?.passed));
+ for(let a of x.studio)add('Independent studio',a.title,'studio:'+a.id,safe(()=>studio.record(a.id).independentPass));
+ for(let a of x.evidence)add('Modeled device evidence',a.title,'evidence-lab:'+a.id,safe(()=>ev.store().results[a.id]?.passed));
+ for(let a of x.work)add('Computed result',a.title,'repo-studio:'+a.id,safe(()=>work.store().results[a.id]?.passed));
+ for(let a of x.assets)add('Source-based practical',a[1],a[0],!!state.assetPractice?.[a[2]]?.passed);
+ if(foundationFields[l.id])add('Foundational simulation','Trace the prerequisite work order','mastery-level:'+l.id,!!s.foundations[l.id]?.pass);
+ return r;
+}
+function status(l,now=Date.now()){
+ const r=requirements(l),c=check(l.id),passed=r.filter(x=>x.pass).length,core=passed===r.length&&c.initial?.pass===true;
+ return {passed,total:r.length,core,initial:c.initial?.pass===true,retained:c.review?.pass===true,reviewDue:!!c.dueAt&&c.dueAt<=now,dueAt:c.dueAt||null,notes:!!S().notes[l.id]?.trim(),requirements:r};
+}
+function recommendation(now=Date.now()){
+ let due=levels.find(l=>status(l,now).reviewDue&&status(l,now).core);
+ if(due)return {level:due,why:'Spaced retrieval is due'};
+ let l=levels.find(l=>!status(l,now).core);
+ return l?{level:l,why:'Next incomplete prerequisite level'}:null;
+}
+function score(id,kind,answers,now=Date.now()){
+ const l=by(id);if(!l||!['initial','review'].includes(kind)||!Array.isArray(answers)||answers.length!==2||answers.some(x=>!Number.isInteger(x)||x<0||x>2))return null;
+ let s=S(),c=s.checks[id] ||= {history:[],reviews:0};
+ if(kind==='review'&&(!c.initial?.pass||!c.dueAt||now<c.dueAt))return null;
+ let pass=answers.every(x=>x===0),record={pass,score:answers.filter(x=>x===0).length,answers,at:now};
+ c[kind]=record;c.history ||= [];c.history.push({...record,kind});c.history=c.history.slice(-20);
+ if(kind==='initial'){c.review=null;c.reviews=0;c.dueAt=pass?now+day:null}
+ else{if(pass)c.reviews=(c.reviews||0)+1;else c.reviews=0;c.dueAt=now+(pass?(c.reviews===1?3:7):1)*day}
+ return record;
+}
+function counts(list){return list.filter(x=>x.pass).length+'/'+list.length}
+const pill=ok=>`<span class="small" style="font-weight:600;color:${ok?'#137333':'#576477'}">${ok?'✓ Done':'To do'}</span>`;
+function item(route,title,meta='',done=false){return `<div style="padding:9px 0;border-bottom:1px solid #dde4ec"><div class="between">${B(route,title)} ${pill(done)}</div>${meta?`<p class="small muted" style="margin:5px 0 0">${H(meta)}</p>`:''}</div>`}
+function section(name,body){return `<section class="card" style="margin:14px 0"><h2>${H(name)}</h2>${body}</section>`}
+function collapse(name,body){return `<details style="margin:12px 0"><summary style="cursor:pointer;font-weight:650;padding:8px 0">${H(name)}</summary>${body}</details>`}
+const linkRefs=(l,x)=>x.sources.map(f=>item('supp-source:'+f.id,f.topic+(f.kind==='answer-key'?' — official answer key':''),`${f.repository.split('/').pop()} · ${f.path} · ${f.kind||'study reference'}`,safe(()=>source.complete(f)))).join('');
+function vocab(l){
+ let t=l.terms.map(termBy).filter(Boolean);
+ return `<p>Study these terms before opening the lessons. Existing vocabulary pages explain what, purpose, why, when, how, underlying mechanism, verification, mistakes and examples. Mark the review on the term page; it is a reading record, not competence.</p>${t.map(v=>collapse(v.name+' — '+(vread(v.id)?'reviewed':'not reviewed'),`<p><b>What:</b> ${H(v.plain)}</p><p><b>What it does:</b> ${H(v.does)}</p><p><b>Why:</b> ${H(v.why)}</p><p><b>When:</b> ${H(v.when)}</p><p><b>How:</b> ${H(v.how)}</p><p><b>Underneath:</b> ${H(v.under)}</p><p><b>Verify:</b> ${H(v.verify)}</p><p><b>Common mistake:</b> ${H(v.mistake)}</p><p><b>Example:</b> ${H(v.example)}</p>${B('vocab:'+v.id,'Open full term and record review')}`)).join('')}${(extra[l.id]||[]).map((t,i)=>collapse(t[0]+' — '+(S().concepts[l.id+':'+i]?'reviewed':'not reviewed'),`<p><b>What:</b> ${H(t[1])}</p><p><b>Mechanism:</b> ${H(t[2])}</p><p><b>Why / when / example:</b> ${H(t[3])}</p><button type="button" class="btn" data-mastery-concept="${l.id}:${i}">${S().concepts[l.id+':'+i]?'Reviewed ✓ (undo)':'Mark reviewed'}</button>`)).join('')}`;
+}
+function foundationView(l){let fields=foundationFields[l.id];if(!fields)return '';let r=S().foundations[l.id];return `<h3>Foundational work order</h3><p>Build the dependency chain; the model calculates the resulting stages. The inputs and evidence are fictional.</p><form data-mastery-foundation="${l.id}">${fields.map(([k,label,opts])=>`<label style="display:block;margin:12px 0">${H(label)}<select required name="${H(k)}" style="display:block;width:100%"><option value="">Choose…</option>${opts.map(o=>`<option value="${H(o)}" ${r?.values?.[k]===o?'selected':''}>${H(o)}</option>`).join('')}</select></label>`).join('')}<button class="btn primary" type="submit">Evaluate the chain</button></form>${r?`<div class="concept"><b role="status">${r.pass?'Model passed':'Model did not pass'}</b><ol>${r.trace.map(t=>`<li>${H(t)}</li>`).join('')}</ol></div>`:''}`}
+function retrieval(l,kind,st){
+ let c=check(l.id),r=c[kind],review=kind==='review',locked=review&&(!c.initial?.pass||!c.dueAt||c.dueAt>Date.now()),offset=review?2:0;
+ if(locked)return `<p>${c.dueAt?'Next spaced review: '+H(new Date(c.dueAt).toLocaleString())+'.':'Pass the initial retrieval first.'} You can study later levels while waiting; the review remains separate.</p>${r?`<p>Latest delayed result: ${r.score}/2.</p>`:''}`;
+ let salt=(c.history?.length||0)+l.id;
+ return `<form data-mastery-check="${l.id}:${kind}">${l.questions.slice(offset,offset+2).map((q,i)=>`<fieldset style="border:1px solid #cbd5e1;border-radius:6px;padding:12px;margin:10px 0"><legend>${H(q[0])}</legend>${[0,1,2].map(j=>(j+salt+i)%3).map(j=>`<label style="display:block;padding:6px"><input required type="radio" name="q${i}" value="${j}"> ${H(q[1][j])}</label>`).join('')}</fieldset>`).join('')}<button class="btn primary" type="submit">Submit ${review?'spaced review':'independent retrieval'}</button></form>${r?`<div class="concept"><b role="status">Latest result: ${r.score}/2 — ${r.pass?'Passed':'Review and retry'}</b>${l.questions.slice(offset,offset+2).map((q,i)=>`<p>${H(q[0])}<br>Correct: ${H(q[1][0])}. Your selection: ${H(q[1][r.answers[i]])}.</p>`).join('')}</div>`:''}`;
+}
+function view(l){
+ let x=links(l),st=status(l),prev=levels.slice(0,l.id-1).filter(v=>!status(v).core),q=S().notes[l.id]||'';
+ let req=st.requirements,group=(type)=>req.filter(r=>r.type===type);
+ let p=section('01 · Understand the prerequisite concepts',`<p><b>Purpose:</b> ${H(l.teaching[0])}</p><p><b>Mechanism:</b> ${H(l.teaching[1])}</p><p><b>Why this level comes now:</b> ${l.id===1?'Everything else assumes a working device and network.':H('Build on '+levels[l.id-2].title.toLowerCase()+' and retain earlier concepts.')}</p>${vocab(l)}`);
+ let lessonContent=l.lessons.map(id=>{let a=lessonBy(id),docs=x.sources.filter(f=>f.lesson===id);return item('lesson:'+id,a?.title||id,`Original lesson ${id} · all three retrieval answers required for path credit`,quizPass(id))+(docs.length?collapse('Related repository teaching and references ('+docs.length+')',docs.map(f=>item('supp-source:'+f.id,f.topic+(f.kind==='answer-key'?' — answer key':''),`${f.repository.split('/').pop()} · ${f.kind||'study reference'}`,safe(()=>source.complete(f)))).join('')):'')}).join('');
+ p+=section('02 · Observe and study the connected lessons',`<p>Work through these lessons in the order shown. The original lesson numbers are preserved as stable references; they are no longer the study order.</p>${lessonContent}${x.modules.length?collapse('Microsoft Learn companions in this level ('+x.modules.length+')',x.modules.map(m=>item('module-study:'+m.id,m.title,'Original explanation, mechanism, workplace case and retrieval check; links to official units.',safe(()=>{let v=modules.status(m);return v.read&&v.check}))).join('')):''}${x.deep.length?collapse('Deep-learning pathways',x.deep.map(d=>item('deep:'+d.id,d.title,'Extended concepts and simulated evidence',safe(()=>deep.status(d).lab))).join('')):''}`);
+ p+=section('03 · Practice with guidance',`<p><b>Workplace assignment:</b> ${H(l.teaching[2])}</p>${x.exercises.map(e=>{let n=e.tasks.filter(t=>state.sourceStudy?.read?.[t.id]).length;return item('source-exercise:'+e.id,e.title,`${n}/${e.tasks.length} original task texts reviewed. Read current prerequisites; real lab dependencies and licensing remain Microsoft's original order.`,n===e.tasks.length)+item('official-lab:'+e.id,'Offline companion checkpoint '+e.id,'Decision and expected evidence; no live operation.',safe(()=>comp.store().done[e.id]&&comp.store().draft?.[e.id]?.result!==false))}).join('')}${x.studio.map(a=>item('studio:'+a.id,a.title,'Use guided mode first; then repeat in independent mode.',safe(()=>studio.record(a.id).independentPass))).join('')}${x.gaps.length?collapse('Objective-specific configuration decisions ('+x.gaps.length+')',x.gaps.map(c=>item('objective-gap:'+c[0],c[0]+' — '+c[1],'Select configuration fields; modeled design check, not device state.',safe(()=>gaps.store().results[c[0]]?.passed))).join('')):''}${foundationView(l)}`);
+ p+=section('04 · Perform, troubleshoot and verify independently',`<p><b>Evidence requirement:</b> ${H(l.teaching[3])}</p>${x.evidence.map(a=>item('evidence-lab:'+a.id,a.title,'State-graded fictional endpoint fleet, including scope and negative controls.',safe(()=>ev.store().results[a.id]?.passed))).join('')}${x.work.map(a=>item('repo-studio:'+a.id,a.title,'Computed output on fictional data; no live execution.',safe(()=>work.store().results[a.id]?.passed))).join('')}${x.assets.map(a=>item(a[0],a[1],'Original source-driven offline result.',!!state.assetPractice?.[a[2]]?.passed)).join('')}${x.tickets.map(a=>item('ticket:'+a.id,a.title,'Extended workplace ticket; '+(a.scope==='design'?'design checkpoint':'simulated state evidence')+' and diagnostic reasoning.',safe(()=>window.MD102V13.fullMastery(a.id)))).join('')}${x.clinics.length?collapse('Focused skill clinics and diagnosis ('+x.clinics.length+')',x.clinics.map(a=>item('clinic:'+a.id,a.id+' — '+a.title,'Independent conceptual scenario practice.',safe(()=>clinic.completedLearning(a)))).join('')):''}${l.id===14?`<p>${B('practice-exams','Advanced practice exams')} ${B('exam','Timed MD-102 practice exam')} ${B('real-labs','Authorized real tenant guide')}</p>`:''}<h3>Explain your evidence in your own words</h3><p>What did you change, why, how did you know it worked, what was unaffected, what could fail, and what would you check next? This explanation is self-assessed and is not graded automatically. Do not enter secrets or live personal information.</p><textarea rows="7" style="width:100%" data-mastery-note="${l.id}">${H(q)}</textarea>`);
+ p+=section('05 · Retrieve and retain',`<h3>Immediate independent check</h3><p>Answer without consulting notes. The check requires both answers correct. It is separate from the lesson quizzes and practical evidence.</p>${retrieval(l,'initial',st)}<h3>Delayed application check</h3><p>Two different questions become available 24 hours after the initial pass. Successful delayed reviews schedule the next review after 3 days, then every 7 days; a failed review schedules a retry after 1 day. Local device time is used; later reviews reuse these questions.</p>${retrieval(l,'review',st)}`);
+ p+=section('06 · Extended source study and objective map',`<p>All supporting source documents assigned to this level are discoverable below. Read the relevant original section and answer key after attempting the lab. These are references and extended study, not mandatory proof of tenant competency.</p>${x.sources.length?collapse('Full source set ('+x.sources.length+')',linkRefs(l,x)):''}${x.cook.length?collapse('Packt cookbook companion instruction',x.cook.map(a=>item('cookbook:'+a.id,a.title,'Original academy guide plus source reference',safe(()=>cook.conceptCompleted(a.id)))).join('')):''}${x.objectives.length?collapse('Current exam objectives ('+x.objectives.length+')',x.objectives.map(o=>item('objective:'+o.id,o.id+' — '+o.title,'Objective instruction and evidence tracker',false)).join('')):''}`);
+ const pending=req.filter(a=>!a.pass);
+ return `<section class="card"><div class="super">NORTHSTAR · DEPENDENCY-ORDERED MASTERY PATH · LEVEL ${l.id}/14</div><h1>${H(l.title)}</h1><p>${B('curriculum','All levels')} ${l.id>1?B('mastery-level:'+(l.id-1),'Previous level'):''} ${l.id<14?B('mastery-level:'+(l.id+1),'Preview next level'):''}</p>${prev.length?`<p class="warning"><b>Prerequisite guidance:</b> earlier levels still need core completion: ${H(prev.map(a=>a.id).join(', '))}. Preview is allowed; the recommended sequence remains unchanged.</p>`:''}<p><b>${st.passed}/${st.total} core learning and practice checks</b> · ${st.initial?'Initial retrieval passed':'Initial retrieval pending'} · ${st.retained?'Delayed retrieval passed':'Delayed retrieval not yet passed'}</p><progress max="${Math.max(1,st.total)}" value="${st.passed}" style="width:100%"></progress><p>${st.core?'Core learning checks complete for this level. This is not real tenant competency.':'Finish the core checks and immediate retrieval before moving on as your primary study.'}</p>${pending.length?collapse('Remaining core checks ('+pending.length+')',pending.map(a=>item(a.route,a.label,a.type,false)).join('')):''}<p class="small muted">Core checks use the current saved learning or modeled exercise result, not mere navigation. Original source reading, notes and advanced tickets are tracked separately.</p></section>${p}<section class="card"><h2>Continue in sequence</h2>${st.core&&l.id<14?B('mastery-level:'+(l.id+1),'Continue to level '+(l.id+1),true):B('curriculum','Return to learning plan',true)}<p>For real Microsoft tenant competence, follow authorized labs separately. No exam outcome is guaranteed.</p></section>`;
+}
+function home(){
+ let now=Date.now(),s=levels.map(l=>({l,st:status(l,now)})),rec=recommendation(now),done=s.filter(x=>x.st.core).length,ret=s.filter(x=>x.st.retained).length,due=s.filter(x=>x.st.reviewDue).length;
+ return `<section class="card"><div class="super">NORTHSTAR · YOUR PRIMARY LEARNING SEQUENCE</div><h1>Mastery Path: from computer fundamentals to enterprise administrator</h1><p>One prerequisite-ordered curriculum. Begin with terminology and mechanisms, then observe, configure, perform independently, investigate failures, verify outcomes and revisit knowledge. All original lesson IDs and progress are preserved.</p><p><b>${done}/14</b> core levels complete · <b>${ret}/14</b> delayed retrieval passed · <b>${due}</b> review due</p><progress max="14" value="${done}" style="width:100%"></progress><p>${rec?B('mastery-level:'+rec.level.id,rec.why+' — Level '+rec.level.id,true):B('mastery-level:14','Review final capstone',true)} ${B('lesson-library','Browse original lessons')} ${B('objective-practice-map','Exam objective map')}</p><p class="small muted">No paid resources are enabled. Core completion means saved study and offline practical evidence; live tenant competency and examination success require separate evidence.</p></section>${s.map(({l,st})=>`<section class="card"><div class="between"><div><div class="super">LEVEL ${String(l.id).padStart(2,'0')}</div><h2>${H(l.title)}</h2></div>${B('mastery-level:'+l.id,st.core?'Review level':'Study level',rec?.level.id===l.id)}</div><p>${H(l.teaching[0])}</p><p>${l.lessons.map(id=>H(lessonBy(id)?.title||id)).join(' · ')}</p><p class="small">${st.passed}/${st.total} core checks · ${st.initial?'retrieval passed':'retrieval pending'} · ${st.reviewDue?'review due':st.retained?'delayed check passed':'delayed check pending'}</p><progress max="${Math.max(1,st.total)}" value="${st.passed}" style="width:100%"></progress></section>`).join('')}`;
+}
+function library(){return `<section class="card"><h1>Original lesson library</h1><p>Original stable lesson IDs in the new prerequisite order. ${B('curriculum','Return to mastery path')}</p>${levels.map(l=>`<h2>${l.id}. ${H(l.title)}</h2>${l.lessons.map(id=>item('lesson:'+id,lessonBy(id)?.title||id,'Original lesson '+id,quizPass(id))).join('')}`).join('')}</section>`}
+let prior=render;render=function(){
+ const r=String(state.route||'');
+ if(r==='curriculum'||r==='mastery-path'||r==='lesson-library'||r.startsWith('mastery-level:')){
+  $('sidenav').innerHTML=navSidebar();$('bladenav').innerHTML=modernBladeNav();$('coachroot').innerHTML='';
+  let l=by(r.slice(14));$('content').innerHTML=r==='lesson-library'?library():l?view(l):home();if(l)S().lastLevel=l.id;return;
+ }
+ prior();let c=$('content');if(!c)return;
+ if(r==='academy-home'||r==='home')c.insertAdjacentHTML('afterbegin',`<section class="card"><h2>Start your unified mastery path</h2><p>14 levels in prerequisite order; recommended next task and delayed review.</p>${B('curriculum','Open primary learning sequence',true)}</section>`);
+ let l=null,idx=null;
+ if(/^lesson:\d+$/.test(r)){idx=Number(r.slice(7));l=forLesson(idx)}
+ else if(r.startsWith('vocab:'))l=levels.find(l=>l.terms.includes(r.slice(6)));
+ else if(r.startsWith('module-study:'))l=levels.find(l=>l.modules.includes(r.slice(13)));
+ else if(r.startsWith('official-lab:'))l=levels.find(l=>l.official.includes(r.slice(13)));
+ else if(r.startsWith('source-exercise:')||r.startsWith('source-task:')){let id=r.split(':')[1].split('.').slice(0,2).join('.');l=levels.find(l=>l.official.includes(id))}
+ else if(r.startsWith('supp-source:')){let f=source?.files?.find(f=>f.id===r.slice(12));if(f)l=forLesson(f.lesson)}
+ else if(r.startsWith('objective-gap:')||r.startsWith('objective:')||r.startsWith('clinic:')){let id=r.split(':')[1],o=objects.find(o=>o.id===id);if(o)l=forLesson(o.lessonId)}
+ else if(r.startsWith('deep:'))l=levels.find(l=>l.deep.includes(r.slice(5)));
+ else if(r.startsWith('studio:'))l=levels.find(l=>l.studio.includes(r.slice(7)));
+ else if(r.startsWith('ticket:'))l=levels.find(l=>l.tickets.includes(r.slice(7)));
+ else if(r.startsWith('evidence-lab:'))l=levels.find(l=>l.evidence.includes(r.slice(13)));
+ else if(r.startsWith('repo-studio:')){let a=work?.labs?.find(a=>a.id===r.slice(12));if(a)l=forLesson(a.lesson)}
+ else if(r.startsWith('cookbook:'))l=levels.find(l=>(cookbookMap[l.id]||[]).includes(r.slice(9)));
+ else if(r==='asset-gpo')l=by(6);else if(r==='asset-temp')l=by(11);
+ if(l){let ordered=levels.flatMap(a=>a.lessons),i=ordered.indexOf(idx);c.insertAdjacentHTML('afterbegin',`<section class="card"><div class="between"><div><div class="super">MASTERY PATH · LEVEL ${l.id}</div><b>${H(l.title)}</b></div>${B('mastery-level:'+l.id,'Return to level')}</div>${idx?`<p>Lesson ${i+1} of ${ordered.length} in prerequisite order (original ID ${idx}). ${i>0?B('lesson:'+ordered[i-1],'Previous ordered lesson'):''} ${i<ordered.length-1?B('lesson:'+ordered[i+1],'Next ordered lesson'):''}</p>`:''}</section>`)}
+};
+let ar=activeArea;activeArea=function(){return /^(mastery-path|mastery-level:|lesson-library)/.test(String(state.route||''))?'academy':ar()};
+try{
+ let i=LEARN_NAV.findIndex(x=>x[0]==='curriculum');if(i>=0)LEARN_NAV.splice(i,1);
+ LEARN_NAV.unshift(['curriculum','▤','Mastery path · start here']);
+ let group=BLADE_GROUPS.academy[0][1],j=group.findIndex(x=>x[0]==='curriculum');if(j>=0)group.splice(j,1);group.unshift(['curriculum','Mastery path · start here'],['lesson-library','Original lesson library']);
+}catch(e){console.warn(e)}
+document.addEventListener('click',e=>{let b=e.target.closest('[data-mastery-concept]');if(!b)return;let [id,i]=b.dataset.masteryConcept.split(':').map(Number);if(state.route!=='mastery-level:'+id||!extra[id]?.[i])return;let s=S(),k=id+':'+i;s.concepts[k]=!s.concepts[k];save();render()});
+document.addEventListener('submit',e=>{let f=e.target;if(f.hasAttribute('data-mastery-check')){e.preventDefault();let [id,kind]=f.dataset.masteryCheck.split(':');if(state.route!=='mastery-level:'+id)return;let a=[f.elements.q0?.value,f.elements.q1?.value];if(a.some(v=>!['0','1','2'].includes(v)))return;if(score(Number(id),kind,a.map(Number))){save();render()}}
+ else if(f.hasAttribute('data-mastery-foundation')){e.preventDefault();let id=Number(f.dataset.masteryFoundation),l=by(id);if(!l||state.route!=='mastery-level:'+id||!foundationFields[id])return;let vals={};for(let [k,_,opts] of foundationFields[id]){let v=f.elements[k]?.value;if(!opts.includes(v))return;vals[k]=v}S().foundations[id]={...foundation(l,vals),values:vals};save();render()}});
+document.addEventListener('input',e=>{let f=e.target;if(!f.hasAttribute('data-mastery-note'))return;let id=Number(f.dataset.masteryNote);if(by(id)&&state.route==='mastery-level:'+id){S().notes[id]=f.value.slice(0,10000);save()}});
+window.MD102MasteryPath={levels,by,forLesson,links,requirements,status,recommendation,score,foundation,store:S,home,view};S();render()
+})();
