@@ -261,6 +261,7 @@
  shell=(content,where)=>oldShell(content,where).replace('<div class="sidefoot">',navigation+'<div class="sidefoot">');
  render=()=>{
   const route=current();
+  document.getElementById("v15-peek")?.remove();
   if(route.startsWith("v15/")){
    let content;
    if(route==="v15/vocabulary")content=catalog();
@@ -273,7 +274,7 @@
    lastRenderedHash=location.hash;if(window.scrollTo)window.scrollTo(0,0);return;
   }
   oldRender();
-  annotate();
+  try{annotate();}catch(e){console.warn("Vocabulary annotations unavailable on this page",e);}
  };
  action=(name,el)=>{
   const term=get(el?.dataset?.id),flow=flows.find(x=>x.id===el?.dataset?.id);
