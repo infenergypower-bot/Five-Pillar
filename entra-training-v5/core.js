@@ -50,7 +50,7 @@ document.addEventListener('click',e=>{let x=e.target.closest('[data-route],[data
 document.addEventListener('submit',e=>{let f=e.target;if(f.matches('#entity-form,#whatif-form,#blueprint-form,#duo-form,#nist-form')){e.preventDefault();if(f.id==='entity-form')handleForm(f);else submitSpecial(f)}else if(f.matches('#exam-setup')){e.preventDefault();examSetupSubmit(f)}});
 document.addEventListener('input',e=>{if(e.target.id==='portal-search'){const term=e.target.value.trim().toLowerCase();document.querySelectorAll('.portalnav button[data-page]').forEach(b=>{b.hidden=!b.textContent.toLowerCase().includes(term)})}});
 document.addEventListener('change',e=>{if(e.target.id==='importfile'&&e.target.files[0]){e.target.files[0].text().then(t=>{try{let d=JSON.parse(t);if(d.app!=='Identity Architect Lab Studio'||!Array.isArray(d.data?.users))throw Error('Wrong backup format');const next={...initialDb(),...d.data};
- for(const key of ['v6','v7','v8','v9','v10','v11','v12','v14'])if(!(key in d.data)&&key in db)next[key]=db[key];
+ for(const key of ['v6','v7','v8','v9','v10','v11','v12','v14','v15'])if(!(key in d.data)&&key in db)next[key]=db[key];
  if(db.v11&&next.v11&&next.v11!==db.v11){
    const originalV11=db.v11,restore=next.v11;
    for(const k of Object.keys(originalV11))delete originalV11[k];
