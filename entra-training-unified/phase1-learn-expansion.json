@@ -1,0 +1,463 @@
+{
+  "asOf": "2026-11-27",
+  "repository": "MicrosoftDocs/learn",
+  "pin": "4103ffa93b8effc15a86bd5106c876ed324c4b20",
+  "reviewScope": "Full content retrieved; headings and introductory passages inspected; topic-level guidance cross-checked. Not line-by-line qualification.",
+  "rows": [
+    {
+      "module": "analyze-ai-identity-risks-defender-xdr",
+      "path": "learn-pr/wwl-sci/analyze-ai-identity-risks-defender-xdr/includes/1-introduction.md",
+      "bytes": 1873,
+      "headings": [
+        "## Learning objectives",
+        "## Prerequisites"
+      ],
+      "error": null,
+      "status": "context-only"
+    },
+    {
+      "module": "analyze-ai-identity-risks-defender-xdr",
+      "path": "learn-pr/wwl-sci/analyze-ai-identity-risks-defender-xdr/includes/2-discover-ai-agents-defender-portal.md",
+      "bytes": 6751,
+      "headings": [
+        "## Access the AI agent inventory",
+        "## Explore what the inventory shows",
+        "## Filter and search for specific agents",
+        "## Review discovery limitations"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "analyze-ai-identity-risks-defender-xdr",
+      "path": "learn-pr/wwl-sci/analyze-ai-identity-risks-defender-xdr/includes/3-assess-blast-radius-attack-paths.md",
+      "bytes": 11569,
+      "headings": [
+        "## Understand blast radius",
+        "## Assess blast radius in Defender XDR",
+        "## Analyze attack paths",
+        "## Plan remediation actions"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "analyze-ai-identity-risks-defender-xdr",
+      "path": "learn-pr/wwl-sci/analyze-ai-identity-risks-defender-xdr/includes/4-knowledge-check.md",
+      "bytes": 130,
+      "headings": [],
+      "error": null,
+      "status": "reference-only-placeholder-or-linked-demo"
+    },
+    {
+      "module": "analyze-ai-identity-risks-defender-xdr",
+      "path": "learn-pr/wwl-sci/analyze-ai-identity-risks-defender-xdr/includes/5-summary.md",
+      "bytes": 2331,
+      "headings": [
+        "## Review what you accomplished",
+        "## What's next"
+      ],
+      "error": null,
+      "status": "context-only"
+    },
+    {
+      "module": "entra-ai-understand",
+      "path": "learn-pr/wwl-sci/entra-ai-understand/includes/authentication-flows-microsoft-foundry.md",
+      "bytes": 3407,
+      "headings": [
+        "## OAuth 2.0 and token issuance",
+        "## Interactive and non-interactive authentication",
+        "## Token flow between client and AI endpoint"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "entra-ai-understand",
+      "path": "learn-pr/wwl-sci/entra-ai-understand/includes/common-identity-misconfigurations-ai.md",
+      "bytes": 4474,
+      "headings": [
+        "## Overprivileged application identities",
+        "## Broad scope assignments",
+        "## Shared credentials and secret management",
+        "## Mixing development and production identities",
+        "## Token handling and leakage risks",
+        "## Missing Conditional Access enforcement",
+        "## Closing the loop"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "entra-ai-understand",
+      "path": "learn-pr/wwl-sci/entra-ai-understand/includes/human-workload-identities-ai-environments.md",
+      "bytes": 3808,
+      "headings": [
+        "## Human identities",
+        "## Application identities",
+        "## Managed identities",
+        "## Choosing the appropriate identity model"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "entra-ai-understand",
+      "path": "learn-pr/wwl-sci/entra-ai-understand/includes/identity-control-layer-ai-solutions.md",
+      "bytes": 2680,
+      "headings": [
+        "## Why identity comes first in AI security",
+        "## Identity across AI development and runtime"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "entra-ai-understand",
+      "path": "learn-pr/wwl-sci/entra-ai-understand/includes/introduction.md",
+      "bytes": 2101,
+      "headings": [
+        "## Learning objectives"
+      ],
+      "error": null,
+      "status": "context-only"
+    },
+    {
+      "module": "entra-ai-understand",
+      "path": "learn-pr/wwl-sci/entra-ai-understand/includes/management-data-plane-ai-workloads.md",
+      "bytes": 2926,
+      "headings": [
+        "## Management plane access",
+        "## Data plane access",
+        "## Why the distinction matters"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "entra-ai-understand",
+      "path": "learn-pr/wwl-sci/entra-ai-understand/includes/role-scope-ai-environments.md",
+      "bytes": 3937,
+      "headings": [
+        "## Role-based access control in Azure",
+        "## Scope hierarchy",
+        "## Built-in and custom roles",
+        "## Designing role assignments intentionally"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "entra-ai-understand",
+      "path": "learn-pr/wwl-sci/entra-ai-understand/includes/summary.md",
+      "bytes": 1573,
+      "headings": [
+        "## Resources"
+      ],
+      "error": null,
+      "status": "context-only"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/1-introduction.md",
+      "bytes": 807,
+      "headings": [
+        "## Learning objectives",
+        "## Prerequisites"
+      ],
+      "error": null,
+      "status": "context-only"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/10-manage-external-users-microsoft-365-workloads.md",
+      "bytes": 2809,
+      "headings": [
+        "### External collaboration options in Microsoft 365",
+        "### Governance and management"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/11-exercise-explore-dynamic-groups.md",
+      "bytes": 1250,
+      "headings": [],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/12-implement-manager-entra-verified-id.md",
+      "bytes": 4862,
+      "headings": [
+        "### What is Entra Verified ID?",
+        "### Deploying the Microsoft Entra Verified ID service"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/13-configure-identity-providers.md",
+      "bytes": 20138,
+      "headings": [
+        "## When is a guest user authenticated with SAML/WS-Fed IdP federation?",
+        "## End-user experience",
+        "## Security Assertion Markup Language 2.0 configuration<br>",
+        "### Required Security Assertion Markup Language 2.0 attributes and claims",
+        "## WS-Federation configuration",
+        "### Required WS-Federation attributes and claims",
+        "## Add Google as an identity provider for B2B guest users",
+        "## What is the experience for the Google user?",
+        "## Deprecation of WebView sign-in support",
+        "## Sign-in endpoints"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/14-implement-cross-tenant-access-controls.md",
+      "bytes": 4756,
+      "headings": [
+        "### Manage inbound and outbound settings",
+        "### Organizational specific configuration",
+        "### Microsoft Cloud-specific configuration",
+        "### B2B Direct Connect"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/15-knowledge-check.md",
+      "bytes": 58,
+      "headings": [],
+      "error": null,
+      "status": "reference-only-placeholder-or-linked-demo"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/16-summary-resources.md",
+      "bytes": 894,
+      "headings": [
+        "## Resources"
+      ],
+      "error": null,
+      "status": "context-only"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/2-describe-guest-access-business-to-business-accounts.md",
+      "bytes": 2055,
+      "headings": [
+        "### Define guest users",
+        "### How guest users join your Microsoft Entra tenant",
+        "### B2B collaboration"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/3-collaboration.md",
+      "bytes": 6729,
+      "headings": [
+        "## Invitation redemption flow",
+        "## External identities scenarios<br>",
+        "## Manage external collaboration settings in Microsoft Entra ID<br>",
+        "## Configure business-to-business external collaboration settings"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/4-exercise-configure-external-collaboration.md",
+      "bytes": 3542,
+      "headings": [
+        "## Configure external collaboration settings"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/5-invite-external-users-individually-bulk.md",
+      "bytes": 4067,
+      "headings": [
+        "## How users in your organization can invite guest users to an app",
+        "## How to bulk invite Microsoft Entra B2B collaboration users",
+        "### Understand the CSV template",
+        "### CSV template structure",
+        "### Additional guidance"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/6-exercise-add-guest-users-to-directory.md",
+      "bytes": 1311,
+      "headings": [],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/7-exercise-invite-guest-users-bulk.md",
+      "bytes": 2455,
+      "headings": [],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/8-demo-invite-guest-users-to-app.md",
+      "bytes": 457,
+      "headings": [],
+      "error": null,
+      "status": "reference-only-placeholder-or-linked-demo"
+    },
+    {
+      "module": "implement-manage-external-identities",
+      "path": "learn-pr/wwl-sci/implement-manage-external-identities/includes/9-user-accounts-azure-active-directory.md",
+      "bytes": 6521,
+      "headings": [
+        "## Add a B2B user to a role",
+        "## Key properties of the Microsoft Entra B2B collaboration user<br>",
+        "### UserType",
+        "### Identities",
+        "### Can Microsoft Entra B2B users be added as members instead of guests?",
+        "### Filter for guest users in the directory",
+        "### Convert UserType",
+        "## Remove guest user limitations",
+        "## Dynamic groups and Microsoft Entra B2B collaboration",
+        "### What are dynamic groups?"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/1-introduction.md",
+      "bytes": 759,
+      "headings": [
+        "## Learning objectives",
+        "## Prerequisites"
+      ],
+      "error": null,
+      "status": "context-only"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/10-summary-resources.md",
+      "bytes": 1560,
+      "headings": [
+        "## Resources"
+      ],
+      "error": null,
+      "status": "context-only"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/2-define-access-packages.md",
+      "bytes": 8512,
+      "headings": [
+        "## Why use entitlement management?",
+        "## What can I do with entitlement management?",
+        "## Summary of terminology",
+        "## What are access packages and what resources can I manage with them?",
+        "## How do I control who gets access?",
+        "## When should I use access packages?"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/3-create-manage-resource-catalog.md",
+      "bytes": 6593,
+      "headings": [
+        "## Create an Azure account and add Microsoft Entra ID Premium P2 trial licenses",
+        "## Create a catalog",
+        "## Add resources to a catalog",
+        "## Add more catalog owners",
+        "## Edit a catalog",
+        "## Delete a catalog"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/4-configure-entitlement-management.md",
+      "bytes": 2121,
+      "headings": [
+        "## Programmatic administration"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/5-add-terms-of-use-acceptance-report.md",
+      "bytes": 13145,
+      "headings": [
+        "## What are terms of use for Entitlement Management",
+        "## Add terms of use",
+        "## View report of who accepted and declined",
+        "## What terms of use look like for users",
+        "### How users can review their terms of use",
+        "## Edit terms of use details",
+        "## Update an existing terms-of-use document"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/6-manage-lifecycle-of-external-users.md",
+      "bytes": 2737,
+      "headings": [
+        "## Manage the lifecycle of external users in Microsoft Entra ID Governance settings"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/7-configure-manage-connected-organizations.md",
+      "bytes": 3218,
+      "headings": [
+        "## What is a connected organization?",
+        "## Add a connected organization"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/8-review-per-user-entitlements.md",
+      "bytes": 2830,
+      "headings": [
+        "## Governance",
+        "## View who has an assignment",
+        "## Review the assignments with PowerShell",
+        "## Remove an assignment"
+      ],
+      "error": null,
+      "status": "topic-reviewed; full line qualification pending"
+    },
+    {
+      "module": "plan-implement-entitlement-management",
+      "path": "learn-pr/wwl-sci/plan-implement-entitlement-management/includes/9-knowledge-check.md",
+      "bytes": 58,
+      "headings": [],
+      "error": null,
+      "status": "reference-only-placeholder-or-linked-demo"
+    }
+  ]
+}
