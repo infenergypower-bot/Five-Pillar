@@ -1,16 +1,18 @@
 /* V15 Micro-to-Macro Vocabulary Microscope. One existing academy; no new backend, services or subscriptions. */
 (function initV15Vocabulary(){
- const categoryNames=["Directory and identity","Authentication and access","Apps and workload identities","Governance, NIST and security operations"];
+ const categoryNames=["Computer basics and directory identities","Authentication and access","Apps and workload identities","Governance, NIST and security operations"];
  const sources=[
   "https://learn.microsoft.com/en-us/entra/fundamentals/entra-admin-center",
   "https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview",
   "https://learn.microsoft.com/en-us/entra/identity-platform/app-objects-and-service-principals",
   "https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-overview"
  ];
- const entries=[V15_DIRECTORY,V15_AUTH,V15_APPLICATIONS,V15_GOVERNANCE].flatMap((rows,category)=>rows.map((r,i)=>{
+ const entries=[V15_PRIMITIVES.concat(V15_DIRECTORY),V15_AUTH,V15_APPLICATIONS,V15_GOVERNANCE].flatMap((rows,category)=>rows.map((r,i)=>{
   if(r.length!==9||!r[0]||r.slice(1).some(x=>typeof x!=="string"||x.length<15))throw Error("Incomplete granular vocabulary entry "+category+"-"+i);
   const [term,definition,does,why,when,how,micro,macro,failure]=r;
-  return {id:term.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""),term,definition,does,why,when,how,micro,macro,failure,category,source:sources[category]};
+  const atomic=category===0&&i<V15_PRIMITIVES.length;
+  const source=atomic?"https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Web_standards/How_the_web_works":sources[category];
+  return {id:term.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""),term,definition,does,why,when,how,micro,macro,failure,category,source,atomic};
  }));
  const termById=new Map(entries.map(x=>[x.id,x]));
  const expansions={
@@ -24,7 +26,10 @@
  "siem":"Security Information and Event Management",
  "pkce":"Proof Key for Code Exchange",
  "http-403":"HTTP status 403: Forbidden",
- "microsoft-graph":"Microsoft Graph API (Application Programming Interface)"
+ "microsoft-graph":"Microsoft Graph API (Application Programming Interface)",
+ "url":"Uniform Resource Locator","dns":"Domain Name System","api":"Application Programming Interface",
+ "http":"Hypertext Transfer Protocol","https-and-tls":"HTTPS with Transport Layer Security",
+ "json":"JavaScript Object Notation"
  };
  const contrasts={
  "authentication":["authorization","Proves identity, not permission for a specific operation."],
@@ -50,6 +55,11 @@
  const get=id=>termById.get(id);
  const alias={"CA":"conditional-access","PIM":"privileged-identity-management","UPN":"upn","MFA":"mfa","RBAC":"rbac","FIDO2":"fido2","TAP":"temporary-access-pass","OIDC":"openid-connect","SCIM":"scim-provisioning","OAuth":"oauth-2-0","JWT":"jwt","Graph":"microsoft-graph","AAL":"authentication-assurance-level","AU":"administrative-unit"};
  const flows=[
+  {id:"web",title:"Start at zero: one button click becomes an authorized API result",category:0,
+    goal:"Learn the exact path from a browser through DNS, secure transport, an API request, authentication, authorization and a real server response.",
+    terms:["computer","software","browser","url","dns","https-and-tls","client","server","http","request","api","endpoint","authentication","authorization","response","json"],
+    question:"A web button says Success. How do you verify the permission really changed?",
+    answer:"Verify the protected API accepted the authorized change and that the specific resource's saved state changed; a UI message alone is not evidence."},
   {id:"who",title:"From one identity property to company-wide access",category:0,goal:"Understand exactly how a user, group, role and application entitlement relate—and why names are not permissions.",terms:["directory-object","object-id","upn","security-group","application-entitlement","least-privilege"],question:"A user is in the directory and can sign in, but Finance Reports denies access. What is the next question?",answer:"Is the correct user or group assigned to that enterprise application, and does the app allow the requested operation?"},
   {id:"signin",title:"Watch one sign-in from the first request to the app",category:1,goal:"Trace the request, identity proof, Conditional Access, token contents, app-side authorization and session.",terms:["sign-in","identity-provider","authentication","conditional-access","access-token","authorization","session-control"],question:"The user passes MFA but the application rejects them. Was authentication necessarily the problem?",answer:"No. Authentication succeeded. Check app assignments, token audience, resource permissions and application errors."},
   {id:"passkey",title:"Follow a passkey challenge at the microscopic level",category:1,goal:"Distinguish public keys, private keys, challenge signing, local user verification and phishing resistance.",terms:["credential","passkey","fido2","authentication-factor","passwordless","authentication-strength"],question:"Does the website receive the private key or face biometric?",answer:"No. A compatible authenticator signs the challenge locally; the relying service verifies using the registered public key."},
@@ -168,7 +178,7 @@
    ${footer()}</div>`;
  }
  function systems(){
-  return `<div class="page v15">${css}<button class="btn" data-route="v15/vocabulary">← Vocabulary library</button><div class="v15-hero" style="margin-top:12px"><div class="eyebrow">VISUAL LEARNING · MICRO TO MACRO</div><h1>12 system stories: follow every decision</h1><p>Each step is a real concept used in the academy. Tap it, learn the small mechanism, then move to the organization-wide consequence.</p></div>
+  return `<div class="page v15">${css}<button class="btn" data-route="v15/vocabulary">← Vocabulary library</button><div class="v15-hero" style="margin-top:12px"><div class="eyebrow">VISUAL LEARNING · MICRO TO MACRO</div><h1>${flows.length} system stories: follow every decision</h1><p>Each step is a real concept used in the academy. Tap it, learn the small mechanism, then move to the organization-wide consequence.</p></div>
     <div class="v15-flows" style="margin-top:16px">${flows.map(f=>`<article class="v15-item"><div class="eyebrow">${esc(categoryNames[f.category])} · ${f.terms.length} technical stages</div><h3>${esc(f.title)}</h3><p>${esc(f.goal)}</p><button class="btn primary" data-route="v15/system/${f.id}">Walk through the flow →</button></article>`).join("")}</div>${footer()}</div>`;
  }
  function systemPage(f){
@@ -249,7 +259,7 @@
       el.innerHTML=`<div class="v15-decision" style="margin-top:16px"><h3>GO DEEPER · Every term from microscopic detail to architecture</h3>
         <p>For this lesson, the following concepts matter. Tap one to learn what it is, why it exists, how it works and what goes wrong.</p>
         <div class="flex wrap">${termList.filter(t=>get(t)).map(t=>`<button class="btn" data-route="${link(t)}">${esc(get(t).term)}</button>`).join("")}</div>
-        <button class="btn primary" data-route="v15/vocabulary">Explore the complete 131-term technical vocabulary →</button></div>`;
+        <button class="btn primary" data-route="v15/vocabulary">Explore all ${entries.length} technical words from micro to macro →</button></div>`;
       host.appendChild(el);
     }
   }
