@@ -69,3 +69,16 @@ Version 7.0 index served; health HTTP 200; complete QA request timed out. Prior 
 ## Phase 1 execution log
 
 - 2026-11-27: tracker created. Scope is all useful identity/architecture training content in the 15 pinned repositories; irrelevant files must be explicitly classified, not indiscriminately taught. No claim of exhaustive manual qualification until independently verified.
+
+### Phase 1 checkpoint — 2026-11-27, release 7.1
+
+**Status: IN PROGRESS. Do not advance to Phase 2.**
+
+- Recovered nontruncated trees for Microsoft Learn `learn-pr/wwl-sci` (5,988 entries including directories) and `learn-pr/wwl-windows-server` (716 entries including directories) at pin `4103ffa93b8effc15a86bd5106c876ed324c4b20`. Root and learn-pr directory inventories recovered; entire Learn repository remains unenumerated.
+- Recovered complete Graph API and resource subtrees at pin `951930b591f9248117793f036e0b13cb779769d1`: v1.0 API 3,974 files; v1.0 resources 3,392; beta API 8,425; beta resources 6,709. Total 22,500 files in these four nontruncated subtrees. Initial filename-prefix filter found 513, 276, 640, and 324 candidates respectively (1,753 total); other Graph trees, alternate names, embedded examples and semantic relevance remain unresolved. This is an inventory, not source qualification.
+- Retrieved 39 additional pinned Microsoft Learn text documents, 16 external identities, 10 entitlement management, 8 AI identity and 5 Defender XDR AI-agent risk. Manifest: [phase1-learn-expansion.json](phase1-learn-expansion.json). Full content retrieved; headings and opening passages inspected; topic-level validation against current official docs. Placeholders and linked demos reference-only; embedded assets and per-line review pending.
+- Added four original learning adaptations to the existing Users, Governance, Apps and Operations chapters. Corrected legacy governance delegation, distinguished resource grants from redemption and Foundry identity/key flows, and gated preview/paid Defender features. Current Microsoft references linked inside each lesson. No resources activated.
+- Curriculum commit `2eb9657914518f5d0a89f5382c91190ff8dac654` deployed as 7.1. Live isolated browser confirmed all four lessons render, 39 source references mapped, master tracker link present, two new audit checks pass and zero page errors. Existing full regression suite has not been reconfirmed after v7.0 timeout.
+- **Next Phase 1 work:** persist and classify full subtree candidate inventories; retrieve remaining relevant Learn, Graph and Entra documents in batches; review actual technical bodies and linked media, not only headings; review applicable licenses and current official evidence per operation; reconcile prior 944 screened records with the new source inventory; create deduplicated file-level qualification decisions, source-to-concept-to-lesson mapping and integrated teaching; verify all accepted material and exclusions. Confirm full regression suite. Phase 1 acceptance requires no unresolved in-scope items; do not mark complete based on counts or regex screening.
+
+**Next phase after Phase 1 acceptance:** Phase 2 — exhaustive vocabulary and granular technical understanding. It has not been started as a new phase.
