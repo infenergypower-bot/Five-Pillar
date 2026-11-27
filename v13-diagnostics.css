@@ -1,0 +1,41 @@
+/* Northstar Academy v13: incident diagnosis workshop */
+.v13-card{margin-top:17px;padding:22px;background:#fff;border:1px solid #c9dbe8;border-radius:14px;box-shadow:0 4px 15px #1138550c;color:#233b51}
+.v13-head>span{font-size:11px;color:#18678b;letter-spacing:.1em;font-weight:900}
+.v13-head h2{font-size:23px;margin:7px 0}
+.v13-head p,.v13-intro p{font-size:13px;color:#557086;line-height:1.7}
+.v13-summary{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0 6px}
+.v13-summary span{background:#e8f3fb;border-radius:16px;padding:7px 10px;color:#265578;font-weight:750;font-size:11px}
+.v13-question{padding:18px 0;border-top:1px solid #e3ecf3}
+.v13-question>span{color:#146e98;font-size:10px;font-weight:900;letter-spacing:.08em}
+.v13-question h3{font-size:15px;color:#24394c;margin:8px 0 11px}
+.v13-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.v13-options button{text-align:left;font:inherit;font-size:12px;line-height:1.6;color:#2f5168;background:#f9fcff;border:1px solid #c9d8e4;border-radius:9px;padding:12px;min-height:68px;cursor:pointer}
+.v13-options button:hover{border-color:#20749f;background:#f0faff}
+.v13-options button.selected{background:#e5f4ff;color:#0f4b75;font-weight:760;border:2px solid #2677aa}
+.v13-options button:focus-visible{outline:3px solid #87bdf0;outline-offset:2px}
+.v13-feedback{border-left:4px solid #259260;padding:11px 14px;font-size:12px;line-height:1.7;background:#eaf8f0;color:#276040;border-radius:5px;margin:11px 0 0}
+.v13-feedback.bad{border-color:#bc7d36;background:#fff7e9;color:#80521e}
+.v13-actions{display:flex;flex-wrap:wrap;gap:10px;margin:13px 0}
+.v13-result{margin:10px 0;padding:12px;background:#e8f4fb;border-radius:8px;color:#245773;font-size:13px}
+.v13-result b{font-size:21px}
+.v13-limits,.v13-ungraded{font-size:11px;color:#687d91}
+.v13-banner{background:#e9f6fa;border:1px solid #b7dce9;border-radius:10px;padding:14px;margin-bottom:16px;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.v13-banner b{font-size:14px}
+.v13-banner span{font-size:12px;color:#476d86;flex:1}
+.v13-overview{max-width:1260px;margin:0 auto}
+.v13-intro{background:linear-gradient(115deg,#112f51,#146987);border-radius:17px;padding:27px;color:#fff}
+.v13-intro small{color:#9bdbe5;font-size:11px;font-weight:900;letter-spacing:.11em}
+.v13-intro h1{font-size:clamp(25px,3vw,35px);color:#fff;max-width:790px}
+.v13-intro p{color:#d8edf7;max-width:810px}
+.v13-figures{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}
+.v13-figures span{background:#ffffff23;border:1px solid #ffffff2d;padding:12px 16px;border-radius:10px;font-size:12px}
+.v13-figures b{display:block;font-size:23px}
+.v13-notice{font-size:12px;background:#ffffff18;border-left:3px solid #9ed5de;padding:10px;color:#e0f1f7}
+.v13-catalog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:17px}
+.v13-catalog article{display:flex;flex-direction:column;align-items:flex-start;border:1px solid #d6e4eb;border-radius:12px;background:#fff;padding:18px;min-width:0}
+.v13-catalog article small{font-weight:900;color:#11769d}
+.v13-catalog article h2{font-size:17px;margin:7px 0}
+.v13-catalog article p{font-size:12px;color:#597183;flex:1;line-height:1.6}
+.v13-catalog article span{font-size:11px;font-weight:800;color:#2e6a5a;margin-bottom:11px}
+@media(max-width:900px){.v13-options{grid-template-columns:1fr}}
+@media(max-width:640px){.v13-card{padding:14px}.v13-intro{padding:21px}.v13-catalog{grid-template-columns:1fr}.v13-banner .btn{width:100%}.v13-figures span{flex:1;min-width:135px}.v13-actions .btn{width:100%}}
