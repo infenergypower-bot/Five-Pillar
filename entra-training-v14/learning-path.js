@@ -59,6 +59,11 @@
   const resume=recentRoute||(db.v12?.last&&db.v12.active?.[db.v12.last]?"v12/mission/"+db.v12.last:
     db.v11?.current?"v11/clinic/"+db.v11.current:db.v8?.current?"v8/learn/"+db.v8.current:null);
   return `<div class="page v14-root">${css}${header()}
+   <section class="panel" style="margin-top:16px;border:2px solid #3c8da5">
+    <div class="eyebrow">START BEFORE THE TECHNICAL JARGON</div><h2>Vocabulary Microscope — what, why, when, how, from one field to the whole company</h2>
+    <p>Before you configure users, groups, MFA or Conditional Access, learn exactly what those terms mean. Study 131 multi-layer definitions, open 15 annotated field examples, and follow 12 interactive system stories. Then return to these lessons with tap-to-define words in context.</p>
+    <div class="flex wrap"><button class="btn primary" data-route="v15/vocabulary">Explain the vocabulary from zero →</button>
+    <button class="btn" data-route="v15/systems">Show how the systems fit together →</button></div></section>
    <div class="grid3" style="margin:17px 0"><div class="panel"><div class="statnum">${total}/14</div><div class="statlabel">Foundational knowledge checks completed</div></div>
    <div class="panel"><div class="statnum">${advanced}/17</div><div class="statlabel">Advanced two-question checks passed</div></div>
    <div class="panel"><div class="statnum">${modules.filter(m=>stats(m).independent).length}/4</div><div class="statlabel">Independent fictional mission results</div></div></div>
@@ -82,7 +87,7 @@
  function domain(m){
   const x=stats(m),n=nextStep(m),idx=Math.max(0,Math.min(4,db.v14.node?.[m.id]||0)),node=m.nodes[idx];
   return `<div class="page v14-root">${css}<button class="btn xs" data-route="v14/path">← All identity learning paths</button>
-  <div class="v14-hero" style="margin-top:12px"><div class="eyebrow">SC-300 · ${esc(m.weight)}</div><h1>${esc(m.name)}</h1><p>${esc(m.description)}</p></div>
+  <div class="v14-hero" style="margin-top:12px"><div class="eyebrow">SC-300 · ${esc(m.weight)}</div><h1>${esc(m.name)}</h1><p>${esc(m.description)}</p></div><div class="v15-decision" style="margin-top:12px"><b>Need the technical words explained first?</b><p>Tap any unfamiliar term inside the lessons, or open the vocabulary glossary to follow it from individual fields to enterprise architecture.</p><button class="btn primary" data-route="v15/vocabulary">Open Vocabulary Microscope →</button></div>
   <div class="panel" style="margin-top:16px"><h3>WATCH · Explore the security decision chain</h3><p>Tap each part of the system and explain how it affects the next stage.</p>
     <div class="v14-map">${m.nodes.map((p,i)=>`<button class="${idx===i?"active":""}" data-action="v14-node" data-id="${m.id}" data-index="${i}">${i+1}. ${esc(p[0])}</button>`).join("")}</div>
     <div class="v14-meaning" role="status"><b>${esc(node[0])}</b><p>${esc(node[1])}</p></div>
