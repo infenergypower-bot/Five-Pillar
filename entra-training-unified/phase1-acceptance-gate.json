@@ -1,0 +1,49 @@
+{
+  "phase": 1,
+  "status": "OPEN",
+  "canAdvance": false,
+  "inventory": 168509,
+  "repositories": 15,
+  "criteria": [
+    [
+      "Complete pinned repository inventory",
+      true,
+      "All 15 trees enumerated; 168,509 entries."
+    ],
+    [
+      "Official SC-300 lab topic adaptations",
+      true,
+      "29 of 29 mapped."
+    ],
+    [
+      "Available SC-300 lab screenshots reviewed and disposition recorded",
+      true,
+      "93 reviewed; 2 missing upstream references superseded."
+    ],
+    [
+      "SC-300 fenced code/output blocks reviewed and disposition recorded",
+      true,
+      "37 of 37; no real commands executed."
+    ],
+    [
+      "All repository entries semantically classified with evidence",
+      false,
+      "Large Learn, Graph and Entra backlogs unresolved."
+    ],
+    [
+      "Every accepted source technically qualified against current guidance and prerequisites",
+      false,
+      "Operation-level checks and external references remain incomplete."
+    ],
+    [
+      "Complete deduplicated source-to-lesson traceability and integration",
+      false,
+      "Remaining in-scope sources not fully mapped."
+    ],
+    [
+      "Full regression after final qualification and integration",
+      false,
+      "Release 7.3 passed; final Phase 1 regression requires completed scope."
+    ]
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "chapters": 14,
+  "integratedSourceLessons": 58,
+  "teachingUnits": 48,
+  "instructionalStages": 18,
+  "prerequisiteDefinitions": 109,
+  "guidedTasks": 48,
+  "checkpointCases": 14,
+  "officialObjectives": 98,
+  "officialLabs": 29,
+  "sourceRepositories": 15,
+  "localSimulators": 8,
+  "commandExercises": 12,
+  "independentScenarios": 24,
+  "detailedObjectiveLessons": 98,
+  "objectiveScenarioChecks": 98,
+  "directOfficialLabs": 29,
+  "repositorySources": 481,
+  "repositoryLabWalkthroughs": 29,
+  "repositorySupplementaryGuides": 32,
+  "repositoryLearnFiles": 268,
+  "additionalSourceAssets": 64,
+  "governanceSlides": 256,
+  "appliedLessons": 12,
+  "queryTasks": 12,
+  "apiTasks": 8,
+  "newWorkbenches": 4,
+  "additionalLearnModules": 19,
+  "granularLessons": 19,
+  "granularFields": 82,
+  "granularCases": 19,
+  "dedicatedGapLabs": 98,
+  "officialTaskHeadings": 179,
+  "atomicVocabulary": 227,
+  "transferScenarios": 48,
+  "transferForms": 2,
+  "additionalObjectiveScenarios": 50,
+  "independentObjectiveCoverage": 98,
+  "taskPracticeMapped": 179,
+  "externalPrerequisiteHeadings": 23,
+  "indexedSourceSteps": 1070,
+  "directoryOperationsWorkshop": 1,
+  "screenedSourceFiles": 944,
+  "tenantReadExercises": 8,
+  "tenantPortfolioObjectives": 98,
+  "qualifiedLabDecisions": 29,
+  "primaryVocabularyTexts": 165,
+  "coreAcronymsChecked": 55,
+  "coreAcronymsMissing": [],
+  "questions": 84,
+  "passed": 1771,
+  "failed": 0,
+  "failures": [],
+  "testType": "source and simulated render; not actual browser or real tenant",
+  "http": 200,
+  "browserErrors": [],
+  "scripts": [
+    "https://entra-console-site-production.up.railway.app/ultimate-curriculum.js?v=7.3"
+  ],
+  "liveLabChecks": [
+    {
+      "lab": 0,
+      "chapter": "tenant",
+      "title": "Lab 00: Safe tenant and subscription preflight",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 1,
+      "chapter": "users",
+      "title": "Lab 01: Provision, delegate, recover and license users",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 2,
+      "chapter": "tenant",
+      "title": "Lab 02: Tenant properties, domains and privacy",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 3,
+      "chapter": "users",
+      "title": "Lab 03: Group membership and licensing",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 4,
+      "chapter": "users",
+      "title": "Lab 04: External collaboration policy boundaries",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 5,
+      "chapter": "users",
+      "title": "Lab 05: Invite, redeem and verify B2B identity",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 6,
+      "chapter": "users",
+      "title": "Lab 06: Google federation and external trust",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 7,
+      "chapter": "hybrid",
+      "title": "Lab 07: Hybrid sync without provisioning",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 8,
+      "chapter": "auth",
+      "title": "Lab 08: Modern MFA methods and enforcement",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 9,
+      "chapter": "auth",
+      "title": "Lab 09: SSPR and combined registration",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 10,
+      "chapter": "device",
+      "title": "Lab 10: Entra VM login without weakening RDP",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 11,
+      "chapter": "govern",
+      "title": "Lab 11: Eligible Azure resource role",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 12,
+      "chapter": "auth",
+      "title": "Lab 12: Smart lockout versus password protection",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 13,
+      "chapter": "policy",
+      "title": "Lab 13: Policy impact before enforcement",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 14,
+      "chapter": "policy",
+      "title": "Lab 14: Risk-based Conditional Access",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 15,
+      "chapter": "auth",
+      "title": "Lab 15: MFA registration policy and adoption",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 16,
+      "chapter": "workloads",
+      "title": "Lab 16: Managed identity and Key Vault authorization",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 17,
+      "chapter": "ops",
+      "title": "Lab 17: Discovery versus app enforcement",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 18,
+      "chapter": "policy",
+      "title": "Lab 18: Conditional Access App Control",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 19,
+      "chapter": "apps",
+      "title": "Lab 19: App registration, scopes and app roles",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 20,
+      "chapter": "apps",
+      "title": "Lab 20: Enterprise app assignment versus enforcement",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 21,
+      "chapter": "apps",
+      "title": "Lab 21: Consent is a permission grant, not app registration",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 22,
+      "chapter": "govern",
+      "title": "Lab 22: Catalog ownership, resources and guest review",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 23,
+      "chapter": "govern",
+      "title": "Lab 23: Terms of use and consent evidence",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 24,
+      "chapter": "govern",
+      "title": "Lab 24: Governed guest lifecycle",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 25,
+      "chapter": "govern",
+      "title": "Lab 25: Review group access versus privileged roles",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 26,
+      "chapter": "govern",
+      "title": "Lab 26: PIM approval, activation and limited scope",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 27,
+      "chapter": "ops",
+      "title": "Lab 27: Sentinel connectors and KQL without costs",
+      "visible": true,
+      "practiceAndAnswer": true
+    },
+    {
+      "lab": 28,
+      "chapter": "ops",
+      "title": "Lab 28: Identity Secure Score and risk remediation",
+      "visible": true,
+      "practiceAndAnswer": true
+    }
+  ],
+  "allLabCardMappings": true
+}

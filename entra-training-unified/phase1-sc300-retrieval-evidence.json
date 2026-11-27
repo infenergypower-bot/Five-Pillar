@@ -1,0 +1,1685 @@
+{
+  "scope": "Exact bytes and Git blob SHA verified, referenced asset paths checked; no visual or technical approval implied.",
+  "commit": "53345303d69ef62e2f5707cf2f7bd1b969b29077",
+  "labFiles": 29,
+  "verifiedLabFiles": 29,
+  "mediaFiles": 93,
+  "verifiedMediaFiles": 93,
+  "mediaRefs": 77,
+  "matchedRefs": 75,
+  "verifiedRefs": 75,
+  "numberedLines": 1070,
+  "headings": 311,
+  "codeBlocks": 37,
+  "unmatchedRefs": [
+    {
+      "alt": "Screen image displaying the MFA registration policy page with browsing path highlighted",
+      "ref": "./media/lp2-mod4-browse-to-mfa-registration-policy.png",
+      "path": "Instructions/Labs/media/lp2-mod4-browse-to-mfa-registration-policy.png",
+      "matched": false,
+      "retrievedAndHashVerified": false
+    },
+    {
+      "alt": "Screen image displaying the MFA registration policy page with browsing path highlighted",
+      "ref": "./media/lp2-mod4-browse-to-mfa-registration-policy1.png",
+      "path": "Instructions/Labs/media/lp2-mod4-browse-to-mfa-registration-policy1.png",
+      "matched": false,
+      "retrievedAndHashVerified": false
+    }
+  ],
+  "failures": [],
+  "sources": [
+    {
+      "path": "Instructions/Labs/Lab_00_SetUpLabResources.md",
+      "blobSha": "07f6b568b9e3673386f4f50d020219adbd04aac0",
+      "bytes": 1702,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 11,
+      "headingCount": 3,
+      "mediaRefs": [],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_01_ManageUserRoles.md",
+      "blobSha": "5df7f2f4c07c9a956f0aa68ccf483292256f9646",
+      "bytes": 17904,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 93,
+      "headingCount": 27,
+      "mediaRefs": [
+        {
+          "alt": "Assigned roles page - showing the selected role",
+          "ref": "./media/directory-role-select-role.png",
+          "path": "Instructions/Labs/media/directory-role-select-role.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Bulk import using csv file entry",
+          "ref": "./media/bulkimportexample.png",
+          "path": "Instructions/Labs/media/bulkimportexample.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the All users users list with one user check box selected and another check box highlighted indicating the ability to select multiple users from the list.",
+          "ref": "./media/lp1-mod2-remove-user.png",
+          "path": "Instructions/Labs/media/lp1-mod2-remove-user.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 6
+    },
+    {
+      "path": "Instructions/Labs/Lab_02_WorkingWithTenantProperties.md",
+      "blobSha": "28f0195b24a21cda227c3ab6345f9a48b86e23e4",
+      "bytes": 8517,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 30,
+      "headingCount": 15,
+      "mediaRefs": [
+        {
+          "alt": "Screen image showing the Azure Active Directory Properties page with the Country or region and Location settings highlighted",
+          "ref": "./media/azure-active-directory-properties-country-location.png",
+          "path": "Instructions/Labs/media/azure-active-directory-properties-country-location.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the Tenant properties page with the Tenant ID box highlighted",
+          "ref": "./media/portal-tenant-id.png",
+          "path": "Instructions/Labs/media/portal-tenant-id.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying tenant properties with the Technical contact, Global contact, and Privacy statement boxes highlighted",
+          "ref": "./media/properties-area.png",
+          "path": "Instructions/Labs/media/properties-area.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "B2B Collaboration Review permissions box with message",
+          "ref": "./media/active-directory-no-privacy-statement-or-contact.png",
+          "path": "Instructions/Labs/media/active-directory-no-privacy-statement-or-contact.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 1
+    },
+    {
+      "path": "Instructions/Labs/Lab_03_AssignLicensesToUsersByGroupMembershipAAD.md",
+      "blobSha": "2a439a2fba4ad66799d0af1152cda790f566bdce",
+      "bytes": 9547,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 62,
+      "headingCount": 17,
+      "mediaRefs": [
+        {
+          "alt": "Screen image the Office.com website with Delia Dennis logged in but no office applications are available, because no license is assigned.",
+          "ref": "./media/delia-no-office-license.png",
+          "path": "Instructions/Labs/media/delia-no-office-license.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the New Group page with Group type, Group name, Owners, and Members highlighted",
+          "ref": "./media/lp1-mod2-create-group.png",
+          "path": "Instructions/Labs/media/lp1-mod2-create-group.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image the Office.com website with Delia Dennis logged in with office applications available, because a license is assigned.",
+          "ref": "./media/delia-office-license.png",
+          "path": "Instructions/Labs/media/delia-office-license.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the New Group page with Group type, Group name, Owners, and Members highlighted",
+          "ref": "./media/lp1-mod2-create-o365-group.png",
+          "path": "Instructions/Labs/media/lp1-mod2-create-o365-group.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the dynamic group membership rules page with rule syntax highlighted",
+          "ref": "./media/lp1-mod3-dynamic-group-membership-rule.png",
+          "path": "Instructions/Labs/media/lp1-mod3-dynamic-group-membership-rule.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 1
+    },
+    {
+      "path": "Instructions/Labs/Lab_04_ConfigureExternalCollaborationSettings.md",
+      "blobSha": "eb9ba6f029f1f99bec681e57186d9be4335d51ba",
+      "bytes": 6052,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 16,
+      "headingCount": 7,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying guest user access restriction options",
+          "ref": "./media/lp1-mod3-guest-user-access-restrictions.png",
+          "path": "Instructions/Labs/media/lp1-mod3-guest-user-access-restrictions.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying guest invite settings with Guests can invite set to No and highlighted",
+          "ref": "./media/lp1-mod3-guest-user-invite-settings.png",
+          "path": "Instructions/Labs/media/lp1-mod3-guest-user-invite-settings.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_05_AddGuestUsersToTheDirectory.md",
+      "blobSha": "db526b785d425b984c7ae00e36558aaef80f2ded",
+      "bytes": 7320,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 27,
+      "headingCount": 10,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the All user page with the Bulk operations and Bulk invite menu options highlighted",
+          "ref": "./media/lp1-mod3-bulk-invite-option.png",
+          "path": "Instructions/Labs/media/lp1-mod3-bulk-invite-option.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the example bulk invite guests template CSV",
+          "ref": "./media/lp1-mod3-template-csv.png",
+          "path": "Instructions/Labs/media/lp1-mod3-template-csv.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying Bulk invite users with File uploaded successfully message highlighted",
+          "ref": "./media/lp1-mod3-bulk-invite-users-upload-csv.png",
+          "path": "Instructions/Labs/media/lp1-mod3-bulk-invite-users-upload-csv.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the results of a bulk operation",
+          "ref": "./media/lp1-mod3-bulk-operations-results.png",
+          "path": "Instructions/Labs/media/lp1-mod3-bulk-operations-results.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 5
+    },
+    {
+      "path": "Instructions/Labs/Lab_06_AddFederatedIdentityProvider.md",
+      "blobSha": "642a6d8c4136f0cff05a3c26b2724bff0f22ede7",
+      "bytes": 9054,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 55,
+      "headingCount": 14,
+      "mediaRefs": [],
+      "codeBlockCount": 1
+    },
+    {
+      "path": "Instructions/Labs/Lab_07_AddHybridIdentityWithAzureADConnect.md",
+      "blobSha": "850e37c6566895cdc4b9e116570f5cddf122b010",
+      "bytes": 38234,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 130,
+      "headingCount": 19,
+      "mediaRefs": [],
+      "codeBlockCount": 16
+    },
+    {
+      "path": "Instructions/Labs/Lab_08_EnableAzureADMultiFactorAuthentication.md",
+      "blobSha": "8ca5d1eeca3dbc488a53911ff38e28b126ef9513",
+      "bytes": 7620,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 41,
+      "headingCount": 12,
+      "mediaRefs": [
+        {
+          "alt": "Screenshot showing MFA options in the dashboard",
+          "ref": "./media/lp2-mod1-set-additional-mfa-settings.png",
+          "path": "Instructions/Labs/media/lp2-mod1-set-additional-mfa-settings.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screenshot showing MFA configuration",
+          "ref": "./media/lp2-mod1-mfa-settings.png",
+          "path": "Instructions/Labs/media/lp2-mod1-mfa-settings.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screenshot highlighting the New Policy button in the Microsoft Entra admin center.",
+          "ref": "./media/lp2-mod1-azure-ad-conditional-access-policy.png",
+          "path": "Instructions/Labs/media/lp2-mod1-azure-ad-conditional-access-policy.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screenshot showing the complete Add Policy dialog",
+          "ref": "./media/lp2-mod1-conditional-access-new-policy-complete.png",
+          "path": "Instructions/Labs/media/lp2-mod1-conditional-access-new-policy-complete.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screenshot showing the MFA option",
+          "ref": "./media/lp2-mod1-users-mfa.png",
+          "path": "Instructions/Labs/media/lp2-mod1-users-mfa.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screenshot showing the MFA options",
+          "ref": "./media/lp2-mod1-mfa-service-settings-and-users.png",
+          "path": "Instructions/Labs/media/lp2-mod1-mfa-service-settings-and-users.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_09_ConfigureAndDeploySelfServicePasswordReset.md",
+      "blobSha": "ee2f816d9a253b5a8bde596f20b0f4834610543d",
+      "bytes": 5726,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 31,
+      "headingCount": 10,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the New Group page with group type, group name, and create highlighted",
+          "ref": "./media/lp2-mod2-create-sspr-security-group.png",
+          "path": "Instructions/Labs/media/lp2-mod2-create-sspr-security-group.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the Password reset properties page with selected, select group, and save highlighted",
+          "ref": "./media/lp2-mod2-enable-password-reset-for-selected-group.png",
+          "path": "Instructions/Labs/media/lp2-mod2-enable-password-reset-for-selected-group.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_10_AzureADAuthenticationForWindowsAndLinuxVM.md",
+      "blobSha": "9432255dd8d478dab7a79d79326a97cca80303f6",
+      "bytes": 8929,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 62,
+      "headingCount": 15,
+      "mediaRefs": [],
+      "codeBlockCount": 1
+    },
+    {
+      "path": "Instructions/Labs/Lab_11_AssignAzureResourceRolesInPrivilegedIdentityManagement.md",
+      "blobSha": "bcf8b9a8440db5d6425dd75979d72317115cea2b",
+      "bytes": 4518,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 23,
+      "headingCount": 7,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the recently added Azure resource",
+          "ref": "./media/lp4-mod3-pim-az-resource-overview.png",
+          "path": "Instructions/Labs/media/lp4-mod3-pim-az-resource-overview.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_12_ManageAzureADSmartLockoutValues.md",
+      "blobSha": "3cf557853fdd2f55199d12abc18192868c8f5691",
+      "bytes": 2650,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 7,
+      "headingCount": 6,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Authentication methods page and the highlighted selections to browse to Password authentication",
+          "ref": "./media/lp2-mod3-browse-to-password-protection.png",
+          "path": "Instructions/Labs/media/lp2-mod3-browse-to-password-protection.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_13_ImplementAndTestAConditionalAccessPolicy.md",
+      "blobSha": "62be34fbb41dae67e9376696fe990acad813072c",
+      "bytes": 9249,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 53,
+      "headingCount": 14,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Conditional Access page with New policy highlighted",
+          "ref": "./media/lp2-mod1-conditional-access-new-policy.png",
+          "path": "Instructions/Labs/media/lp2-mod1-conditional-access-new-policy.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying a new conditional access policy with policy settings highlighted",
+          "ref": "./media/lp2-mod3-create-conditional-access-policy.png",
+          "path": "Instructions/Labs/media/lp2-mod3-create-conditional-access-policy.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying a the blocked resource access due to an enabled conditional access policy",
+          "ref": "./media/lp2-mod3-test-conditional-access-policy.png",
+          "path": "Instructions/Labs/media/lp2-mod3-test-conditional-access-policy.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the Conditional Access page with New policy highlighted",
+          "ref": "./media/lp2-mod1-conditional-access-new-policy.png",
+          "path": "Instructions/Labs/media/lp2-mod1-conditional-access-new-policy.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying a new conditional access policy with policy settings highlighted",
+          "ref": "./media/lp2-mod3-create-session-conditional-access-policy.png",
+          "path": "Instructions/Labs/media/lp2-mod3-create-session-conditional-access-policy.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_14_EnableSignRiskPolicy.md",
+      "blobSha": "027d21c78b97e463511be4631b80c91e01a5a719",
+      "bytes": 4154,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 22,
+      "headingCount": 7,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Conditional Access page and the Create new policy option",
+          "ref": "./media/lp2-mod4-browse-to-identity-protection.png",
+          "path": "Instructions/Labs/media/lp2-mod4-browse-to-identity-protection.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_15_ConfigureAAD_MultiFactorAuthRegPolicy.md",
+      "blobSha": "444a383b83fa3af7dbcb23dd7176a370131db2ce",
+      "bytes": 3673,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 15,
+      "headingCount": 7,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the MFA registration policy page with browsing path highlighted",
+          "ref": "./media/lp2-mod4-browse-to-mfa-registration-policy.png",
+          "path": "Instructions/Labs/media/lp2-mod4-browse-to-mfa-registration-policy.png",
+          "matched": false,
+          "retrievedAndHashVerified": false
+        },
+        {
+          "alt": "Screen image displaying the MFA registration policy page with browsing path highlighted",
+          "ref": "./media/lp2-mod4-browse-to-mfa-registration-policy1.png",
+          "path": "Instructions/Labs/media/lp2-mod4-browse-to-mfa-registration-policy1.png",
+          "matched": false,
+          "retrievedAndHashVerified": false
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_16_UsingAzureKeyVaultForManagedIdentities.md",
+      "blobSha": "6f7fb8a942faea30592b13ea0e3525f7d79bcb35",
+      "bytes": 6344,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 40,
+      "headingCount": 10,
+      "mediaRefs": [],
+      "codeBlockCount": 5
+    },
+    {
+      "path": "Instructions/Labs/Lab_17_DefenderForCloudAppsDiscoveryAndRestrictions.md",
+      "blobSha": "2f54ed7020c1922bf7bdba3a999dcd711dd8ad8f",
+      "bytes": 2953,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 14,
+      "headingCount": 7,
+      "mediaRefs": [],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_18_DefenderForCloudAppsAccessPolicies.md",
+      "blobSha": "f9fd6179252e3ae45eaeaf95efa4a103f6a0a1bc",
+      "bytes": 6634,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 48,
+      "headingCount": 13,
+      "mediaRefs": [],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_19_RegisterAnApplication.md",
+      "blobSha": "f8966156758ab463bf1dd6149e30e4b8c4ae2577",
+      "bytes": 14890,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 41,
+      "headingCount": 12,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Register an application page with the name and default settings highlighted",
+          "ref": "./media/lp3-mod3-register-an-application.png",
+          "path": "Instructions/Labs/media/lp3-mod3-register-an-application.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screenshot of the Platform configuration pane in the Azure portal",
+          "ref": "./media/configure-platforms.png",
+          "path": "Instructions/Labs/media/configure-platforms.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screenshot of Azure portal showing the Certificates and secrets pane in app registration",
+          "ref": "./media/portal-05-app-reg-04-credentials.png",
+          "path": "Instructions/Labs/media/portal-05-app-reg-04-credentials.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "An app registration's Expose an API pane in the Azure portal",
+          "ref": "./media/portal-02-expose-api.png",
+          "path": "Instructions/Labs/media/portal-02-expose-api.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screenshot of the Expose an API pane showing two exposed scopes.",
+          "ref": "./media/portal-03-scopes-list.png",
+          "path": "Instructions/Labs/media/portal-03-scopes-list.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the Roles and administrators blade with the New custom role menu option highlighted",
+          "ref": "./media/lp3-mod1-new-custom-role.png",
+          "path": "Instructions/Labs/media/lp3-mod1-new-custom-role.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the New custom role Permissions tab with search, manage permissions, and Next highlighted",
+          "ref": "./media/lp3-mod1-custom-role-permissions.png",
+          "path": "Instructions/Labs/media/lp3-mod1-custom-role-permissions.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 1
+    },
+    {
+      "path": "Instructions/Labs/Lab_20_ImplementAccessManagementForApps.md",
+      "blobSha": "63bca856b88f28d49d25869e477078640123bc6c",
+      "bytes": 2852,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 14,
+      "headingCount": 7,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Enterprise applications page with New application highlighted",
+          "ref": "./media/lp3-mod1-new-enterprise-application.png",
+          "path": "Instructions/Labs/media/lp3-mod1-new-enterprise-application.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the Browse Microsoft Entra Gallery page with the search box highlighted",
+          "ref": "./media/lp3-mod1-azure-ad-gallery-search.png",
+          "path": "Instructions/Labs/media/lp3-mod1-azure-ad-gallery-search.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying adding a user account assignment to an app with the Select button highlighted ",
+          "ref": "./media/lp3-mod1-add-app-assignment.png",
+          "path": "Instructions/Labs/media/lp3-mod1-add-app-assignment.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_21_GrantTenantWideAdminConsentToAnApplication.md",
+      "blobSha": "2c5b5f79a343548f3b8e4f7b47a006698ae200b7",
+      "bytes": 3977,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 13,
+      "headingCount": 7,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Demo app page with the directory ID highlighted",
+          "ref": "./media/lp3-mod3-demo-app-directory-id.png",
+          "path": "Instructions/Labs/media/lp3-mod3-demo-app-directory-id.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the API permission page with Grant admin consent for Contoso highlighted",
+          "ref": "./media/lp3-mod3-api-permissions-admin-consent.png",
+          "path": "Instructions/Labs/media/lp3-mod3-api-permissions-admin-consent.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the Demo app permissions page with Grant admin consent for Contoso highlighted",
+          "ref": "./media/lp3-mod3-grant-admin-consent-in-enterprise-app.png",
+          "path": "Instructions/Labs/media/lp3-mod3-grant-admin-consent-in-enterprise-app.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_22_CreateAndManageACatalogOfResourcesInAADEntitlementManagement.md",
+      "blobSha": "bf9e85d158a6df97bd2bc30df138246ecab515aa",
+      "bytes": 8134,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 40,
+      "headingCount": 11,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Identity governance catalog page with the New catalog menu highlighted ",
+          "ref": "./media/lp4-mod1-identity-governance-new-catalog.png",
+          "path": "Instructions/Labs/media/lp4-mod1-identity-governance-new-catalog.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the New catalog pan with the Name, Description, Enabled, and Create options highlighted",
+          "ref": "./media/lp4-mod1-new-catalog-marketing.png",
+          "path": "Instructions/Labs/media/lp4-mod1-new-catalog-marketing.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Add resources to a catalog",
+          "ref": "./media/catalog-add-resources.png",
+          "path": "Instructions/Labs/media/catalog-add-resources.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the Roles and administrators page for the Marketing catalog",
+          "ref": "./media/lp4-mod1-catalog-roles-and-admins.png",
+          "path": "Instructions/Labs/media/lp4-mod1-catalog-roles-and-admins.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the properties being enabled.",
+          "ref": "./media/lp4-mod1-edit-marketing-catalog.png",
+          "path": "Instructions/Labs/media/lp4-mod1-edit-marketing-catalog.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_23_AddTermsOfUseAcceptanceReporting.md",
+      "blobSha": "897df2c861cc3ccd9cc732be6c1c97b5b900a1b7",
+      "bytes": 15000,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 60,
+      "headingCount": 13,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Terms of use page with New terms highlighted",
+          "ref": "./media/lp4-mod1-new-terms-of-use.png",
+          "path": "Instructions/Labs/media/lp4-mod1-new-terms-of-use.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Expire consents settings to set start date, frequency, and duration",
+          "ref": "./media/lp4-mod1-new-terms-of-use-create.png",
+          "path": "Instructions/Labs/media/lp4-mod1-new-terms-of-use-create.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the New terms of use page with configured options highlighted",
+          "ref": "./media/lp4-mod1-new-terms-of-use-create.png",
+          "path": "Instructions/Labs/media/lp4-mod1-new-terms-of-use-create.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the conditional access policy with configuration options highlighted",
+          "ref": "./media/lp4-mod1-terms-of-use-ca-policy.png",
+          "path": "Instructions/Labs/media/lp4-mod1-terms-of-use-ca-policy.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the terms of use with the Accepted and Declined columns highlighted",
+          "ref": "./media/lp4-mod1-terms-of-use-accept-decline.png",
+          "path": "Instructions/Labs/media/lp4-mod1-terms-of-use-accept-decline.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Terms of use consents pane listing the users that have accepted",
+          "ref": "./media/accepted-tou.png",
+          "path": "Instructions/Labs/media/accepted-tou.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Example terms of use that appears when a user signs in",
+          "ref": "./media/user-tou.png",
+          "path": "Instructions/Labs/media/user-tou.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "View of terms of use with zoom buttons",
+          "ref": "./media/zoom-buttons.png",
+          "path": "Instructions/Labs/media/zoom-buttons.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Example terms of use that appears when a user signs in on a mobile device",
+          "ref": "./media/mobile-tou.png",
+          "path": "Instructions/Labs/media/mobile-tou.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image of a popup which says \"View settings and privacy\"",
+          "ref": "./media/lp4-mod1-myaccount-setting-and-privacy.png",
+          "path": "Instructions/Labs/media/lp4-mod1-myaccount-setting-and-privacy.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the settings and privacy page with organization's notes highlighted",
+          "ref": "./media/lp4-mod1-myaccount-setting-and-privacy-org-notes.png",
+          "path": "Instructions/Labs/media/lp4-mod1-myaccount-setting-and-privacy-org-notes.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image of the Identity Governance terms of use being edited.",
+          "ref": "./media/lp4-mod1-edit-terms-of-use.png",
+          "path": "Instructions/Labs/media/lp4-mod1-edit-terms-of-use.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the terms of use with the update option highlighted",
+          "ref": "./media/lp4-mod1-edit-terms-of-use-update.png",
+          "path": "Instructions/Labs/media/lp4-mod1-edit-terms-of-use-update.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the update terms of use version pane with the upload required pdf and require re-accept highlighted",
+          "ref": "./media/lp4-mod1-update-terms-of-use-version.png",
+          "path": "Instructions/Labs/media/lp4-mod1-update-terms-of-use-version.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_24_ManageTheLifecycleOfExternalUsersInAADIdentityGovernanceSettings .md",
+      "blobSha": "996aff2db8ada67cbf0a00cddd510bb66ea96b90",
+      "bytes": 4370,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 9,
+      "headingCount": 6,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Identity governance settings page with manage the lifecycle of external users highlighted.",
+          "ref": "./media/lp4-mod1-manage-lifcycle-of-ext-users.png",
+          "path": "Instructions/Labs/media/lp4-mod1-manage-lifcycle-of-ext-users.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_25_CreatingAccessReviewsForUsers.md",
+      "blobSha": "64d6b806faf28650fd96dac176ba9acda7f4e86f",
+      "bytes": 3633,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 19,
+      "headingCount": 6,
+      "mediaRefs": [],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_26_ConfigurePrivilegedIdentityManagementForAADRoles.md",
+      "blobSha": "b61ba9780feb738a6db1813bb3a2f61dbd6ddb97",
+      "bytes": 11160,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 53,
+      "headingCount": 14,
+      "mediaRefs": [
+        {
+          "alt": "Screen image displaying the Microsoft Entra roles page with the Settings menu highlighted",
+          "ref": "./media/lp3-mod3-pim-ad-roles-settings.png",
+          "path": "Instructions/Labs/media/lp3-mod3-pim-ad-roles-settings.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the top portion of the Role setting details -Compliance Administrator page with Edit highlighted",
+          "ref": "./media/lp4-mod3-pim-edit-compliance-role.png",
+          "path": "Instructions/Labs/media/lp4-mod3-pim-edit-compliance-role.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the edit role settings page and select a member pane with the selected members highlighted",
+          "ref": "./media/lp4-mod3-pim-add-approver.png",
+          "path": "Instructions/Labs/media/lp4-mod3-pim-add-approver.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying Microsoft Entra roles with Add assignments menu highlighted",
+          "ref": "./media/lp4-mod3-pim-assign-role.png",
+          "path": "Instructions/Labs/media/lp4-mod3-pim-assign-role.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the select a member pane with a selected member highlighted",
+          "ref": "./media/lp4-mod3-pim-add-role-assignment.png",
+          "path": "Instructions/Labs/media/lp4-mod3-pim-add-role-assignment.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying My roles with eligible role assignments highlighted",
+          "ref": "./media/lp4-mod3-my-roles.png",
+          "path": "Instructions/Labs/media/lp4-mod3-my-roles.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying a popup to activate the compliance administrator",
+          "ref": "./media/lp4-mod3-pim-activate-role.png",
+          "path": "Instructions/Labs/media/lp4-mod3-pim-activate-role.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        },
+        {
+          "alt": "Screen image displaying the options listed in the action column of the Compliance Adminsitrator",
+          "ref": "./media/lp4-mod3-pim-edit-role-assignments.png",
+          "path": "Instructions/Labs/media/lp4-mod3-pim-edit-role-assignments.png",
+          "matched": true,
+          "retrievedAndHashVerified": true
+        }
+      ],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_27_MicrosoftSentinelKustoQueries.md",
+      "blobSha": "76fc4bbaa69b56249bc91010f05eb40c3d2650f1",
+      "bytes": 5720,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 27,
+      "headingCount": 8,
+      "mediaRefs": [],
+      "codeBlockCount": 0
+    },
+    {
+      "path": "Instructions/Labs/Lab_28_MonitorIdentitySecureScore.md",
+      "blobSha": "9f6defb20cb60865f1ab130f202f8a865fdbe59b",
+      "bytes": 5051,
+      "decision": "topic adaptation; detailed operations and media unresolved",
+      "retrieved": true,
+      "shaVerified": true,
+      "numberedLines": 14,
+      "headingCount": 7,
+      "mediaRefs": [],
+      "codeBlockCount": 0
+    }
+  ],
+  "media": [
+    {
+      "path": "Instructions/Labs/media/accepted-tou.png",
+      "blobSha": "5270fcfe58694930a3f1f5e1c2c313b2d882ba21",
+      "bytes": 120357,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/active-directory-no-privacy-statement-or-contact.png",
+      "blobSha": "b98927849bc4e820d551fc868eb993ba4af923e5",
+      "bytes": 30368,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/add-saml-idp.png",
+      "blobSha": "26575874a097c82f3b82ee07c113ce2c89c40e2d",
+      "bytes": 29876,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/azure-active-directory-properties-country-location.png",
+      "blobSha": "be471a794c8213d787c41bc6ec9f3f4ef92a6732",
+      "bytes": 24242,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/azure-portal-menu-aad.png",
+      "blobSha": "d5397ed36cef7a80b50ae9f1c61e294d3bad5620",
+      "bytes": 73197,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/azurepassactivation.png",
+      "blobSha": "9b21b151b1877c12cca3c9e774e9185797b63527",
+      "bytes": 25485,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/bulkimportexample.png",
+      "blobSha": "2c8646415ded32c0082f1e929d466df036810f5b",
+      "bytes": 108355,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/catalog-add-resources.png",
+      "blobSha": "1b1cd5f592fe81a36e865296ef99895544571b61",
+      "bytes": 55203,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/configure-platforms.png",
+      "blobSha": "b2c552157787e244cbc73567cbe6217485c75ca9",
+      "bytes": 96193,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/delia-no-office-license.png",
+      "blobSha": "e4156bf165ba5b2affa539c600160494c7f18c08",
+      "bytes": 47189,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/delia-office-license.png",
+      "blobSha": "096a46a736273e3b8126e9423d153c52040c8ee6",
+      "bytes": 45721,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/directory-role-remove-role.png",
+      "blobSha": "bb1eedf394ded869eb91aee59ee03639a5780d4c",
+      "bytes": 107141,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/directory-role-select-role.png",
+      "blobSha": "a7d9a5146559e23c936b9262f74d3dc97a582f3a",
+      "bytes": 47101,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/linkedinlookup.png",
+      "blobSha": "f304df2241f95d5d6fb678c2f22d04da091baf14",
+      "bytes": 86412,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod2-assign-license-group.png",
+      "blobSha": "295fd1a4a1a7f667e301e9d251b36db51319e771",
+      "bytes": 18058,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod2-assign-user-license-options.png",
+      "blobSha": "44095255fb4efc77d8cf8e5ef9eb96bca32e1f77",
+      "bytes": 20452,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod2-change-group-license.png",
+      "blobSha": "730714eeb951832ad0a62d8a1851c998e566707d",
+      "bytes": 42158,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod2-create-group.png",
+      "blobSha": "5248ca7169d2bacba19445d4d4d829f794091bc5",
+      "bytes": 73411,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod2-create-o365-group.png",
+      "blobSha": "bf215c31823e772559b6af27c2990f197010daa4",
+      "bytes": 28133,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod2-remove-user.png",
+      "blobSha": "a4652a58df963325e5a5322c1efc30b5ca774764",
+      "bytes": 50461,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod3-bulk-invite-option.png",
+      "blobSha": "86d0f50a402f28c2db81b4adb0135a4364c8a495",
+      "bytes": 18869,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod3-bulk-invite-users-upload-csv.png",
+      "blobSha": "4f9a6437e42ee371647c009fe87961201acf1c75",
+      "bytes": 48708,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod3-bulk-operations-results.png",
+      "blobSha": "d1e0c1200c259c5dbd5d0a0ba58b92dc8b281545",
+      "bytes": 39820,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod3-dynamic-group-membership-rule.png",
+      "blobSha": "93d9f555c5fae3578b608462c0a070c16a3adaaf",
+      "bytes": 83890,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod3-guest-user-access-restrictions.png",
+      "blobSha": "8bc777edfc1a5cb8cf2894e0043579ff13beb517",
+      "bytes": 10379,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod3-guest-user-invite-settings.png",
+      "blobSha": "f2b9e2eb11dfd5c482c7bfa9011f773e1e79a825",
+      "bytes": 17570,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod3-new-guest-user-menu-selection.png",
+      "blobSha": "04aafe3bbbd2bf68695a2679438a6da4fb43a7de",
+      "bytes": 19312,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp1-mod3-template-csv.png",
+      "blobSha": "530535ec51da22e8b4bc4be46444c9ddfe624c1a",
+      "bytes": 10104,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod1-azure-ad-conditional-access-policy.png",
+      "blobSha": "fc0ca03d03209a0d0c0174a3f21e1e652cc5515f",
+      "bytes": 46964,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod1-conditional-access-new-policy-complete.png",
+      "blobSha": "1a321fafc07dee672d237b79c9621e1730d39ce2",
+      "bytes": 119985,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod1-conditional-access-new-policy.png",
+      "blobSha": "00989a8c1fc560a7ce3862cb6492de36be15ea63",
+      "bytes": 299962,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod1-mfa-service-settings-and-users.png",
+      "blobSha": "e217532727faebe0893b7156735ed41d150ee6a3",
+      "bytes": 33206,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod1-mfa-settings.png",
+      "blobSha": "1b269a9dcecc44efdce2c9791e8c00f1e3ac76e3",
+      "bytes": 47127,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod1-set-additional-mfa-settings.png",
+      "blobSha": "42458a27d8c0c3634291b38dcb773233cb686198",
+      "bytes": 50283,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod1-users-mfa.png",
+      "blobSha": "4cbeccbaf6fefa2ea3bce415c762366f6b4bf1bd",
+      "bytes": 38097,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod2-create-sspr-security-group.png",
+      "blobSha": "922064d93a3b3b51bd269b4b3046129bfd2bb6b7",
+      "bytes": 77056,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod2-enable-password-reset-for-selected-group.png",
+      "blobSha": "f97544d3864decbfb785ecf88c0d51399436293a",
+      "bytes": 147590,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod2-get-back-into-your-account-page.png",
+      "blobSha": "a7f9bf5ffe0dcbe254d34278901d2a9f3469df88",
+      "bytes": 162671,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod2-keep-your-account-secure-page.png",
+      "blobSha": "10cbb0e357ed43cd9ea9e1eaeff0d57d6940b72e",
+      "bytes": 137390,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod2-sspr-verification-step-1.png",
+      "blobSha": "18bb740b6a8d8f174a33527db903d8acaa2a0c22",
+      "bytes": 27627,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod3-browse-to-password-protection.png",
+      "blobSha": "ee666855c7e251b6d90007d61f8ebe3ea5e2c4b4",
+      "bytes": 50329,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod3-create-conditional-access-policy.png",
+      "blobSha": "3f8c3c76be068a2a1732f9322dd2d6f02c36cf5c",
+      "bytes": 91125,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod3-create-session-conditional-access-policy.png",
+      "blobSha": "56ce46add0cbe8fa026b39c574d0eae4a8bc8ee5",
+      "bytes": 22742,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod3-test-conditional-access-policy.png",
+      "blobSha": "fa23ba70a7da3b782fb2831334fdf4173bdc5fc6",
+      "bytes": 22004,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp2-mod4-browse-to-identity-protection.png",
+      "blobSha": "6d8fe7fee0d30122e2d53e1cfd0b09cf9c659db1",
+      "bytes": 261570,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod1-add-app-assignment.png",
+      "blobSha": "76daeef50d73ce109ff7bd8f0a9d8ced4e646105",
+      "bytes": 85244,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod1-azure-ad-gallery-search.png",
+      "blobSha": "415d87c159ced81f1782e2e94266c759a9a79015",
+      "bytes": 22680,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod1-custom-role-permissions.png",
+      "blobSha": "7cd8ebe8be4cfb72350aec9b57d70fd329f9293b",
+      "bytes": 205948,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod1-new-custom-role.png",
+      "blobSha": "fd32b014760e8741c0d0b2cacfb9cb3608962989",
+      "bytes": 594560,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod1-new-enterprise-application.png",
+      "blobSha": "c003b0fcadffa448b4d7d897048f16bb56c7d543",
+      "bytes": 30142,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod3-api-permissions-admin-consent.png",
+      "blobSha": "32fc2387f88a97c39a075a9ad53888a9fb0a23af",
+      "bytes": 117166,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod3-app-roles-create-app-role.png",
+      "blobSha": "88b082b3b4d4a54bc77835d3fec643e8532929f0",
+      "bytes": 107069,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod3-demo-app-directory-id.png",
+      "blobSha": "c235038e419bfa82cfaf59906a1fa418a0de2312",
+      "bytes": 115091,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod3-grant-admin-consent-in-enterprise-app.png",
+      "blobSha": "1ad98c6164ed53a146b71c99be974de74c93fc6c",
+      "bytes": 193472,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod3-pim-ad-roles-settings.png",
+      "blobSha": "1885a9963a9d5669750e5374eb3bbbeadbd01ae5",
+      "bytes": 140232,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp3-mod3-register-an-application.png",
+      "blobSha": "58b3926a21088361e10ff31c7add06eb43f65f29",
+      "bytes": 183195,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-catalog-roles-and-admins.png",
+      "blobSha": "1f4b95313d1481ab1ed8802c79f017a88ff6ee96",
+      "bytes": 28101,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-edit-marketing-catalog.png",
+      "blobSha": "17a88e9a2f9d5ccacec1f1293dfc6bbb60f5d418",
+      "bytes": 78986,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-edit-terms-of-use-update.png",
+      "blobSha": "cda8fc65bf2ae49b35fe1939125ad062d299834a",
+      "bytes": 64553,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-edit-terms-of-use.png",
+      "blobSha": "08526580c9939b92d91f4ebc5017d86375be364e",
+      "bytes": 77155,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-identity-governance-new-catalog.png",
+      "blobSha": "90c983805242b68413f4fecdd105c93826af9c3d",
+      "bytes": 126307,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-manage-lifcycle-of-ext-users.png",
+      "blobSha": "ab197ef4b7ede1413ebed4a9b874cff0a0dde6bf",
+      "bytes": 133727,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-myaccount-setting-and-privacy-org-notes.png",
+      "blobSha": "d440392c8fa6f77816ab717f004992b3a15622a4",
+      "bytes": 35757,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-myaccount-setting-and-privacy.png",
+      "blobSha": "2c1d63131010cd4a5d0b6a17682ac7d9acb5f1eb",
+      "bytes": 74825,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-new-catalog-marketing.png",
+      "blobSha": "791bf9acc4cb8bed97afafdd88f277c61db3352d",
+      "bytes": 39623,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-new-terms-of-use-create.png",
+      "blobSha": "36583155aaddd73a344d74e63c6a9622a7fd744e",
+      "bytes": 9545,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-new-terms-of-use.png",
+      "blobSha": "29adc0a6340b452c73a1b173f1007d319ecb5af0",
+      "bytes": 121357,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-terms-of-use-accept-decline.png",
+      "blobSha": "0939a71bc400afca38769dbf2b27f40ed4294395",
+      "bytes": 92888,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-terms-of-use-ca-policy.png",
+      "blobSha": "bc8b66d13cd2bcfcaba715ad1773cb19f2dd9d29",
+      "bytes": 110838,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod1-update-terms-of-use-version.png",
+      "blobSha": "d1b3dce4c86d49c9a94ee00f4e79f12290186db8",
+      "bytes": 47078,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-my-roles.png",
+      "blobSha": "c95797cb014fe4b3af2c88d362c7b7ff42a64327",
+      "bytes": 87293,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-pim-activate-role.png",
+      "blobSha": "ce449a676ef0196d8934047c6eab04516a2e7233",
+      "bytes": 62449,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-pim-add-approver.png",
+      "blobSha": "0010fb60819c980c19990cd0d64062a2afe6b2b6",
+      "bytes": 174756,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-pim-add-role-assignment.png",
+      "blobSha": "f17cc3bc26b55d3f3af8f96a08a50edf47df1558",
+      "bytes": 54978,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-pim-assign-role.png",
+      "blobSha": "e5850a4d20209a0aa1000e07dd4ff454cac5b0a8",
+      "bytes": 46258,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-pim-az-resource-overview.png",
+      "blobSha": "ff3e4453d96791c8915b84f7c42c16dec38f5adb",
+      "bytes": 67654,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-pim-azure-resource-management.png",
+      "blobSha": "dae167d1dfc951be2b7707ea19402deac9cc2145",
+      "bytes": 81847,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-pim-edit-compliance-role.png",
+      "blobSha": "84b6e65e5ba5b28013d6a33a6740921c42920ef0",
+      "bytes": 97133,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod3-pim-edit-role-assignments.png",
+      "blobSha": "4ccc3048a617d2ca0d999a5977fdf9458a10d34d",
+      "bytes": 14305,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod4-sentinel-add-aad-connector.png",
+      "blobSha": "9561635c29edd444c8e885d5c319d01808876c86",
+      "bytes": 91047,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/lp4-mod4-sentinel-config-aad-connector.png",
+      "blobSha": "378d1551b58f3866144d2976a421e47e487385e3",
+      "bytes": 121258,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/mobile-tou.png",
+      "blobSha": "48aae5a9134e9e5c4aa5173ca7e52a1601a80077",
+      "bytes": 54150,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/portal-02-expose-api.png",
+      "blobSha": "5d497dd1fdf912ebda7b332cb6e6be1ace99c9c4",
+      "bytes": 230520,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/portal-03-scopes-list.png",
+      "blobSha": "55ad9464f3396408220dd4372c4ec109ba573628",
+      "bytes": 20385,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/portal-05-app-reg-04-credentials.png",
+      "blobSha": "2166b5b3f9fe6b123f02728176b8883320e9bcff",
+      "bytes": 48374,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/portal-tenant-id.png",
+      "blobSha": "0e76214c520816e74d17aa8e914197bbdadf5972",
+      "bytes": 33690,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/properties-area.png",
+      "blobSha": "eb209cc4fea5e0576942eb9f86a6ca040be66ce3",
+      "bytes": 30675,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/security-defaults-disable-before-conditional-access.png",
+      "blobSha": "399f608471f673caaa0628f7f4b7767d41598875",
+      "bytes": 124182,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/selectonedrive.png",
+      "blobSha": "51125cb3631ccc1b49ca7af67afd4327e750058f",
+      "bytes": 21251,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/user-tou.png",
+      "blobSha": "93de2d6c0eb086deece6ebb5299ca3a473864461",
+      "bytes": 29323,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/view-history-menu.png",
+      "blobSha": "b646eed1783fec512d9beabab1ea70c940ddd19a",
+      "bytes": 87905,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/view-history-pane.png",
+      "blobSha": "5f1eae79a25aa01ac22d586bd4791a2abe36a8e1",
+      "bytes": 7712,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    },
+    {
+      "path": "Instructions/Labs/media/zoom-buttons.png",
+      "blobSha": "540df0accc68b602e1dc9d11d7aa6f8c8c4374fa",
+      "bytes": 92700,
+      "status": "pinned inventory; visual review pending",
+      "retrieved": true,
+      "shaVerified": true
+    }
+  ]
+}
