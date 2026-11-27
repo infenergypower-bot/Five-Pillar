@@ -1,5 +1,13 @@
 # MD-102 exam-readiness master execution ledger — R4
 Updated November 27, 2026. Scope: October 27, 2026 Microsoft MD-102 blueprint. Preserve legacy IDs and user progress. No new paid resources, subscriptions or scheduled jobs.
+
+## R6 continuation — focused question qualification and procedural practice
+- Reviewed eight inherited cases against direct Microsoft documentation: assignment exclusions/filters, Conditional Access report-only outcomes, Win32 detection, dependencies, supersedence, Graph pagination, throttling and Remediations triggers. Replaced implausible distractors and generic explanations with scenario-specific reasoning. IDs and correct-answer indices remain stable. These are author documentation checks, not independent validation of the bank.
+- Corrected the revised app-detection case to APP-069 and remediation-trigger case to OPE-080. Other inherited mappings still require substantive review.
+- Added four original offline procedural fixtures at `#procedures-r6`, linked from their respective objective lessons: MAN-032 targeting, INF-015 evaluation/enforcement, OPE-073 paging, OPE-080 remediation. Each includes prerequisites, guided steps, configurable inputs, computed evidence, independent verification prompts and cleanup. Conditional Access requires observing report-only failure before enforcing the noncompliant fixture. These are deliberately limited models, not complete portal replicas or evidence of tenant competency.
+- Local Chrome verification passed: 20 valid configuration combinations, five invalid/unknown input cases, positive/negative UI workflows, all four persisted across reload, four prerequisite links, reset isolation, phone viewport and zero page errors. Existing R5 regression passed all 83 routes, wrong/correct responses, persistence and gates; R4 regression passed all 14 levels, 52 runtime checks, weighted nonoverlapping exam forms and exposure behavior. All 674 existing bank candidates remain structurally valid. No learner's existing browser profile was used.
+- Browser tests accept optional `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to use an installed Chrome. New regression: `node academy-tests/qa-procedures-r6.cjs [base-url]` with Playwright available or `PLAYWRIGHT_MODULE` configured.
+- Production verification is pending for this commit. Full source/question qualification, remaining procedural coverage, independent expert review and authorized real-tenant competency remain open. No new paid resources or subscriptions.
 Status definitions: verified = specific acceptance test passed; partial = implemented but incomplete coverage or validation; blocked = evidence or authorization not available. A deployed feature is not necessarily exam-ready content.
 
 ## 38 acceptance requirements
