@@ -14,7 +14,7 @@ function assessment(id){
  const item=CASES[id];if(!item)return '';
  const progress=window.MD102V9.progress(id);
  if(!progress.started)return '<div class="v13-card"><p><b>Diagnostic workshop:</b> Start the workplace ticket to unlock the scenario questions and study its prerequisites.</p></div>';
- const r=record(id),a=latest(id),completed=item.steps.every((q,i)=>r.choices[i]!==undefined);
+ const r=record(id),a=r.draftActive?null:latest(id),completed=item.steps.every((q,i)=>r.choices[i]!==undefined);
  const originalTicket=(window.MD102V9.tickets||[]).find(t=>t.id===id);
  const practiceStatus=originalTicket&&window.MD102V9.status(originalTicket).pass;
  return '<section class="v13-card" aria-label="Structured diagnostic reasoning"><div class="v13-head"><span>NEW · STRUCTURED TROUBLESHOOTING</span><h2>Diagnose → verify → correct</h2><p>Three workplace decisions assess your troubleshooting reasoning separately from the simulated device/policy state. Do not change a real device based on this educational simulation.</p><div class="v13-summary"><span>'+(practiceStatus?'✓':'○')+' Configuration evidence '+(practiceStatus?'passed':'pending')+'</span><span>'+(diagnosticPass(id)?'✓':'○')+' Diagnosis '+(diagnosticPass(id)?'passed':'pending')+'</span><span>'+(fullMastery(id)?'✓ Combined training checkpoint passed':'Two independent outcomes required for combined checkpoint')+'</span></div></div>'+
@@ -49,9 +49,9 @@ document.addEventListener('click',ev=>{
  let route=String(state.route||'');if(!route.startsWith('ticket:'))return;
  let id=route.slice(7),item=CASES[id];if(!item||!window.MD102V9.progress(id).started)return;
  let r=record(id);
- if(b.hasAttribute('data-v13choose')){let [i,j]=b.dataset.v13choose.split(':').map(Number);if(!item.steps[i]||!Number.isInteger(j)||j<0||j>=3)return;r.choices[i]=j;save();render();return;}
- if(b.hasAttribute('data-v13score')){if(item.steps.some((q,i)=>r.choices[i]===undefined))return;let answers=item.steps.map((_,i)=>r.choices[i]),score=answers.filter((a,i)=>a===item.steps[i].answer).length;r.attempts.push({at:Date.now(),score,answers,passed:score===3});r.attempts=r.attempts.slice(-30);save();render();return;}
- if(b.hasAttribute('data-v13clear')){r.choices={};save();render();return;}
+ if(b.hasAttribute('data-v13choose')){let [i,j]=b.dataset.v13choose.split(':').map(Number);if(!item.steps[i]||!Number.isInteger(j)||j<0||j>=3)return;r.choices[i]=j;r.draftActive=true;save();render();return;}
+ if(b.hasAttribute('data-v13score')){if(item.steps.some((q,i)=>r.choices[i]===undefined))return;let answers=item.steps.map((_,i)=>r.choices[i]),score=answers.filter((a,i)=>a===item.steps[i].answer).length;r.attempts.push({at:Date.now(),score,answers,passed:score===3});r.attempts=r.attempts.slice(-30);r.draftActive=false;save();render();return;}
+ if(b.hasAttribute('data-v13clear')){r.choices={};r.draftActive=true;save();render();return;}
 });
 window.MD102V13={cases:CASES,record,diagnosticPass,fullMastery,get summary(){return {cases:Object.keys(CASES).length,questions:Object.values(CASES).reduce((n,v)=>n+v.steps.length,0),diagnosticsPassed:Object.keys(CASES).filter(diagnosticPass).length,combinedPassed:Object.keys(CASES).filter(fullMastery).length}}};
 store();render();
