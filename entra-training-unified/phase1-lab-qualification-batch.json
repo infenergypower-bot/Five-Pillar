@@ -2,8 +2,228 @@
   "asOf": "2026-11-27",
   "repository": "MicrosoftLearning/SC-300-Identity-and-Access-Administrator",
   "pin": "53345303d69ef62e2f5707cf2f7bd1b969b29077",
-  "reviewScope": "Full Markdown body reviewed, including task instructions and image references. Image pixels and live tenant execution not reviewed. Current Microsoft Learn role, procedure and licensing references cross-checked at topic level. Four source-specific adaptations, not exhaustive operation-by-operation validation.",
+  "reviewScope": "All 29 pinned lab bodies retrieved during source review; topic-level adaptations and selected technical guidance corrections. Some long bodies were condensed for review. Not a claim of per-operation, media or every link validation. Local practice uses fictional data.",
   "rows": [
+    {
+      "number": 0,
+      "chapter": "tenant",
+      "title": "Lab 00: Safe tenant and subscription preflight",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_00_SetUpLabResources.md",
+      "reason": "Replace mandatory trial signup with authorization and existing entitlement checks.",
+      "prereq": "Approved tenant, named admin, scoped access; no trials or purchases.",
+      "mechanism": "Tenant is a directory; subscription is a resource/billing boundary; license enables feature. Verify tenant ID, role, entitlement and resource scope before any operation.",
+      "practice": "Entra Free tenant, no subscription: classify directory read, CA, PIM, VM deployment.",
+      "answer": "Authorized read may be possible. CA and PIM require applicable existing licenses; VM deployment needs authorized subscription and budget. Use local alternatives.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/fundamentals/licensing",
+        "https://learn.microsoft.com/en-us/entra/fundamentals/what-is-entra"
+      ]
+    },
+    {
+      "number": 1,
+      "chapter": "users",
+      "title": "Lab 01: Provision, delegate, recover and license users",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_01_ManageUserRoles.md",
+      "reason": "Retain individual, CSV and Graph provisioning; reject shared passwords, ForceChangePasswordNextSignIn=false, plain-text credential storage and dated installer.",
+      "prereq": "User Administrator for eligible user creation, Privileged Role Administrator for role assignment, License Administrator and available seats.",
+      "mechanism": "UPN identifies sign-in; object ID identifies object; roles grant privileges, licenses enable services. App registration defaults differ from enterprise app management. Soft-deleted user normally recoverable 30 days.",
+      "practice": "Model Chris: create unique temporary credential with forced change, reject duplicate CSV UPN, add/remove Application Administrator, delete/restore and assign existing seat.",
+      "answer": "Check new-session permissions before/after role change; verify restored object and dependent assignments independently. No purchase on seat exhaustion. Graph permissions and directory role are both evaluated.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/users/users-bulk-add",
+        "https://learn.microsoft.com/en-us/graph/api/user-post-users?view=graph-rest-1.0",
+        "https://learn.microsoft.com/en-us/entra/fundamentals/license-users-groups"
+      ]
+    },
+    {
+      "number": 2,
+      "chapter": "tenant",
+      "title": "Lab 02: Tenant properties, domains and privacy",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_02_WorkingWithTenantProperties.md",
+      "reason": "Separate verified custom domains from onmicrosoft.com management; reject assumed fabricated subdomain and using sample privacy PDF as legal policy.",
+      "prereq": "Authorized domain/property administrator, approved DNS ownership proof and legal notice.",
+      "mechanism": "Tenant ID stays stable on display rename. Domain proof validates namespace; UPN and region are separate. Privacy contact/URL publishes notice, not authorization.",
+      "practice": "Classify display rename, custom domain verification, onmicrosoft.com fallback domain, technical contact and privacy statement.",
+      "answer": "Verify DNS proof only for authorized domain; use supported Microsoft 365 fallback-domain flow. Check notice from user view; no actual DNS or production changes.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/fundamentals/add-custom-domain",
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/setup/add-or-replace-your-onmicrosoftcom-domain"
+      ]
+    },
+    {
+      "number": 3,
+      "chapter": "users",
+      "title": "Lab 03: Group membership and licensing",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_03_AssignLicensesToUsersByGroupMembershipAAD.md",
+      "reason": "Retain security/M365 groups, assigned/dynamic membership, licensing; reject broad all-user rules without impact review.",
+      "prereq": "Groups Administrator, License Administrator, eligible existing licenses, seats and usage location.",
+      "mechanism": "Dynamic rules evaluate attributes asynchronously. Group license is inherited; direct assignment can coexist. M365 groups support collaboration.",
+      "practice": "Sales member, Finance member, Sales guest; rule Sales AND Member; one directly licensed user and insufficient seats. Predict assignment and removal.",
+      "answer": "Only Sales member matches. Capacity, conflicting service plans or location can block assignment. Direct license can survive group removal. Check per-user license errors in M365 admin center.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/users/groups-dynamic-tutorial",
+        "https://learn.microsoft.com/en-us/entra/identity/users/licensing-groups-assign",
+        "https://learn.microsoft.com/en-us/entra/identity/users/licensing-group-advanced"
+      ]
+    },
+    {
+      "number": 4,
+      "chapter": "users",
+      "title": "Lab 04: External collaboration policy boundaries",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_04_ConfigureExternalCollaborationSettings.md",
+      "reason": "Keep guest visibility, invite roles, domain allow/deny and OTP. Do not enable self-service indiscriminately or call OTP universally strongest.",
+      "prereq": "Authorized external identities admin, approved domains and test identities.",
+      "mechanism": "Guest directory visibility, invitation authorization, domain restriction, cross-tenant access and resource grants are distinct.",
+      "practice": "Compare allowed partner and denied unknown domain; existing redeemed guest; authorized inviter vs guest; existing SharePoint grant.",
+      "answer": "New invitation may be blocked independently of resource access. Domain restriction is not retroactive blanket revocation of redeemed access; check resource sharing and existing assignments.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure",
+        "https://learn.microsoft.com/en-us/entra/external-id/allow-deny-list",
+        "https://learn.microsoft.com/en-us/entra/external-id/cross-tenant-access-overview"
+      ]
+    },
+    {
+      "number": 5,
+      "chapter": "users",
+      "title": "Lab 05: Invite, redeem and verify B2B identity",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_05_AddGuestUsersToTheDirectory.md",
+      "reason": "Retain CSV and Graph invitation; replace broad User.ReadWrite.All with least-privileged User.Invite.All where applicable. No real invitations.",
+      "prereq": "Guest Inviter or authorized role per policy; validated email and redirect; approved Graph scope.",
+      "mechanism": "Invitation creates/uses guest object; sendInvitationMessage controls mail; redemption state and resource grant are separate.",
+      "practice": "Model valid address, missing redirect and duplicate; draft fictional invitation with sendInvitationMessage false; compare pending, accepted, resource-assigned.",
+      "answer": "Reject invalid input; inspect existing object. Verify guest ID, redemption and resource grant independently. Do not contact actual addresses.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/graph/api/invitation-post?view=graph-rest-1.0",
+        "https://learn.microsoft.com/en-us/entra/external-id/b2b-quickstart-add-guest-users-portal",
+        "https://learn.microsoft.com/en-us/entra/external-id/redemption-experience"
+      ]
+    },
+    {
+      "number": 6,
+      "chapter": "users",
+      "title": "Lab 06: Google federation and external trust",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_06_AddFederatedIdentityProvider.md",
+      "reason": "Retain OAuth client, redirects, test audience and redemption. Reject shared Google accounts, plain-text secrets, universal Bluetooth/passkey claim.",
+      "prereq": "Approved existing provider project/workforce tenant, authorized test identity and secure secret store.",
+      "mechanism": "IdP authenticates guest; Entra binds identity and issues resource token. Client ID is identifier, secret confidential; callback exact match matters.",
+      "practice": "Model correct callback, wrong callback, expired secret and successful sign-in without app grant.",
+      "answer": "Wrong callback/expired secret fail federation; successful authentication is not authorization. Verify issuer, redirect, redemption and app grant. No external project created.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/external-id/google-federation",
+        "https://learn.microsoft.com/en-us/entra/external-id/redemption-experience",
+        "https://learn.microsoft.com/en-us/entra/identity-platform/redirect-uri-restrictions"
+      ]
+    },
+    {
+      "number": 7,
+      "chapter": "hybrid",
+      "title": "Lab 07: Hybrid sync without provisioning",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_07_AddHybridIdentityWithAzureADConnect.md",
+      "reason": "Keep AD infrastructure, UPN, Connect installation, inbound rules, staged sync, PTA and hybrid join. Reject old VM template/trial provisioning and insecure credentials; detailed commands not fully qualified.",
+      "prereq": "Approved existing supported AD/Connect environment, Hybrid Identity Administrator and on-prem rights. No VM or trial.",
+      "mechanism": "Import, join/transform, export; verified UPN controls sign-in suffix, source anchor links identities. Scope changes can delete objects; staging previews exports. PHS/PTA/federation are distinct.",
+      "practice": "Model three users/two suffixes; include approved suffix, exclude remainder; inspect staged adds/deletes; compare PHS/PTA outage; interpret DomainJoined YES/AzureAdJoined NO.",
+      "answer": "Abort unexpected deletion and preserve deletion guard. PTA requires agents; PHS uses synced hash in cloud. Hybrid join requires both domain and Entra state. No real exports.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-sync-configure-filtering",
+        "https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-sync-staging-server",
+        "https://learn.microsoft.com/en-us/entra/architecture/resilience-in-hybrid"
+      ]
+    },
+    {
+      "number": 8,
+      "chapter": "auth",
+      "title": "Lab 08: Modern MFA methods and enforcement",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_08_EnableAzureADMultiFactorAuthentication.md",
+      "reason": "Supersede legacy MFA method management retired September 30, 2025; per-user MFA is legacy enforcement; no shared admin passwords or app-password rollout.",
+      "prereq": "Authentication Policy Administrator; CA Administrator and existing P1 for CA. Free security defaults are separate.",
+      "mechanism": "Methods policy permits methods, registration binds credentials, CA requires factor/strength during sign-in. Registered does not mean every session challenged.",
+      "practice": "Fictional Delia registered push and passkey; pilot policy requires phishing-resistant strength; compare passkey, password+push, out-of-scope and report-only.",
+      "answer": "Supported passkey may satisfy strength; push alone does not satisfy phishing-resistant strength. Report-only logs projected effect. Verify sign-in policy and auth details.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods-manage",
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-mfa-getstarted",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-authentication-strengths",
+        "https://learn.microsoft.com/en-us/entra/fundamentals/security-defaults"
+      ]
+    },
+    {
+      "number": 9,
+      "chapter": "auth",
+      "title": "Lab 09: SSPR and combined registration",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_09_ConfigureAndDeploySelfServicePasswordReset.md",
+      "reason": "Retain pilot, scope, registration and positive/negative tests; use unified methods policy instead of legacy method toggles.",
+      "prereq": "Authorized SSPR admin and applicable existing license; hybrid writeback prerequisites separate.",
+      "mechanism": "Scope determines eligibility, methods policy defines proof, registration records methods. Cloud reset and AD writeback are separate.",
+      "practice": "Allan pilot member with two proofs, Grady outside pilot, synced user without writeback; predict reset outcomes.",
+      "answer": "Allan succeeds only with required proofs, Grady not in scope, hybrid reset needs writeback when applicable. Verify audit and fresh sign-in without touching real users.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods-manage",
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-registration-mfa-sspr-combined",
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/tutorial-enable-sspr"
+      ]
+    },
+    {
+      "number": 10,
+      "chapter": "device",
+      "title": "Lab 10: Entra VM login without weakening RDP",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_10_AzureADAuthenticationForWindowsAndLinuxVM.md",
+      "reason": "Keep managed identity, Windows/Linux extensions and VM login RBAC; reject default disabling NLA/CredSSP.",
+      "prereq": "Existing approved VM, supported OS/client, identity, extension, RBAC and network; no new compute.",
+      "mechanism": "VM User Login vs Administrator Login governs OS access; Contributor alone does not grant OS login. Windows RDP and Linux SSH have distinct flows.",
+      "practice": "Reader, Contributor, VM User Login: predict OS vs management access; troubleshoot missing extension, wrong tenant, network.",
+      "answer": "VM User Login is separate non-admin permission; verify extension, scope, client and network. Use supported web-account RDP or OpenSSH; no insecure port/security changes.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/devices/howto-vm-sign-in-azure-ad-windows",
+        "https://learn.microsoft.com/en-us/entra/identity/devices/howto-vm-sign-in-azure-ad-linux",
+        "https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal"
+      ]
+    },
+    {
+      "number": 11,
+      "chapter": "govern",
+      "title": "Lab 11: Eligible Azure resource role",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_11_AssignAzureResourceRolesInPrivilegedIdentityManagement.md",
+      "reason": "Keep PIM eligibility, activation, duration and removal; source explicitly blocks some actual tasks. Global Admin alone is not Azure resource authority.",
+      "prereq": "Existing P2/Governance and authorized resource-scope role-assignment administrator.",
+      "mechanism": "Azure RBAC scope is independent of directory role. Eligible is not active; activation follows configured approval/MFA and time.",
+      "practice": "Engineer eligible API Management Contributor on one resource group, approval required, 1h. Compare pending, approved, expired, unrelated scope.",
+      "answer": "Only active approved window grants scoped role. Verify schedule/request and active assignment, expiration, negative test. No live elevation.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/id-governance/licensing-fundamentals",
+        "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-resource-roles-assign-roles",
+        "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-resource-roles-activate-your-roles"
+      ]
+    },
+    {
+      "number": 12,
+      "chapter": "auth",
+      "title": "Lab 12: Smart lockout versus password protection",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_12_ManageAzureADSmartLockoutValues.md",
+      "reason": "Separate cloud lockout duration/threshold from on-prem banned-password audit/enforce mode. Never lock real accounts for a lab.",
+      "prereq": "Existing P1+ for customization, approved auth policy admin.",
+      "mechanism": "Smart lockout considers familiar/unfamiliar behavior and avoids counting repeated identical bad hashes; AD lockout is distinct.",
+      "practice": "Synthetic repeated identical and distinct failures; compare cloud and AD threshold with PTA; identify evidence.",
+      "answer": "Raw event count alone is insufficient. Coordinate cloud/AD controls and inspect sign-in evidence; simulate lockout only.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-password-smart-lockout",
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-password-ban-bad",
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-sspr-policy"
+      ]
+    },
     {
       "chapter": "policy",
       "path": "Instructions/Labs/Lab_13_ImplementAndTestAConditionalAccessPolicy.md",
@@ -19,6 +239,125 @@
         "https://learn.microsoft.com/en-us/entra/identity/conditional-access/what-if-tool",
         "https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-block-example",
         "https://learn.microsoft.com/en-us/entra/identity/conditional-access/plan-conditional-access"
+      ],
+      "number": 13
+    },
+    {
+      "number": 14,
+      "chapter": "policy",
+      "title": "Lab 14: Risk-based Conditional Access",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_14_EnableSignRiskPolicy.md",
+      "reason": "Keep separate user/sign-in risks and remediation; replace immediate all-user enforcement with pilot/report-only review.",
+      "prereq": "Existing P2/eligible suite, CA admin, approved scope and usable strong credentials.",
+      "mechanism": "User risk estimates account compromise; sign-in risk estimates illegitimate request. Detection, policy and remediation differ.",
+      "practice": "A high user risk/low sign-in, B reverse, C neither. Model high-risk report-only and hypothetical enforcement.",
+      "answer": "A user-risk policy, B sign-in-risk policy, C neither. Report-only not enforcement; confirm current compatible grants, emergency access and audit.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/plan-conditional-access"
+      ]
+    },
+    {
+      "number": 15,
+      "chapter": "auth",
+      "title": "Lab 15: MFA registration policy and adoption",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_15_ConfigureAAD_MultiFactorAuthRegPolicy.md",
+      "reason": "Distinguish licensed ID Protection registration policy, registration campaign and CA Register security information user action.",
+      "prereq": "Existing P2 for ID Protection registration policy, authorized method admin, licensed CA when relevant.",
+      "mechanism": "Registration enables proof; campaign nudges; registration CA secures enrollment; sign-in CA controls access.",
+      "practice": "Not registered, SMS registered, passkey registered: compare adoption and phishing-resistant sign-in requirement.",
+      "answer": "Registration status does not prove strength or actual MFA usage. Verify registration and sign-in evidence separately.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-mfa-getstarted",
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-registration-campaign",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-all-users-security-info-registration"
+      ]
+    },
+    {
+      "number": 16,
+      "chapter": "workloads",
+      "title": "Lab 16: Managed identity and Key Vault authorization",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_16_UsingAzureKeyVaultForManagedIdentities.md",
+      "reason": "Prefer RBAC over broad Secret Management access policy; do not print secrets/tokens or assume archival API version current.",
+      "prereq": "Approved existing VM/vault, managed identity, network and data-plane RBAC; no new Azure resource.",
+      "mechanism": "System-assigned identity lifecycle tied to resource. Correct audience plus resource role required; Key Vault Contributor does not grant secret read.",
+      "practice": "Compare Graph audience vs vault audience, Key Vault Reader vs Secrets User, unrelated scope.",
+      "answer": "Wrong audience fails; correct audience without permission denied; approved Secrets User can read within scope. Check networking and role propagation; never expose real secret.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-access-policy",
+        "https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide",
+        "https://learn.microsoft.com/en-us/entra/managed-identities-azure-resources/overview"
+      ]
+    },
+    {
+      "number": 17,
+      "chapter": "ops",
+      "title": "Lab 17: Discovery versus app enforcement",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_17_DefenderForCloudAppsDiscoveryAndRestrictions.md",
+      "reason": "Sanction/unsanction label alone is not universal blocking; requires configured supported endpoint integration or other control.",
+      "prereq": "Existing Defender for Cloud Apps and supported Endpoint integration, authorized security role.",
+      "mechanism": "Discovery observes telemetry, catalog risk describes app, sanction status expresses policy; enforcement depends on managed device and control.",
+      "practice": "Managed/unmanaged devices access fictional app; compare tag only and integrated enforcement.",
+      "answer": "Tag is not proof of block. Verify endpoint policy and logs, supported device and exception. No real restriction.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/security/zero-trust/create-policies",
+        "https://learn.microsoft.com/en-us/defender-cloud-apps/mde-integration"
+      ]
+    },
+    {
+      "number": 18,
+      "chapter": "policy",
+      "title": "Lab 18: Conditional Access App Control",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_18_DefenderForCloudAppsAccessPolicies.md",
+      "reason": "Separate CA report-only from Defender monitor-only; app and client support matter. No live alert email.",
+      "prereq": "Existing CA P1 and Defender for Cloud Apps, supported application and approved admin.",
+      "mechanism": "CA authorizes and routes supported sessions; Defender policy monitors or enforces based on filters. Banner alone is not data protection proof.",
+      "practice": "Pradeep uses Forms from compliant/unmanaged device; compare outside scope, report-only, enabled monitor-only.",
+      "answer": "Only applicable supported routed sessions get control; monitor observes not blocks. Verify sign-in and activity logs; native clients may differ.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/defender-cloud-apps/proxy-deployment-aad",
+        "https://learn.microsoft.com/en-us/defender-cloud-apps/access-policy-aad",
+        "https://learn.microsoft.com/en-us/defender-cloud-apps/troubleshooting-proxy"
+      ]
+    },
+    {
+      "number": 19,
+      "chapter": "apps",
+      "title": "Lab 19: App registration, scopes and app roles",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_19_RegisterAnApplication.md",
+      "reason": "Correct delegated scope versus application role; never store real secret in Notepad; custom credential permissions do not automatically grant app assignments.",
+      "prereq": "Approved app owner/administrator; applicable custom-role entitlement and Privileged Role Admin when required.",
+      "mechanism": "Application is definition, service principal tenant instance; public SPA uses PKCE no secret; confidential client approved credential. API validates issuer/audience/expiry plus scp or roles.",
+      "practice": "Employees API: delegated read, app-only read role, wrong audience, delegated write but user read-only. Map redirect and custom role permissions.",
+      "answer": "Correct flow plus resource permission required. Wrong audience fails; delegated scope cannot override user authority. Distinguish app roles and custom directory roles.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc",
+        "https://learn.microsoft.com/en-us/entra/identity-platform/howto-add-app-roles-in-apps",
+        "https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-configure-app-access-web-apis"
+      ]
+    },
+    {
+      "number": 20,
+      "chapter": "apps",
+      "title": "Lab 20: Enterprise app assignment versus enforcement",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_20_ImplementAccessManagementForApps.md",
+      "reason": "Assignment alone does not always restrict all users; Assignment required setting and downstream app authorization matter.",
+      "prereq": "Approved existing app, app administrator or owner; appropriate group assignment entitlement. No SaaS signup.",
+      "mechanism": "Service principal holds assignments and settings; SSO authenticates, SCIM provisions, app RBAC authorizes.",
+      "practice": "Adele assigned, Alex not; compare Assignment required Yes/No, disabled app and missing downstream account.",
+      "answer": "Yes restricts unassigned ordinary users under supported flow; No may permit sign-in subject to other rules. Verify Entra and app-side authorization separately.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/assign-user-or-group-access-portal",
+        "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/application-properties",
+        "https://learn.microsoft.com/en-us/entra/identity/app-provisioning/user-provisioning"
       ]
     },
     {
@@ -36,7 +375,8 @@
         "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/user-admin-consent-overview",
         "https://learn.microsoft.com/en-us/entra/identity-platform/howto-update-permissions",
         "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/manage-consent-requests"
-      ]
+      ],
+      "number": 21
     },
     {
       "chapter": "govern",
@@ -53,6 +393,41 @@
         "https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-delegate",
         "https://learn.microsoft.com/en-us/entra/id-governance/licensing-fundamentals",
         "https://learn.microsoft.com/en-us/entra/id-governance/create-access-review"
+      ],
+      "number": 22
+    },
+    {
+      "number": 23,
+      "chapter": "govern",
+      "title": "Lab 23: Terms of use and consent evidence",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_23_AddTermsOfUseAcceptanceReporting.md",
+      "reason": "Keep PDF/version, expiry, CA grant, report and editing. Per-device acceptance is not universally appropriate; no shared admin password.",
+      "prereq": "Approved legal document, existing applicable CA license, authorized admin and pilot.",
+      "mechanism": "Terms object contains version and acceptance; CA requires acceptance; calendar expiry differs from individual duration. OAuth consent is separate.",
+      "practice": "Alice accepts Jan 1, Bob Jan 15; monthly calendar expiry vs 30-day duration; version 2 requiring reacceptance and decline.",
+      "answer": "Calendar next expiry Feb 1 for both in model; per-user duration differs. Decline blocks if required, excluded not targeted. Verify version and record; no actual enforcement.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/id-governance/terms-of-use",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/plan-conditional-access",
+        "https://learn.microsoft.com/en-us/entra/fundamentals/licensing"
+      ]
+    },
+    {
+      "number": 24,
+      "chapter": "govern",
+      "title": "Lab 24: Governed guest lifecycle",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_24_ManageTheLifecycleOfExternalUsersInAADIdentityGovernanceSettings .md",
+      "reason": "Update narrow claim: guests invited through entitlement management or converted to governed can be lifecycle managed; independently granted resources may be affected.",
+      "prereq": "Existing entitlement management and authorized governance administrator; dependency inventory and recovery plan.",
+      "mechanism": "Final package expiry removes package access; governed guest lifecycle may block and delete account; unmanaged guests are separate.",
+      "practice": "A invited through package with extra SharePoint grant, B preexisting unmanaged, C converted governed; final package expires.",
+      "answer": "A/C may be blocked/deleted according to settings; B not automatically removed. Independent grants may remain until account action. Verify scope, history and dependencies before approved cleanup.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-external-users",
+        "https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-overview",
+        "https://learn.microsoft.com/en-us/entra/id-governance/licensing-fundamentals"
       ]
     },
     {
@@ -70,6 +445,59 @@
         "https://learn.microsoft.com/en-us/entra/id-governance/complete-access-review",
         "https://learn.microsoft.com/en-us/entra/id-governance/access-reviews-overview",
         "https://learn.microsoft.com/en-us/entra/id-governance/licensing-fundamentals"
+      ],
+      "number": 25
+    },
+    {
+      "number": 26,
+      "chapter": "govern",
+      "title": "Lab 26: PIM approval, activation and limited scope",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_26_ConfigurePrivilegedIdentityManagementForAADRoles.md",
+      "reason": "Keep eligibility, settings, approval, duration and removal; avoid shared passwords and single classroom admin as approver; source scope demo is not actual AU assignment.",
+      "prereq": "Existing P2/Governance, Privileged Role Administrator, approved independent approver and test identity.",
+      "mechanism": "Eligibility allows request; approval/activation creates time-limited privilege. AU scope limits supported operations; directory scope broader.",
+      "practice": "Miriam eligible Compliance Admin 2h: pending, denied, approved, expired; compare Sales AU User Admin with tenant-wide.",
+      "answer": "Pending/denied no privilege; approved time window only. Verify PIM history and scope; unrelated operation denied. No live role activation.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-getting-started",
+        "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-change-default-settings",
+        "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/administrative-units",
+        "https://learn.microsoft.com/en-us/entra/id-governance/licensing-fundamentals"
+      ]
+    },
+    {
+      "number": 27,
+      "chapter": "ops",
+      "title": "Lab 27: Sentinel connectors and KQL without costs",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_27_MicrosoftSentinelKustoQueries.md",
+      "reason": "Source optional lab unavailable; reject personal subscription/trial. Current Defender portal transition; use synthetic telemetry.",
+      "prereq": "Existing approved workspace/connector/permissions and explicit ingestion budget only for real work; no resources enabled.",
+      "mechanism": "Diagnostics route selected events; connectors do not prove completeness. SigninLogs and AuditLogs distinct. KQL filter/project and correlate.",
+      "practice": "Synthetic sign-ins with nonzero ResultType; audit role change. Query 24h, failures, project user/time/result; correlate by identity/time.",
+      "answer": "Empty results may mean no match, wrong range, latency or missing ingestion. Audit change not proof of attack. Use local synthetic tables.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/azure/sentinel/connect-data-sources",
+        "https://learn.microsoft.com/en-us/azure/sentinel/microsoft-sentinel-onboard",
+        "https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/signinlogs"
+      ]
+    },
+    {
+      "number": 28,
+      "chapter": "ops",
+      "title": "Lab 28: Identity Secure Score and risk remediation",
+      "decision": "adapt",
+      "path": "Instructions/Labs/Lab_28_MonitorIdentitySecureScore.md",
+      "reason": "Correct source summary: user risk, not sign-in risk. Example score and update time not universal; score is not proof of security.",
+      "prereq": "Authorized read role, existing P2 for real risk policy; CA admin and approval; local only.",
+      "mechanism": "Secure Score measures recommended controls. Recommendation, configured policy, effective behavior and score are separate.",
+      "practice": "33 fictional unprotected users; draft report-only user risk policy with emergency access, registration and license checks.",
+      "answer": "Verify scope and policy state, report-only logs and gaps; score may lag. High score not proof of no compromise. No real change.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-identity-secure-score",
+        "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/plan-conditional-access"
       ]
     }
   ]
