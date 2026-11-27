@@ -11,14 +11,19 @@ function makeNewAssessment(){let set=examSetup(),pool=set.mode==='drills'?(windo
  // Timed/full rehearsals use the 91 individually authored v4 cases rather than objective-template practice candidates.
  if(set.mode==='timed'||set.mode==='full')pool=pool.filter(q=>String(q.id||'').startsWith('v4-'));
  if(set.mode==='weakness') {let failed=(v.quizHistory||[]).filter(x=>!x.correct).map(x=>x.id),ids=new Set(failed);pool=pool.filter(q=>ids.has(q.id));if(pool.length===0){toast('No previously missed items yet. Complete an assessment first.');return}}
- if(set.mode==='domain'&&set.domain!=='all')pool=pool.filter(q=>q.domain===set.domain);
+ if((set.mode==='domain'||set.mode==='timed')&&set.domain!=='all')pool=pool.filter(q=>q.domain===set.domain);
  if(!pool.length){toast('No questions available for these settings.');return}
  const n=Math.min(Math.max(5,Number(set.size)||20),pool.length);
  let selected=[];
  if(set.mode==='full'||(set.mode==='timed'&&set.domain==='all')){
   let remain=shuffle(pool);
-  for(let [domain,weight] of Object.entries(weights)){let count=Math.round(n*weight),options=remain.filter(q=>q.domain===domain).slice(0,count);selected.push(...options);remain=remain.filter(q=>!options.includes(q))}
-  selected.push(...remain.slice(0,n-selected.length));
+  const quotas=Object.entries(weights).map(([domain,weight])=>({domain,exact:n*weight,count:Math.floor(n*weight)}));
+  let remaining=n-quotas.reduce((total,q)=>total+q.count,0);
+  const remainders=[...quotas].sort((a,b)=>(b.exact-b.count)-(a.exact-a.count));
+  for(let i=0;i<remaining;i++)remainders[i%remainders.length].count++;
+  for(let q of quotas){let options=remain.filter(item=>item.domain===q.domain).slice(0,q.count);selected.push(...options);remain=remain.filter(item=>!options.includes(item))}
+  if(selected.length<n)selected.push(...remain.slice(0,n-selected.length));
+  selected=selected.slice(0,n);
  }else selected=shuffle(pool).slice(0,n);
  let items=shuffle(selected).map(q=>({id:q.id,choiceOrder:shuffle(q.choices.map((_,i)=>i)),order:shuffle(q.choices.map((_,i)=>i))}));
  // Ensure ordering questions start unsolved, without altering solution data.
