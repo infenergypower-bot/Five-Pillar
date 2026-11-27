@@ -1,0 +1,76 @@
+{
+  "asOf": "2026-11-27",
+  "repository": "MicrosoftLearning/SC-300-Identity-and-Access-Administrator",
+  "pin": "53345303d69ef62e2f5707cf2f7bd1b969b29077",
+  "reviewScope": "Full Markdown body reviewed, including task instructions and image references. Image pixels and live tenant execution not reviewed. Current Microsoft Learn role, procedure and licensing references cross-checked at topic level. Four source-specific adaptations, not exhaustive operation-by-operation validation.",
+  "rows": [
+    {
+      "chapter": "policy",
+      "path": "Instructions/Labs/Lab_13_ImplementAndTestAConditionalAccessPolicy.md",
+      "title": "Lab 13: Policy impact before enforcement",
+      "decision": "adapt",
+      "reason": "Source text reviewed in full. Accept scoped user/resource assignment, policy evaluation, testing, rollback and session-control concepts. Supersede blanket Global Administrator assumption and immediate enforcement; do not disable Security Defaults solely for practice. Azure Monitor workbook can have separate costs; don't enable it.",
+      "prereq": "Authorized isolated tenant with applicable Conditional Access license (typically P1 for included users), Conditional Access Administrator or approved equivalent, approved test identity/resource, emergency access and rollback plan. Local model needs none.",
+      "mechanism": "Assignments decide whether a policy is in scope. The grant control determines whether access is blocked or allowed subject to requirements; session controls constrain an already-authorized session. Report-only computes impact and logs results without enforcing the policy. What If is a modeled evaluation of specified inputs, not proof that every runtime dependency or sign-in is covered.",
+      "practice": "In the local model create a fictional report-only policy targeting Debra and Sway with Block access. Compare Debra/Sway, Debra/another app, and a second user/Sway. Predict whether policy applies and whether access is actually blocked. Switch the fictional state to On and repeat, then return it to Off. Model sign-in frequency as a separate session policy rather than as an immediate account block.",
+      "answer": "Debra/Sway is in scope. Report-only records the would-block result without enforcing it; other combinations are not in scope. On enforces the block for a matching request. Off does not evaluate the policy. Verify in actual approved sign-in logs where available; an existing session, cached token, policy propagation and other policies can affect runtime observations. Never change real Security Defaults or enable a policy just to pass this course.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/what-if-tool",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-block-example",
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/plan-conditional-access"
+      ]
+    },
+    {
+      "chapter": "apps",
+      "path": "Instructions/Labs/Lab_21_GrantTenantWideAdminConsentToAnApplication.md",
+      "title": "Lab 21: Consent is a permission grant, not app registration",
+      "decision": "adapt",
+      "reason": "Full source text reviewed. Preserve configured-permission review, app registration versus enterprise application distinction, and tenant-wide grant caution. Correct blanket Global Administrator requirement: role capability depends on requested permission type; Privileged Role Administrator can grant consent for Microsoft Graph application permissions, whereas Cloud Application Administrator and Application Administrator cannot grant Graph app roles. Do not mechanically regrant existing consent.",
+      "prereq": "Fictional app and resource service principal for local exercise. Real consent requires approved app, publisher and scope verification, correct role, change authorization, and review of existing grants. No actual consent executed.",
+      "mechanism": "An application registration describes requested permissions; the enterprise app represents the service principal in a tenant. Delegated grants authorize access on behalf of a signed-in user, subject to user authorization. Application grants give the service principal access without a user and are represented by app role assignments. Listing a permission on an app registration is not proof of effective consent.",
+      "practice": "Fictional Demo App requests delegated User.Read and application Directory.ReadWrite.All. A Cloud Application Administrator is asked to approve both. Decide which grant is supportable by the role and whether either is justified by a read-only profile feature. Record client ID, resource API, requested permission type, approved grant, reviewer and before/after evidence; explain rollback.",
+      "answer": "User.Read delegated may be permitted by the applicable consent policy and administrator authority. The Graph application role cannot be granted by that administrator; a more privileged authorized role would be required, and the broad write request is unjustified for this feature. Reject it, inspect existing delegated grants and app role assignments separately, and verify a least-privilege token and denied write. No actual token or tenant-wide grant is needed.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent",
+        "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/user-admin-consent-overview",
+        "https://learn.microsoft.com/en-us/entra/identity-platform/howto-update-permissions",
+        "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/manage-consent-requests"
+      ]
+    },
+    {
+      "chapter": "govern",
+      "path": "Instructions/Labs/Lab_22_CreateAndManageACatalogOfResourcesInAADEntitlementManagement.md",
+      "title": "Lab 22: Catalog ownership, resources and guest review",
+      "decision": "adapt",
+      "reason": "Full source text reviewed. The prerequisite paragraph describes Terms of Use rather than catalog management and recommends a trial; supersede it with feature-specific governance licensing and catalog delegation guidance. The source mixes an enabled catalog with an optional staging state, and combines guest access review with catalog administration; teach those as separate operations.",
+      "prereq": "Existing eligible governance entitlement for the precise feature; authorized Identity Governance Administrator or delegated catalog creator/owner with resource-specific rights as applicable. Approved existing test resources only. No trial, paid subscription, real guest removal or production changes.",
+      "mechanism": "A catalog organizes governed resources and access packages. Adding a group, app or site to a catalog makes it available for package design, not an immediate grant to a requester. Catalog owners manage their catalog; package policy defines who can request, approval and duration. A separate review evaluates existing access. A catalog cannot be deleted while it contains access packages.",
+      "practice": "In a fictional Marketing catalog add Retail Readers group and a demo enterprise app; make Adele a catalog owner but not tenant admin. Design an access package with manager approval and 30-day expiry. Explain what changes after adding the resource versus approval versus expiry. Stage a guest review separately and compare automatic removal with manual result review. Predict what happens when a catalog with a package is deleted.",
+      "answer": "Adding a resource changes catalog availability only; the approved package assignment grants the selected resource roles, and expiry ends package-governed access. Other independent grants may remain. A catalog-scoped role is not tenant administration. Delete or retire dependent packages through approved process before removing the catalog. Validate review target, reviewer availability and nonresponse policy before any real auto-apply.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-catalog-create",
+        "https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-delegate",
+        "https://learn.microsoft.com/en-us/entra/id-governance/licensing-fundamentals",
+        "https://learn.microsoft.com/en-us/entra/id-governance/create-access-review"
+      ]
+    },
+    {
+      "chapter": "govern",
+      "path": "Instructions/Labs/Lab_25_CreatingAccessReviewsForUsers.md",
+      "title": "Lab 25: Review group access versus privileged roles",
+      "decision": "adapt",
+      "reason": "Full source text reviewed. The scenario discusses privileged assignments, but its actual operation reviews membership of a Sales and Marketing group; do not treat group membership review as a PIM role review. Replace blanket Global Administrator assumption with scope-specific review roles; reviewer decisions and application of results are separate.",
+      "prereq": "Local fictional review: no license. Real group/app review requires applicable governance license (for basic scenarios Entra ID P2 or ID Governance as specified), suitable authorized role, valid target and reviewers, and approved removal policy.",
+      "mechanism": "Define target resource, population, reviewers, schedule, nonresponse behavior and how results are applied. A reviewer can approve or deny existing access. Denial is a decision until results are applied or automatic application is configured. A review of group membership is not automatically a review of Entra or Azure privileged role assignments; use PIM review for that distinct resource type.",
+      "practice": "Review three fictional Sales members: Alex approves one member, denies a transferred member and leaves a third unanswered. Predict outcome under manual application and under an approved auto-apply policy that removes nonresponses. Identify which audit evidence proves the decision and which proves membership actually changed. Now decide how to review an eligible Entra privileged role.",
+      "answer": "With manual application, a decision does not itself establish removal; review and apply approved results, then inspect membership. Auto-apply may remove denied and nonresponding members depending on configured settings. For eligible privileged role access use the appropriate PIM access review, not an unrelated group review. Keep records of reviewer, decision, applied results and post-review membership or role assignment.",
+      "refs": [
+        "https://learn.microsoft.com/en-us/entra/id-governance/create-access-review",
+        "https://learn.microsoft.com/en-us/entra/id-governance/complete-access-review",
+        "https://learn.microsoft.com/en-us/entra/id-governance/access-reviews-overview",
+        "https://learn.microsoft.com/en-us/entra/id-governance/licensing-fundamentals"
+      ]
+    }
+  ]
+}

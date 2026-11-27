@@ -1,0 +1,36 @@
+{
+  "method": "Pinned git ls-tree, not content qualification; only explicit maintenance paths excluded. All unreviewed content remains unresolved.",
+  "total": 168509,
+  "states": {
+    "reference-license-or-policy": 39,
+    "excluded-repository-maintenance": 55,
+    "unresolved-relevance": 129626,
+    "previously-screened-unresolved": 896,
+    "priority-candidate-unreviewed": 37892,
+    "unresolved-submodule": 1
+  },
+  "repositories": {
+    "Azure-Samples/ms-identity-javascript-tutorial": 143,
+    "microsoft/entra-agentid-samples": 171,
+    "microsoft/EntraIDGovernance-Training": 48,
+    "MicrosoftDocs/entra-docs": 16240,
+    "MicrosoftDocs/learn": 56208,
+    "microsoftgraph/microsoft-graph-docs-contrib": 95070,
+    "MicrosoftLearning/AZ-040T00-Automating-Administration-with-PowerShell": 101,
+    "MicrosoftLearning/AZ-104-MicrosoftAzureAdministrator": 95,
+    "MicrosoftLearning/AZ-800-Administering-Windows-Server-Hybrid-Core-Infrastructure": 40,
+    "MicrosoftLearning/lab-explorer": 14,
+    "MicrosoftLearning/MD-102T00-Microsoft-365-Endpoint-Administrator": 33,
+    "MicrosoftLearning/SC-100-Microsoft-Cybersecurity-Architect": 27,
+    "MicrosoftLearning/SC-200T00A-Microsoft-Security-Operations-Analyst": 127,
+    "MicrosoftLearning/SC-300-Identity-and-Access-Administrator": 145,
+    "MicrosoftLearning/SC-900-Microsoft-Security-Compliance-and-Identity-Fundamentals": 47
+  },
+  "errors": [],
+  "prior_screen_rows": 944,
+  "prior_screen_matched": 944,
+  "inventory_sha256": "7f4ea274c595947d15f640653782cd59acc528e13fdd458bddf5ed416e675467",
+  "compressed_file": "phase1-full-inventory.tsv.gz",
+  "verified_count": 168509,
+  "archiveLocation": "Local checkout Documents/IdentityAcademy-Phase1/entra-training-unified/phase1-full-inventory.tsv.gz; regenerate via phase1-inventory.py. Binary upload not confirmed."
+}
