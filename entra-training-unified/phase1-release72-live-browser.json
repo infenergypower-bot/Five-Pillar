@@ -1,0 +1,78 @@
+{
+  "chapters": 14,
+  "integratedSourceLessons": 58,
+  "teachingUnits": 48,
+  "instructionalStages": 18,
+  "prerequisiteDefinitions": 109,
+  "guidedTasks": 48,
+  "checkpointCases": 14,
+  "officialObjectives": 98,
+  "officialLabs": 29,
+  "sourceRepositories": 15,
+  "localSimulators": 8,
+  "commandExercises": 12,
+  "independentScenarios": 24,
+  "detailedObjectiveLessons": 98,
+  "objectiveScenarioChecks": 98,
+  "directOfficialLabs": 29,
+  "repositorySources": 481,
+  "repositoryLabWalkthroughs": 29,
+  "repositorySupplementaryGuides": 32,
+  "repositoryLearnFiles": 268,
+  "additionalSourceAssets": 64,
+  "governanceSlides": 256,
+  "appliedLessons": 12,
+  "queryTasks": 12,
+  "apiTasks": 8,
+  "newWorkbenches": 4,
+  "additionalLearnModules": 19,
+  "granularLessons": 19,
+  "granularFields": 82,
+  "granularCases": 19,
+  "dedicatedGapLabs": 98,
+  "officialTaskHeadings": 179,
+  "atomicVocabulary": 227,
+  "transferScenarios": 48,
+  "transferForms": 2,
+  "additionalObjectiveScenarios": 50,
+  "independentObjectiveCoverage": 98,
+  "taskPracticeMapped": 179,
+  "externalPrerequisiteHeadings": 23,
+  "indexedSourceSteps": 1070,
+  "directoryOperationsWorkshop": 1,
+  "screenedSourceFiles": 944,
+  "tenantReadExercises": 8,
+  "tenantPortfolioObjectives": 98,
+  "qualifiedLabDecisions": 29,
+  "primaryVocabularyTexts": 165,
+  "coreAcronymsChecked": 55,
+  "coreAcronymsMissing": [],
+  "questions": 84,
+  "passed": 1771,
+  "failed": 0,
+  "failures": [],
+  "testType": "source and simulated render; not actual browser or real tenant",
+  "http": 200,
+  "browserErrors": [],
+  "scripts": [
+    "https://entra-console-site-production.up.railway.app/ultimate-curriculum.js?v=7.2"
+  ],
+  "liveLessonChecks": [
+    {
+      "title": "Lab 13: Policy impact before enforcement",
+      "visible": true
+    },
+    {
+      "title": "Lab 21: Consent is a permission grant, not app registration",
+      "visible": true
+    },
+    {
+      "title": "Lab 22: Catalog ownership, resources and guest review",
+      "visible": true
+    },
+    {
+      "title": "Lab 25: Review group access versus privileged roles",
+      "visible": true
+    }
+  ]
+}

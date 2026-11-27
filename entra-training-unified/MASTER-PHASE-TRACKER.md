@@ -96,3 +96,10 @@ Version 7.0 index served; health HTTP 200; complete QA request timed out. Prior 
 - No Microsoft tenant resources, trials, subscriptions or paid add-ons created. Existing local learner progress is untouched; isolated browser profiles were used.
 
 **Exact next action:** begin with the remaining 25 official SC-300 lab text bodies and their linked assets, then the full pinned Learn/Graph/Entra candidate backlog. Record evidence and decision per file; use semantic triage for nonidentity areas rather than treating filename matches as qualification. Retain Phase 1 until no in-scope item remains unresolved.
+
+### Release 7.2 production verification — 2026-11-27
+
+- GitHub curriculum commit `4da439e448094d128c2e35f31178da3522f96e12` deployed to the existing Entra Console Site Railway Function. Deployment `ae2eb4b1-47be-4a91-9adb-273bf1569561` reported SUCCESS. No new service or paid feature activated.
+- Full production `/qa-unified` endpoint returned HTTP 200; **3,734 passed, 0 failed, including 1,963 interaction checks**. [Full regression evidence](phase1-release72-full-regression.json). This covers source/simulated render and interactions, not actual Microsoft tenant competency.
+- Separate isolated live Edge session verified script version 7.2, HTTP 200, all four lab sections visible, 1,771 built-in checks passed, zero failed and zero JavaScript errors. [Live browser evidence](phase1-release72-live-browser.json).
+- Built-in unified regression gap is closed for release 7.2. Exhaustive file-level source qualification, linked media review, operation-level prerequisites, full crosswalk and accepted learning integration remain open. Retain Phase 1; do not mark Phase 2 started. Next action is unchanged.

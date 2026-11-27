@@ -1,4 +1,4 @@
-import pathlib, json, subprocess, concurrent.futures, re, csv, collections, os
+import pathlib, json, subprocess, concurrent.futures, re, csv, collections, os, gzip, shutil, hashlib
 root=pathlib.Path.home()/'Documents'/'IdentityAcademy-Phase1'
 base=root/'entra-training-unified'
 screen=json.loads((base/'qualification-screen.json').read_text(encoding='utf-8-sig'))
@@ -40,5 +40,11 @@ out=base/'phase1-full-inventory.tsv'
 with out.open('w',encoding='utf-8',newline='') as f:
     w=csv.writer(f,delimiter='\t',lineterminator='\n');w.writerow(['repository','pin','path','blob_sha','screen_state']);w.writerows(rows)
 stats={'method':'Pinned git ls-tree, not content qualification; only explicit maintenance paths excluded. All unreviewed content remains unresolved.','total':len(rows),'states':dict(collections.Counter(r[4] for r in rows)),'repositories':dict(collections.Counter(r[0] for r in rows)),'errors':errors,'prior_screen_rows':len(old),'prior_screen_matched':sum((r[0],r[2]) in old for r in rows)}
+with out.open('rb') as src, (base/'phase1-full-inventory.tsv.gz').open('wb') as dst:
+    with gzip.GzipFile(filename='',fileobj=dst,mode='wb',mtime=0) as compressed: shutil.copyfileobj(src,compressed)
+stats['inventory_sha256']=hashlib.sha256(out.read_bytes()).hexdigest()
+stats['compressed_file']='phase1-full-inventory.tsv.gz'
+stats['verified_count']=sum(1 for _ in gzip.open(base/stats['compressed_file'],'rt',encoding='utf-8'))-1
+assert stats['verified_count']==stats['total']
 (base/'phase1-inventory-summary.json').write_text(json.dumps(stats,indent=2),encoding='utf-8')
 print(json.dumps(stats),flush=True)
