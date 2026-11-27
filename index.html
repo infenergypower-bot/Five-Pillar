@@ -41,6 +41,7 @@ body{background:#fff;color:#252525;font-family:'Segoe UI',system-ui,-apple-syste
 <div class="workarea"><aside class="sidenav" id="sidenav" aria-label="Primary navigation"></aside><aside class="bladenav" id="bladenav" aria-label="Section navigation"></aside><main class="main" id="content" aria-live="polite"></main></div>
 <div class="mobile-training-bar"><button data-route="devices-overview">▣ Devices</button><button data-route="missions">◎ Guided lab</button><button data-route="curriculum">▤ Learn</button><button data-route="diagnostics">⚙ Diagnose</button></div>
 </div>
+<div id="storage-alert" hidden role="alert" style="position:fixed;bottom:12px;right:12px;z-index:10000;max-width:min(480px,90vw);background:#fff4d5;color:#332701;border:1px solid #a67510;border-radius:6px;padding:12px;box-shadow:0 2px 10px #0003"><strong>Local progress warning</strong><p id="storage-alert-text" style="margin:8px 0"></p><button type="button" id="storage-export" class="btn">Export current session</button> <button type="button" id="storage-raw" class="btn" hidden>Export original snapshot</button></div>
 <div id="coachroot"></div><div id="modalroot"></div><div id="toastroot"></div><input type="file" id="importfile" accept=".json" class="visuallyhidden" />
 <script>const ACADEMY = {
   "lessons": [
@@ -7426,9 +7427,47 @@ function seed(){const now=date();return {version:3,route:'home',records:{
  {id:'d7',name:'AND-WH-01',platform:'Android',ownership:'Corporate',join:'Entra registered',mode:'Dedicated',user:'No primary user',enrolled:true,bitlocker:true,defender:true,compliant:true,updated:true,issues:'None',lastSync:'35 minutes ago',syncCount:0}
  ],configuration:[],compliance:[],updates:[],autopilot:[],apps:[],protection:[],security:[],access:[],roles:[],scripts:[],suite:[],cloudpc:[]},
  visited:[],selected:'',actions:[],logs:[{time:now,detail:'Practice tenant created with seven example endpoints',kind:'System'}],missionActive:'',missionDone:{},caseAttempts:{},quizAnswers:{},labChecks:{},lessonTab:{},lessonDone:{},exam:null,examHistory:[],find:'',lens:'all',topic:'all',guide:true,filters:{}, decisions:{}, tourSeen:false};}
-let state;
-try{state=JSON.parse(localStorage.getItem(STORE)||'null')||seed();if(!state.records||state.version!==3)state=seed()}catch(e){state=seed()}
-function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}};
+let state, recoveryRaw=null, storageError='', storageLastSaved='';
+function validateSnapshot(value){
+ const plain=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+ if(!plain(value)||value.version!==3||!plain(value.records)||!Array.isArray(value.records.devices))throw Error('Not a supported Northstar progress snapshot (version 3).');
+ let count=0;
+ function inspect(v,depth){if(++count>300000||depth>60)throw Error('Snapshot exceeds safe complexity limits.');if(v&&typeof v==='object'){for(const key of Object.keys(v)){if(['__proto__','constructor','prototype'].includes(key))throw Error('Unsafe property in progress file.');inspect(v[key],depth+1)}}}
+ inspect(value,0);
+ const base=seed(),out={...base,...value,records:{...base.records,...value.records}};
+ for(const key of Object.keys(base.records)){if(!Array.isArray(out.records[key])||out.records[key].some(x=>!plain(x)))throw Error('Invalid record collection: '+key);}
+ for(const key of ['visited','actions','logs','examHistory'])if(!Array.isArray(out[key]))throw Error('Invalid progress list: '+key);
+ for(const key of ['missionDone','caseAttempts','quizAnswers','labChecks','lessonTab','lessonDone','filters','decisions'])if(!plain(out[key]))throw Error('Invalid progress object: '+key);
+ if(typeof out.route!=='string')out.route='home';
+ for(const key of ['v4','v5','v6','v7','v8','v9','sourceStudy','supportStudy','repositoryStudio','gapCases','moduleStudy','assetPractice','scriptReview','evidenceLab'])if(out[key]!=null&&!plain(out[key]))throw Error('Invalid learning module progress: '+key);
+ return out;
+}
+function storageBanner(){
+ const box=$('storage-alert');if(!box)return;
+ box.hidden=!storageError&&!recoveryRaw;
+ if(box.hidden)return;
+ $('storage-alert-text').textContent=recoveryRaw!==null?'The previous browser snapshot could not be validated. It has not been overwritten. Export the original data before importing a valid backup or resetting. Current practice is temporary.':storageError+' Current work may exist only in memory; export a backup before closing this page.';
+ $('storage-raw').hidden=recoveryRaw===null;
+}
+function safeRouteHash(){try{return decodeURIComponent(location.hash.slice(1))}catch(e){return ''}}
+try{
+ let raw=localStorage.getItem(STORE);
+ if(raw===null)state=seed();
+ else{try{state=validateSnapshot(JSON.parse(raw))}catch(e){recoveryRaw=raw;state=seed();storageError='Invalid stored progress: '+e.message}}
+}catch(e){state=seed();storageError='Browser storage is unavailable.'}
+function save(){
+ if(recoveryRaw!==null){storageBanner();return false}
+ try{localStorage.setItem(STORE,JSON.stringify(state));storageError='';storageLastSaved=new Date().toISOString();storageBanner();return true}
+ catch(e){storageError='Browser storage could not save this snapshot (storage may be full or blocked).';storageBanner();return false}
+}
+function replaceSnapshot(incoming){
+ const next=validateSnapshot(incoming);next.route='home';
+ // Do not discard the in-memory session if the replacement cannot be persisted.
+ try{localStorage.setItem(STORE,JSON.stringify(next))}catch(e){throw Error('Replacement could not be stored. Your current session is unchanged. Export it first.')}
+ recoveryRaw=null;storageError='';state=next;
+ try{history.replaceState(null,'',location.pathname+location.search+'#home')}catch(e){}
+ location.reload();
+}
 function log(detail,kind='Info',device='',action=''){state.logs.unshift({time:date(),detail,kind});if(state.logs.length>150)state.logs.length=150;if(action)state.actions.push({time:Date.now(),action,device});if(state.actions.length>200)state.actions.shift();save()}
 function toast(t){$('toastroot').innerHTML='<div class="toast" role="status">'+esc(t)+'</div>';clearTimeout(window.toastTimeout);window.toastTimeout=setTimeout(()=>$('toastroot').innerHTML='',3600)}
 function nav(route){state.route=route;state.visited=[...new Set([...state.visited,route])];save();window.location.hash=encodeURIComponent(route);$('sidenav').classList.remove('open');$('mobilemenu').setAttribute('aria-expanded','false');if($('topresults'))$('topresults').hidden=true;render();window.scrollTo(0,0)}
@@ -7578,7 +7617,7 @@ function deviceAction(action,name){const d=state.records.devices.find(x=>x.name=
 function download(name,type,text){let blob=new Blob([text],{type}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
 function exportState(){download('endpoint-lab-progress-'+new Date().toISOString().slice(0,10)+'.json','application/json',JSON.stringify(state,null,2));log('Exported practice progress','System','','Export JSON');toast('Progress file downloaded')}
 function exportCsv(){let columns=['Device name','Platform','Ownership','Entra join','MDM enrolled','Compliant','BitLocker','Last sync','Issue'];let rows=state.records.devices.map(d=>[d.name,d.platform,d.ownership,d.join,d.enrolled,d.compliant,d.bitlocker,d.lastSync,d.issues]);let csv=[columns,...rows].map(arr=>arr.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\r\n');download('simulated-device-inventory.csv','text/csv',csv);log('Exported simulated device inventory as CSV','Report','','Export CSV');toast('Device CSV downloaded');render()}
-function importState(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const incoming=JSON.parse(r.result);if(incoming.version!==3||!incoming.records||!Array.isArray(incoming.records.devices))throw new Error('Invalid progress file format');state=incoming;save();nav('home');toast('Progress imported successfully')}catch(e){toast('Could not import: '+e.message)}};r.readAsText(file)}
+function importState(file){if(!file)return;if(file.size>10000000){toast('Progress file exceeds the 10 MB import limit');return}const r=new FileReader();r.onload=()=>{try{const incoming=validateSnapshot(JSON.parse(r.result));confirmDialog('Replace local progress?','Import will replace the current local simulation and reload all learning modules. Export your current session first if you want to keep it.',()=>{try{replaceSnapshot(incoming)}catch(e){toast('Could not import: '+e.message)}})}catch(e){toast('Could not import: '+e.message)}finally{if($('importfile'))$('importfile').value=''}};r.onerror=()=>{toast('Could not read the selected progress file');if($('importfile'))$('importfile').value=''};r.readAsText(file)}
 function render(){const route=state.route||'home';try{
  $('sidenav').innerHTML=navSidebar();$('bladenav').innerHTML=modernBladeNav();let page;
  if(route==='home')page=adminOverview();else if(route==='academy-home')page=dashboard();else if(route==='devices-overview')page=devicesOverview();else if(route==='apps-overview')page=appsOverview();else if(route==='security-overview')page=securityOverview();else if(route==='tenant-overview')page=tenantOverview();else if(route==='diagnostics')page=diagnosticsView();else if(route==='curriculum')page=curriculum();else if(route.startsWith('lesson:'))page=lessonPage(route.split(':')[1]);else if(route==='missions')page=missions();else if(route==='cases')page=casesPage();else if(route.startsWith('case:'))page=casePage(route.slice(5));else if(route==='exam')page=examPage();else if(route==='readiness')page=readiness();else if(route==='glossary')page=glossary();else if(route==='devices')page=devices();else if(route==='enrollment')page=enrollment();else if(route==='reports')page=reports();else if(route==='troubleshoot')page=troubleshoot();else if(route==='agents')page=agentsPage();else if(route==='suite')page=suitePage();else if(schema[route])page=entityPage(route);else page=adminOverview();
@@ -7587,7 +7626,7 @@ function render(){const route=state.route||'home';try{
  }catch(e){console.error('Simulator page error',route,e);$('content').innerHTML='<div class="callout warn"><h2>This screen encountered an error</h2><p>'+esc(e.message)+'</p><button class="btn primary" data-route="diagnostics">Open application diagnostics</button></div>'}}
 function startMission(id){let m=ACADEMY.missions.find(x=>x.id===id);if(!m)return;state.missionActive=id;save();nav(m.route);toast('Guided mission active: '+m.title)}
 function completeLesson(id){let l=ACADEMY.lessons.find(x=>x.id===+id);if(!l)return;let correct=l.quiz.filter((q,i)=>state.quizAnswers[id+'-'+i]===q.correct).length;if(correct>=Math.ceil(l.quiz.length*.67)){state.lessonDone[id]=true;save();toast('Lesson marked as mastered');render()}else toast('Answer at least '+Math.ceil(l.quiz.length*.67)+' of '+l.quiz.length+' correctly first. Review the teaching section.')}
-function maybeReset(){confirmDialog('Reset all local practice data?','This deletes all simulated devices you created, mission progress, notes and exam scores in this browser. Export your progress first.',()=>{state=seed();save();$('modalroot').innerHTML='';nav('home');toast('The offline practice tenant was reset')})}
+function maybeReset(){confirmDialog('Reset all local practice data?','This deletes all simulated devices you created, mission progress, notes and exam scores in this browser. Export your progress first. The academy will reload and rebuild the original practice fleet.',()=>{try{replaceSnapshot(seed())}catch(e){toast('Could not reset: '+e.message)}})}
 // Context menu controls and guided tutor actions, independent of content re-rendering.
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.os){state.filters.device=b.dataset.os;save();nav('devices');return}
@@ -7627,9 +7666,10 @@ document.addEventListener('input',e=>{const el=e.target;if(el.hasAttribute('data
 document.addEventListener('submit',e=>{if(e.target.id==='recordform'){e.preventDefault();submitRecord(e.target)}});
 $('mobilemenu').addEventListener('click',()=>{let open=$('sidenav').classList.toggle('open');$('mobilemenu').setAttribute('aria-expanded',String(open))});
 $('importfile').addEventListener('change',e=>importState(e.target.files[0]));
-window.addEventListener('hashchange',()=>{let r=decodeURIComponent(location.hash.slice(1));if(r&&r!==state.route){state.route=r;state.visited=[...new Set([...state.visited,r])];save();render()}});
+window.addEventListener('hashchange',()=>{let r=safeRouteHash();if(r&&r!==state.route){state.route=r;state.visited=[...new Set([...state.visited,r])];save();render()}});
 setInterval(()=>{if(state.route==='exam'&&state.exam&&!state.exam.finished){const n=$('examclock');if(n)n.textContent=mmss(state.exam.endsAt-Date.now());if(state.exam.endsAt<Date.now())finishExam()}},1000);
-if(location.hash.slice(1)){const r=decodeURIComponent(location.hash.slice(1));if(r)state.route=r}
+if(location.hash.slice(1)){const r=safeRouteHash();if(r)state.route=r}
+$('storage-export').addEventListener('click',()=>exportState());$('storage-raw').addEventListener('click',()=>{if(recoveryRaw!==null)download('northstar-original-recovery.json','application/json',recoveryRaw)});
 state.visited=[...new Set([...state.visited,state.route])];save();render();
 
 </script>
@@ -7715,5 +7755,6 @@ state.visited=[...new Set([...state.visited,state.route])];save();render();
 <script src="module-study-data.js"></script>
 <script src="module-study.js"></script>
 <script src="official-md102-asset-practice.js"></script>
+<script src="endpoint-evidence-lab.js"></script>
 <noscript><style>.app{display:none!important}</style><main style="max-width:750px;margin:10vh auto;padding:24px;font:16px/1.6 system-ui,Arial"><h1>Intune training simulator needs a browser</h1><p>This file preview is blocking JavaScript, so clicking the training controls here cannot work. It is not a Microsoft tenant issue.</p><p><strong>For iPad:</strong> upload the included <code>index.html</code> to a static HTTPS host such as GitHub Pages, then open the resulting website in Safari. You can also open the HTML file on a desktop computer in Chrome or Edge.</p><p>The training workbook remains readable without any scripts. Never enter real Microsoft credentials into this simulator.</p></main></noscript>
 </body></html>
