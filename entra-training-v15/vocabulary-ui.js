@@ -8,7 +8,7 @@
   "https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-overview"
  ];
  const entries=[V15_DIRECTORY,V15_AUTH,V15_APPLICATIONS,V15_GOVERNANCE].flatMap((rows,category)=>rows.map((r,i)=>{
-  if(r.length!==9||r.some(x=>typeof x!=="string"||x.length<15))throw Error("Incomplete granular vocabulary entry "+category+"-"+i);
+  if(r.length!==9||!r[0]||r.slice(1).some(x=>typeof x!=="string"||x.length<15))throw Error("Incomplete granular vocabulary entry "+category+"-"+i);
   const [term,definition,does,why,when,how,micro,macro,failure]=r;
   return {id:term.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""),term,definition,does,why,when,how,micro,macro,failure,category,source:sources[category]};
  }));
