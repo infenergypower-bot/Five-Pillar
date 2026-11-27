@@ -54,40 +54,67 @@ applies=function(policy,d){if(!priorApplies(policy,d))return false;
  if(policy.ownershipFilter&&policy.ownershipFilter!=='All'&&d.ownership!==policy.ownershipFilter)return false;
  return true;
 };
-const priorSync=syncDevice;
-syncDevice=function(dev){
- if(!dev.enrolled)return priorSync(dev);
- // Capture the lifecycle of simulated policy evaluation; sync is distinct from deployment success.
- const before={compliant:dev.compliant,bitlocker:dev.bitlocker,installed:(dev.appInstalled||[]).slice()};
- const msg=priorSync(dev);
- const all=[...state.records.configuration.map(p=>({...p,category:'configuration'})),...state.records.security.map(p=>({...p,category:'security'})),...state.records.compliance.map(p=>({...p,category:'compliance'})),...state.records.apps.map(p=>({...p,category:'apps'}))];
- const applicable=all.filter(p=>applies(p,dev));
- const evaluations=[];
- const conflict=applicable.filter(x=>x.category==='configuration').some(p=>applicable.some(q=>q!==p&&q.category==='configuration'&&q.setting===p.setting&&q.value!==p.value&&q.value!=null));
- for(const pol of applicable){let status='Succeeded',reason='Assignment evaluated on simulated device sync';
-  if(conflict&&pol.category==='configuration'){status='Conflict';reason='Incompatible configuration settings apply to the same device';}
-  if(pol.category==='apps'){
-   if(pol.platform&&pol.platform!==dev.platform){status='Not applicable';reason='Application OS does not match device OS';}
-   else if(/incorrect|invalid|missing/i.test(pol.detection||'')){status='Failed';reason='Detection rule cannot verify expected installed artifact';}
-   else if(pol.intent==='Available'){status='Available';reason='User must initiate optional installation';}
-   else if(dev.issues?.includes('disk full')){status='Failed';reason='Insufficient disk capacity';}
-  }
-  if(pol.category==='compliance'){status=dev.compliant?'Compliant':'Noncompliant';reason=dev.compliant?'Requirements satisfied':'Device failed one or more required signals';}
-  if(pol.category==='security'&&pol.type==='Disk encryption'&&pol.mode!=='Enforce'){status='Not configured';reason='Policy does not enable encryption in this simulation';}
-  evaluations.push({id:pol.id,name:pol.name,category:pol.category,status,reason,checked:new Date().toISOString()});
+/* Deterministic teaching evaluator. No live Intune requests. Policy/device states are intentionally simplified. */
+function evaluateSnapshot(device,records,eligible,now){
+ const d=JSON.parse(JSON.stringify(device)),all=['configuration','security','compliance','apps','updates'].flatMap(category=>(records[category]||[]).map(p=>({...p,category}))),evaluations=[];
+ if(!d.enrolled)return {device:d,evaluations:[],ok:false,reason:'Device is not MDM-enrolled'};
+ if(d.online===false)return {device:d,evaluations:d.evaluations||[],ok:false,reason:'Device offline; no new check-in or policy result'};
+ const assigned=all.filter(p=>eligible(p,d));
+ const emit=(p,status,reason)=>evaluations.push({id:p.id,name:p.name,category:p.category,status,reason,checked:now});
+ const config=assigned.filter(p=>p.category==='configuration'),groups=new Map();
+ for(const p of config){const key=p.setting||p.name;let g=groups.get(key)||[];g.push(p);groups.set(key,g)}
+ d.settings={...(d.settings||{})};
+ for(const [key,policies] of groups){let vals=new Set(policies.map(p=>String(p.value??'Configured')));if(vals.size>1){for(const p of policies)emit(p,'Conflict','Different values for this setting; no new value applied.')}else{d.settings[key]=policies[0].value??'Configured';for(const p of policies)emit(p,'Succeeded','Applicable setting evaluated in the offline model.')}}
+ for(const p of assigned.filter(x=>x.category==='security')){
+  if(p.mode==='Audit'){emit(p,'Audit','Audit mode: no enforcing change in this model.');continue}
+  if(p.mode!=='Enforce'){emit(p,'Not configured','No supported enforcing action configured.');continue}
+  if(p.type==='Disk encryption')d.bitlocker=true;
+  if(p.type==='Antivirus')d.defender=true;
+  d.securitySettings={...(d.securitySettings||{}),[p.type]:'Enforced'};
+  emit(p,'Succeeded','Applicable security configuration evaluated in the offline model.');
  }
- dev.evaluations=evaluations;
- const installedApps=applicable.filter(p=>p.category==='apps'&&p.intent==='Required'&&!evaluations.find(x=>x.id===p.id&&x.status==='Failed'));
- dev.appInstalled=installedApps.map(p=>p.name);
- dev.issues=conflict?'Policy conflict detected':!dev.compliant?'Compliance requirements not met':evaluations.some(x=>x.status==='Failed')?'App installation failure':dev.updated?'None':'Update pending';
- dev.lastEvaluation=new Date().toISOString();
+ const checks=assigned.filter(p=>p.category==='compliance'),outcomes=[];
+ for(const p of checks){let failed=[];if(p.requiresEncryption&&!d.bitlocker)failed.push('Encryption requirement failed');if(p.requiresDefender&&!d.defender)failed.push('Antivirus requirement failed');let ok=!failed.length;outcomes.push(ok);emit(p,ok?'Compliant':'Noncompliant',ok?'This policy’s modeled requirements are satisfied.':failed.join('; '))}
+ // With no evaluated compliance policy, preserve the prior simulator status but report the absence of a fresh evaluation.
+ if(checks.length){d.compliant=outcomes.every(Boolean);d.complianceEvidence=d.compliant?'Compliant':'Noncompliant'}else{d.complianceEvidence='No applicable policy evaluated'}
+ const apps=assigned.filter(p=>p.category==='apps'),installed=new Set(d.appInstalled||[]),byApp=new Map();
+ for(const p of apps){let key=p.name||p.id,arr=byApp.get(key)||[];arr.push(p);byApp.set(key,arr)}
+ for(const [name,policies] of byApp){
+  let intents=new Set(policies.map(p=>p.intent));
+  if(intents.has('Required')&&intents.has('Uninstall')){for(const p of policies)emit(p,'Conflict','Required and Uninstall intents conflict in this training model.');continue}
+  for(const p of policies){
+   if(p.intent==='Available'){emit(p,installed.has(name)?'Succeeded':'Available',installed.has(name)?'Already installed.':'Optional app awaiting user action.');continue}
+   if(p.intent==='Uninstall'){installed.delete(name);emit(p,'Succeeded','Explicit simulated uninstall removed the app.');continue}
+   if(p.intent!=='Required'){emit(p,'Not configured','Unknown assignment intent.');continue}
+   if(d.diskFull===true||/disk full|insufficient disk/i.test(String(device.issues||''))){emit(p,'Failed','Insufficient disk capacity.');continue}
+   if(p.requiresRuntime&&d.runtimeInstalled===false){emit(p,'Failed','Required runtime absent.');continue}
+   if(/incorrect|invalid|missing/i.test(String(p.detection||''))){emit(p,'Failed','Detection rule cannot verify the intended artifact.');continue}
+   installed.add(name);emit(p,'Succeeded','Required application detected in this simulation.');
+  }
+ }
+ d.appInstalled=[...installed]; // Assignment removal is not an uninstall.
+ for(const p of assigned.filter(x=>x.category==='updates')){
+  if(d.platform!=='Windows'){emit(p,'Not applicable','Windows update ring does not apply to this platform.');continue}
+  if(d.updateBlocked===true){emit(p,'Failed','Simulated update eligibility/hold blocks completion.');continue}
+  if(Number(p.qualityDeferral)<=2){d.updated=true;d.updateStatus='Installed';emit(p,'Succeeded','Eligible quality update installed in this training model.')}else{emit(p,'Pending','Deferral means the simulated quality update is not yet offered.')}
+ }
+ d.evaluations=evaluations;d.lastEvaluation=now;d.lastSync='Just now';d.syncCount=(d.syncCount||0)+1;
+ d.issues=evaluations.some(x=>x.status==='Conflict')?'Policy conflict detected':evaluations.some(x=>x.category==='apps'&&x.status==='Failed')?'App installation failure':evaluations.some(x=>x.category==='updates'&&x.status==='Failed')?'Update blocked':!d.compliant?'Compliance requirements not met':d.updated?'None':'Update pending';
+ return {device:d,evaluations,ok:true,reason:'Evaluated '+d.name+' (simulated)'};
+}
+syncDevice=function(dev){
+ const before={compliant:dev.compliant,bitlocker:dev.bitlocker,installed:(dev.appInstalled||[]).slice()};
+ const outcome=evaluateSnapshot(dev,state.records,applies,new Date().toISOString());
+ if(!outcome.ok){log('Sync not completed: '+dev.name+'; '+outcome.reason,'Warning',dev.name,'Sync');return outcome.reason}
+ Object.assign(dev,outcome.device);
  state.v4.evalHistory[dev.id] ||= [];
- state.v4.evalHistory[dev.id].unshift({at:dev.lastEvaluation,before,after:{compliant:dev.compliant,bitlocker:dev.bitlocker,appInstalled:dev.appInstalled},outcomes:evaluations});
+ state.v4.evalHistory[dev.id].unshift({at:dev.lastEvaluation,before,after:{compliant:dev.compliant,bitlocker:dev.bitlocker,appInstalled:dev.appInstalled},outcomes:outcome.evaluations});
  state.v4.evalHistory[dev.id]=state.v4.evalHistory[dev.id].slice(0,10);
- state.v4.events.unshift({at:dev.lastEvaluation,type:'Device evaluation',detail:dev.name+': '+evaluations.length+' assignments evaluated'});
+ state.v4.events.unshift({at:dev.lastEvaluation,type:'Device evaluation',detail:dev.name+': '+outcome.evaluations.length+' assignments evaluated'});
  state.v4.events=state.v4.events.slice(0,300);
- save();return msg;
+ log('Device sync: '+dev.name+'; '+outcome.evaluations.length+' assignments evaluated','Device',dev.name,'Sync');save();return outcome.reason;
 };
+window.MD102PolicyEvaluator={evaluateSnapshot};
 window.MD102V4={version:V4VERSION,setupNorthstar,get objectives(){return window.MD102_OBJECTIVES||[]},get enterprise(){return state.v4},get data(){return state},evaluateDevice:(id)=>{let d=state.records.devices.find(x=>x.id===id);return d?syncDevice(d):'No device found'},getGroupMembers:(name)=>state.records.devices.filter(d=>matchesGroup(d,name)),audit:()=>({lessons:ACADEMY.lessons.length,missions:ACADEMY.missions.length,cases:ACADEMY.cases.length,legacyQuestions:ACADEMY.questions.length,devices:state.records.devices.length,users:state.records.users.length,objectives:window.MD102_OBJECTIVES?.length||0})};
 setupNorthstar();
 // Keep real navigation reachable from the entire console.
