@@ -8,7 +8,7 @@ function record(id){let v=store();v.cases[id] ||= {choices:{},attempts:[]};retur
 function latest(id){const a=record(id).attempts;return a.length?a[a.length-1]:null}
 function diagnosticPass(id){const a=latest(id);return !!(a&&a.passed);}
 function fullMastery(id){const t=(window.MD102V9.tickets||[]).find(x=>x.id===id);return !!(t&&window.MD102V9.status(t).pass&&diagnosticPass(id));}
-function shuffle(id,idx){let seed=0;for(const char of id+':'+idx)seed=((seed*131)+char.charCodeAt(0))>>>0;return [0,1,2].sort((a,b)=>(((a+1)*16807+seed*13)>>>0)-(((b+1)*16807+seed*13)>>>0))}
+function shuffle(id,idx){let seed=2166136261;for(const char of id+':'+idx)seed=Math.imul(seed^char.charCodeAt(0),16777619)>>>0;let out=[0,1,2];for(let k=2;k>0;k--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;let j=seed%(k+1);[out[k],out[j]]=[out[j],out[k]]}return out}
 function opts(q,id,i,choice){return shuffle(id,i).map(j=>'<button type="button" class="'+(choice===j?'selected':'')+'" data-v13choose="'+i+':'+j+'" aria-pressed="'+(choice===j)+'">'+E(q.options[j])+'</button>').join('')}
 function assessment(id){
  const item=CASES[id];if(!item)return '';
