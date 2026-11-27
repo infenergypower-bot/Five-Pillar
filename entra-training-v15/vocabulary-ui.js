@@ -13,6 +13,39 @@
   return {id:term.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""),term,definition,does,why,when,how,micro,macro,failure,category,source:sources[category]};
  }));
  const termById=new Map(entries.map(x=>[x.id,x]));
+ const expansions={
+ "upn":"User Principal Name","rbac":"Role-Based Access Control","mfa":"Multi-Factor Authentication",
+ "fido2":"FIDO2 — modern specifications from the FIDO (Fast IDentity Online) Alliance and W3C WebAuthn",
+ "jwt":"JSON Web Token","kql":"Kusto Query Language","b2b-collaboration":"Business-to-Business collaboration",
+ "saml":"Security Assertion Markup Language","openid-connect":"OpenID Connect (OIDC)",
+ "scim-provisioning":"System for Cross-domain Identity Management (SCIM)",
+ "privileged-identity-management":"Privileged Identity Management (PIM)",
+ "temporary-access-pass":"Temporary Access Pass (TAP)",
+ "siem":"Security Information and Event Management",
+ "pkce":"Proof Key for Code Exchange",
+ "http-403":"HTTP status 403: Forbidden",
+ "microsoft-graph":"Microsoft Graph API (Application Programming Interface)"
+ };
+ const contrasts={
+ "authentication":["authorization","Proves identity, not permission for a specific operation."],
+ "authorization":["authentication","Determines permitted operations; authentication is evidence of identity."],
+ "upn":["object-id","UPN can change and resembles a name; object ID identifies an exact directory record."],
+ "object-id":["upn","Object ID references the directory record; UPN is used as a sign-in style name."],
+ "application-registration":["enterprise-application","App registration describes a client; enterprise application manages a service principal inside a tenant."],
+ "enterprise-application":["application-registration","Enterprise app is tenant-local; registration defines the app itself."],
+ "mfa":["conditional-access","MFA is authentication proof; Conditional Access is policy evaluating when certain proof is needed."],
+ "conditional-access":["mfa","CA evaluates signals and rules; MFA is one possible grant requirement."],
+ "id-token":["access-token","ID token authenticates a user to a client; access token is for an API resource."],
+ "access-token":["id-token","Access tokens target resources; ID tokens target the signing-in client."],
+ "sign-in-risk":["user-risk","Sign-in risk concerns an event; user risk concerns likelihood the account itself is compromised."],
+ "user-risk":["sign-in-risk","User compromise signal differs from event-specific anomaly signal."],
+ "managed-identity":["application-registration","Managed identity uses platform-managed workload identity; typical app registrations require separate authentication design."],
+ "resource-rbac":["rbac","Azure resource RBAC and Entra directory roles protect different resources and operations."],
+ "guest-user":["member-user","Guest is commonly external collaboration; user type alone does not determine effective authorization."],
+ "eligible-role":["role-activation","Eligible is potential privileged authority; activation provides time-limited current authority."],
+ "access-package":["application-entitlement","Governed request/approval workflow differs from actual effective application authorization."]
+ };
+
  if(termById.size!==entries.length)throw Error("Duplicate vocabulary term ID");
  const get=id=>termById.get(id);
  const alias={"CA":"conditional-access","PIM":"privileged-identity-management","UPN":"upn","MFA":"mfa","RBAC":"rbac","FIDO2":"fido2","TAP":"temporary-access-pass","OIDC":"openid-connect","SCIM":"scim-provisioning","OAuth":"oauth-2-0","JWT":"jwt","Graph":"microsoft-graph","AAL":"authentication-assurance-level","AU":"administrative-unit"};
@@ -111,7 +144,7 @@
   const nearby=entries.filter(x=>x.category===e.category&&x.id!==e.id).slice(Math.max(0,entries.filter(x=>x.category===e.category).indexOf(e)-2),Math.max(0,entries.filter(x=>x.category===e.category).indexOf(e)-2)+4).slice(0,3);
   const paired=flows.filter(f=>f.terms.includes(e.id));
   const related=Object.entries(preferred).filter(([,ids])=>ids.includes(e.id)).slice(0,4);
-  return `<div class="page v15">${css}<div class="v15-crumb"><button data-route="v15/vocabulary">All vocabulary</button> › ${esc(categoryNames[e.category])} › ${esc(e.term)}</div><div class="v15-hero"><div class="eyebrow">IDENTITY ENGINEERING VOCABULARY · ${esc(categoryNames[e.category])}</div><h1>${esc(e.term)}</h1><p style="font-size:17px">${esc(e.definition)}</p></div>
+  return `<div class="page v15">${css}<div class="v15-crumb"><button data-route="v15/vocabulary">All vocabulary</button> › ${esc(categoryNames[e.category])} › ${esc(e.term)}</div><div class="v15-hero"><div class="eyebrow">IDENTITY ENGINEERING VOCABULARY · ${esc(categoryNames[e.category])}</div><h1>${esc(e.term)}</h1>${expansions[e.id]?`<p><b>Full name:</b> ${esc(expansions[e.id])}</p>`:""}<p style="font-size:17px">${esc(e.definition)}</p></div>
    <div class="v15-micro"><div><strong>MICRO · ONE OBJECT / FIELD / EVENT</strong><p>${esc(e.micro)}</p></div><div><strong>MIDDLE · HOW IT OPERATES</strong><p>${esc(e.does)}</p></div><div><strong>MACRO · THE ORGANIZATION</strong><p>${esc(e.macro)}</p></div></div>
    <div class="v15-lenses">
     <section class="v15-lens"><div class="eyebrow">01 · WHAT IS IT?</div><h3>Start with the meaning</h3><p>${esc(e.definition)}</p></section>
@@ -124,6 +157,7 @@
    <div class="v15-decision" style="margin-top:15px"><b>Make the connections</b><p>${esc(e.micro)}</p><p><b>That allows:</b> ${esc(e.does)}</p><p><b>At company scale:</b> ${esc(e.macro)}</p></div>
    <div class="v15-danger" style="margin-top:15px"><b>Important distinction</b><p>${esc(e.failure)}</p></div>
    ${anatomySection(e)}
+   ${contrasts[e.id]?`<div class="panel" style="margin-top:15px"><h3>Do not confuse these two words</h3><p><b>${esc(e.term)}</b> versus <button class="btn xs" data-route="${link(contrasts[e.id][0])}">${esc(get(contrasts[e.id][0])?.term||contrasts[e.id][0])}</button></p><p>${esc(contrasts[e.id][1])}</p></div>`:""}
    ${paired.length?`<div class="panel" style="margin-top:15px"><h3>Watch this word in a working system</h3>${paired.slice(0,3).map(f=>`<button class="btn" data-route="v15/system/${f.id}">${esc(f.title)} →</button>`).join(" ")}</div>`:""}
    <div class="panel" style="margin-top:15px"><h3>Now you explain it back</h3><p>Without looking at the explanation, describe what the term does, when you would need it, and how you would recognize an incorrect configuration. This is your own reflection, not an automatically graded certification assessment.</p>
     <form id="v15-reflection" data-id="${e.id}"><label class="field">My explanation in my own words<textarea name="notes" rows="4" maxlength="4000" placeholder="It is… It is used when… At the smallest level… In an organization… If wrong, I would check…">${esc(memory.notes[e.id]||"")}</textarea></label>
