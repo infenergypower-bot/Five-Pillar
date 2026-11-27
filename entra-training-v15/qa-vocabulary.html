@@ -15,19 +15,19 @@ function go(route){location.hash="#/"+route;render();}
 render=function(){if(current().startsWith("v8/learn/")){$("root").innerHTML='<div class="v8-frame"><div class="panel"><p>Conditional Access, MFA, authorization and authentication are four different technical concepts.</p><div class="v8-terms">Legacy short definitions</div></div></div>';}};
 document.addEventListener("click",function(e){const el=e.target.closest("[data-route],[data-action]");if(!el)return;e.preventDefault();if(el.dataset.route)go(el.dataset.route);else action(el.dataset.action,el);});
 </script>
-<script src="./vocab-directory.js" defer></script><script src="./vocab-auth.js" defer></script><script src="./vocab-apps.js" defer></script><script src="./vocab-governance.js" defer></script><script src="./field-anatomy.js" defer></script><script src="./vocabulary-ui.js" defer></script>
+<script src="./vocab-primitives.js" defer></script><script src="./vocab-directory.js" defer></script><script src="./vocab-auth.js" defer></script><script src="./vocab-apps.js" defer></script><script src="./vocab-governance.js" defer></script><script src="./field-anatomy.js" defer></script><script src="./vocabulary-ui.js" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded",function(){
  const tests=[];
  function test(name,fn){try{if(fn()!==true)throw Error("Expected change not observed");tests.push({name,pass:true});}catch(e){tests.push({name,pass:false,error:String(e.message||e)});}}
  try{
  const e=window.__V15_TESTS;
- test("131 real, separately defined technical concepts loaded",()=>e.entries.length===131);
+ test("157 real, separately defined technical concepts loaded",()=>e.entries.length===157);
  test("Every concept has complete what/why/when/how/micro/macro/troubleshooting",()=>e.entries.every(x=>[x.definition,x.does,x.why,x.when,x.how,x.micro,x.macro,x.failure].every(t=>t.length>=15)));
- test("Twelve clickable system sequences and fifteen annotated field examples",()=>e.flows.length===12&&e.anatomy.length===15);
+ test("Thirteen clickable system sequences and fifteen annotated field examples",()=>e.flows.length===13&&e.anatomy.length===15);
  test("All system steps point to actual vocabulary entries",()=>e.flows.every(f=>f.terms.every(t=>!!e.get(t))));
  go("v15/vocabulary");
- test("Full searchable vocabulary homepage renders",()=>$("root").textContent.includes("131 distinct guided terms")&&$("root").querySelectorAll('[data-v15-card]').length===131);
+ test("Full searchable vocabulary homepage renders",()=>$("root").textContent.includes("157 distinct guided terms")&&$("root").querySelectorAll('[data-v15-card]').length===157);
  const input=$("v15-query");input.value="passkey";input.dispatchEvent(new Event("input",{bubbles:true}));
  test("Live search filters the visible vocabulary cards",()=>$("root").querySelectorAll('[data-v15-card]').length>0&&$("root").querySelectorAll('[data-v15-card]').length<131);
  go("v15/term/passkey");
