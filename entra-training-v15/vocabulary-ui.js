@@ -47,6 +47,7 @@
   "scim-monitoring":["scim-provisioning","attribute-mapping","audit-log","microsoft-sentinel","kql","deprovisioning"]
  };
  db.v15=db.v15||{reviewed:{},needsReview:{},notes:{},last:null,category:"All",query:"",flowProgress:{}};
+ db.v15.anatomy=db.v15.anatomy||{};
  const memory=db.v15;
  const oldRender=render,oldShell=shell,oldAction=action,esc=s=>safe(String(s??""));
  const base="v15",link=id=>`${base}/term/${id}`;
@@ -95,6 +96,16 @@
  function cards(list){
   return list.map(e=>`<article class="v15-item" data-v15-card><div class="eyebrow">${esc(categoryNames[e.category])}</div><h3>${esc(e.term)}</h3><p>${esc(e.definition)}</p><p class="small muted"><b>Why:</b> ${esc(e.why)}</p><button class="btn primary" data-route="${link(e.id)}">Explain it from micro to macro →</button> ${memory.needsReview[e.id]?'<span class="v15-chip">Revisit</span>':""}</article>`).join("");
  }
+ function anatomySection(e){
+  const a=V15_ANATOMY.find(x=>x[0]===e.id);if(!a)return "";
+  const selected=Number(memory.anatomy?.[e.id]||0),idx=Math.max(0,Math.min(a[2].length-1,selected)),part=a[2][idx];
+  return `<div class="panel" style="margin-top:15px"><div class="eyebrow">UNDER THE MICROSCOPE · CLICK ANY FIELD</div>
+    <h3>Dissect an actual-looking ${esc(e.term)} example</h3><p class="small muted">Fictional or schematic example. No real Microsoft secret, token or customer identity is used.</p>
+    <div class="v15-decision" style="overflow-wrap:anywhere"><code>${esc(a[1])}</code></div>
+    <div class="v15-flowline">${a[2].map((p,i)=>`<button data-action="v15-part" data-id="${e.id}" data-index="${i}" aria-current="${idx===i?"step":"false"}">${i+1}. ${esc(p[0])}</button>`).join("")}</div>
+    <div class="v15-decision" role="status"><b>${esc(part[0])}</b><p>${esc(part[1])}</p></div>
+    <p><b>What can go wrong:</b> ${esc(a[3])}</p></div>`;
+ }
  function termPage(e){
   memory.last=e.id;
   const nearby=entries.filter(x=>x.category===e.category&&x.id!==e.id).slice(Math.max(0,entries.filter(x=>x.category===e.category).indexOf(e)-2),Math.max(0,entries.filter(x=>x.category===e.category).indexOf(e)-2)+4).slice(0,3);
@@ -112,6 +123,7 @@
    </div>
    <div class="v15-decision" style="margin-top:15px"><b>Make the connections</b><p>${esc(e.micro)}</p><p><b>That allows:</b> ${esc(e.does)}</p><p><b>At company scale:</b> ${esc(e.macro)}</p></div>
    <div class="v15-danger" style="margin-top:15px"><b>Important distinction</b><p>${esc(e.failure)}</p></div>
+   ${anatomySection(e)}
    ${paired.length?`<div class="panel" style="margin-top:15px"><h3>Watch this word in a working system</h3>${paired.slice(0,3).map(f=>`<button class="btn" data-route="v15/system/${f.id}">${esc(f.title)} →</button>`).join(" ")}</div>`:""}
    <div class="panel" style="margin-top:15px"><h3>Now you explain it back</h3><p>Without looking at the explanation, describe what the term does, when you would need it, and how you would recognize an incorrect configuration. This is your own reflection, not an automatically graded certification assessment.</p>
     <form id="v15-reflection" data-id="${e.id}"><label class="field">My explanation in my own words<textarea name="notes" rows="4" maxlength="4000" placeholder="It is… It is used when… At the smallest level… In an organization… If wrong, I would check…">${esc(memory.notes[e.id]||"")}</textarea></label>
@@ -217,6 +229,10 @@
  };
  action=(name,el)=>{
   const term=get(el?.dataset?.id),flow=flows.find(x=>x.id===el?.dataset?.id);
+  if(name==="v15-part"&&term){
+   const a=V15_ANATOMY.find(x=>x[0]===term.id);const i=Number(el.dataset.index);
+   if(a&&i>=0&&i<a[2].length){memory.anatomy[term.id]=i;save();render();}return;
+  }
   if(name==="v15-peek"&&term){dialog(term);return;}
   if(name==="v15-close"){document.getElementById("v15-peek")?.remove();return;}
   if(name==="v15-review"&&term){memory.reviewed[term.id]=new Date().toISOString();delete memory.needsReview[term.id];save();render();toast("Self-review saved. This is not tested mastery.","good");return;}
@@ -245,5 +261,5 @@
   memory.notes[id]=String(new FormData(event.target).get("notes")||"").slice(0,4000);save();toast("Your explanation saved locally. Keep practicing.","good");
  });
  document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("v15-peek")?.remove();});
- window.__V15_TESTS={entries,get,flows,preferred,categoryNames};
+ window.__V15_TESTS={entries,get,flows,preferred,categoryNames,anatomy:V15_ANATOMY};
 })();
